@@ -17,7 +17,7 @@ services:
       - "5672:5672"
     deploy:
       restart_policy:
-        condition: always
+        condition: on-failure
         delay: 5s
         window: 120s
     configs:
@@ -33,7 +33,7 @@ services:
           - cega
     deploy:
       restart_policy:
-        condition: always
+        condition: on-failure
         delay: 5s
         window: 120s
     environment:
@@ -57,7 +57,7 @@ services:
           - cega
     deploy:
       restart_policy:
-        condition: always
+        condition: on-failure
         delay: 5s
         window: 120s
     configs:

@@ -15,7 +15,7 @@ public class CreateEurekaConfigurationTask extends LocalEGATask {
 
     @TaskAction
     public void run() throws IOException {
-        createConfig(Config.EUREKA_PY.getName(), getProject().file("../../docker/images/cega/eureka.py"));
+        createConfig(Config.EUREKA_PY.getName(), getProject().file("eureka.py"));
     }
 
 }

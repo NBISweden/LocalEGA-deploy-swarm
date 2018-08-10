@@ -16,7 +16,7 @@ public class CreateDBConfigurationTask extends LocalEGATask {
 
     @TaskAction
     public void run() throws IOException {
-        createConfig(Config.DB_SQL.getName(), getProject().file("../../../extras/db.sql"));
+        createConfig(Config.DB_SQL.getName(), getProject().file("db/db.sql"));
         writeTrace("DB_INSTANCE", "db");
         writeTrace("POSTGRES_USER", "lega");
         writeTrace("POSTGRES_PASSWORD", UUID.randomUUID().toString().replace("-", ""));

@@ -25,8 +25,8 @@ public class CreateUsersConfigurationTask extends LocalEGATask {
 
     @TaskAction
     public void run() throws IOException, GeneralSecurityException {
-        createConfig(Config.SERVER_PY.getName(), getProject().file("../../docker/images/cega/server.py"));
-        createConfig(Config.USERS_HTML.getName(), getProject().file("../../docker/images/cega/users.html"));
+        createConfig(Config.SERVER_PY.getName(), getProject().file("server.py"));
+        createConfig(Config.USERS_HTML.getName(), getProject().file("users.html"));
         String johnPassword = generateUser("john");
         createConfig(Config.JOHN_YML.getName(), getProject().file(".tmp/users/john.yml"));
         writeTrace("EGA_USER_PASSWORD_JOHN", johnPassword);

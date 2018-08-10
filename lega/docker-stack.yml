@@ -18,7 +18,7 @@ services:
       - "15672:15672"
     deploy:
       restart_policy:
-        condition: always
+        condition: on-failure
         delay: 5s
         window: 120s
     environment:
@@ -40,7 +40,7 @@ services:
       - lega
     deploy:
       restart_policy:
-        condition: always
+        condition: on-failure
         delay: 5s
         window: 120s
     environment:
@@ -64,7 +64,7 @@ services:
       placement:
         constraints: [node.role == manager]
       restart_policy:
-        condition: always
+        condition: on-failure
         delay: 5s
         window: 120s
     depends_on:
@@ -83,7 +83,7 @@ services:
       placement:
         constraints: [node.role == manager]
       restart_policy:
-        condition: always
+        condition: on-failure
         delay: 5s
         window: 120s
     depends_on:
@@ -108,7 +108,7 @@ services:
       - cega_cega
     deploy:
       restart_policy:
-        condition: always
+        condition: on-failure
         delay: 5s
         window: 120s
     environment:
@@ -136,7 +136,7 @@ services:
       - lega
     deploy:
       restart_policy:
-        condition: always
+        condition: on-failure
         delay: 5s
         window: 120s
     depends_on:
@@ -163,7 +163,7 @@ services:
       - "9000:9000"
     deploy:
       restart_policy:
-        condition: always
+        condition: on-failure
         delay: 5s
         window: 120s
     environment:

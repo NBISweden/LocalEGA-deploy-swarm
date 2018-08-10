@@ -32,8 +32,7 @@ public class IngestFileTask extends LocalEGATask {
 
     @TaskAction
     public void run() throws IOException, NoSuchAlgorithmException, KeyManagementException, URISyntaxException, TimeoutException, InvalidKeyException, XmlPullParserException, InvalidPortException, ErrorResponseException, NoResponseException, InvalidBucketNameException, InsufficientDataException, InvalidEndpointException, InternalException, InterruptedException {
-        String host = System.getenv("DOCKER_HOST").substring(6).split(":")[0];
-        host = host == null ? "localhost" : host;
+        String host = getHost();
         int before = getFilesAmount(host);
         ingest(host);
 

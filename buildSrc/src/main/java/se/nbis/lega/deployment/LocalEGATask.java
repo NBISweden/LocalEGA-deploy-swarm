@@ -23,6 +23,11 @@ public abstract class LocalEGATask extends DefaultTask {
         Security.addProvider(new BouncyCastleProvider());
     }
 
+    protected String getHost() {
+        String host = System.getenv("DOCKER_HOST");
+        return host == null ? "localhost" : host.substring(6).split(":")[0];
+    }
+
     protected String getProperty(String key) {
         return (String) getProject().getProperties().getOrDefault(key, null);
     }
