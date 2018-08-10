@@ -25,4 +25,5 @@ install:
   - gradle deploy
 
 script:
+  - gradle sleep 120
   - gradle ingest
