@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/NBISweden/LocalEGA-deploy-swarm.svg?branch=master)](https://travis-ci.com/NBISweden/LocalEGA-deploy-swarm)
+
 # Docker Swarm Deployment
 
 ![](https://habrastorage.org/webt/zt/rm/bk/ztrmbknpfaz9ybmoy3j12x5tlcw.gif)
