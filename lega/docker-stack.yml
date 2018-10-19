@@ -75,6 +75,23 @@ services:
     volumes:
       - inbox:/ega/inbox
 
+  id-mapper:
+    image: nbisweden/ega-base
+    networks:
+      - lega
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        window: 120s
+    depends_on:
+      - db
+      - mq
+    configs:
+      - source: conf.ini
+        target: /etc/ega/conf.ini
+    entrypoint: ["gosu", "lega", "ega-id-mapper"]
+
   ingest:
     image: nbisweden/ega-base
     networks:
@@ -101,7 +118,7 @@ services:
     entrypoint: ["gosu", "lega", "ega-ingest"]
 
   keys:
-    image: nbisweden/ega-base
+    image: cscfi/ega-keyserver
     hostname: keys
     networks:
       - lega
@@ -112,22 +129,23 @@ services:
         delay: 5s
         window: 120s
     environment:
-      - LEGA_PASSWORD
-      - KEYS_PASSWORD
+      - SPRING_PROFILES_ACTIVE=no-oss
+      - EGA_KEY_PATH=/etc/ega/pgp/ega.sec,/etc/ega/pgp/ega2.sec
+      - EGA_KEYPASS_PATH=/etc/ega/pgp/ega.sec.pass,/etc/ega/pgp/ega2.sec.pass
+      - EGA_SHAREDPASS_PATH=/etc/ega/pgp/ega.shared.pass
+      - EGA_PUBLICKEY_URL=
+      - EGA_LEGACY_PATH=
     configs:
-      - source: conf.ini
-        target: /etc/ega/conf.ini
-      - source: keys.ini.enc
-        target: /etc/ega/keys.ini.enc
-      - source: ssl.cert
-        target: /etc/ega/ssl.cert
-      - source: ssl.key
-        target: /etc/ega/ssl.key
       - source: ega.sec
         target: /etc/ega/pgp/ega.sec
       - source: ega2.sec
         target: /etc/ega/pgp/ega2.sec
-    entrypoint: ["gosu","lega","ega-keyserver","--keys","/etc/ega/keys.ini.enc"]
+      - source: ega.sec.pass
+        target: /etc/ega/pgp/ega.sec.pass
+      - source: ega2.sec.pass
+        target: /etc/ega/pgp/ega2.sec.pass
+      - source: ega.shared.pass
+        target: /etc/ega/pgp/ega.shared.pass
 
   verify:
     image: nbisweden/ega-base
@@ -206,8 +224,14 @@ configs:
   ssl.cert:
     external: true
   ssl.key:
-      external: true
+    external: true
   ega.sec:
     external: true
   ega2.sec:
-      external: true
+    external: true
+  ega.sec.pass:
+    external: true
+  ega2.sec.pass:
+    external: true
+  ega.shared.pass:
+    external: true
