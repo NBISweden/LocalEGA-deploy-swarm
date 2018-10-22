@@ -30,7 +30,7 @@ services:
     image: nbisweden/ega-base
     hostname: cega-users
     networks:
-          - cega
+      - cega
     deploy:
       restart_policy:
         condition: on-failure
@@ -49,21 +49,6 @@ services:
       - source: jane.yml
         target: /cega/users/lega/jane.yml
     command: ["python3.6", "/cega/server.py"]
-
-  cega-eureka:
-    image: nbisweden/ega-base
-    hostname: cega-eureka
-    networks:
-          - cega
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        window: 120s
-    configs:
-      - source: eureka.py
-        target: /cega/eureka.py
-    command: ["python3.6", "/cega/eureka.py"]
 
 configs:
   cega.defs.json:
