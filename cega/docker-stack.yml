@@ -27,7 +27,7 @@ services:
         target: /etc/rabbitmq/rabbitmq.config
 
   cega-users:
-    image: nbisweden/ega-base
+    image: nbisweden/ega-base:latest
     hostname: cega-users
     networks:
       - cega
