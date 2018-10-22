@@ -70,8 +70,12 @@ public abstract class LocalEGATask extends DefaultTask {
         }
         List<String> lines = FileUtils.readLines(file, Charset.defaultCharset());
         Map<String, String> result = new HashMap<>();
+
         for (String line : lines) {
-            result.put(line.split("=")[0].trim(), line.split("=")[1].trim());
+            String[] split = line.split("=");
+            String key = split[0].trim();
+            String[] value = Arrays.copyOfRange(split, 1, split.length);
+            result.put(key, String.join("=", value));
         }
         return result;
     }

@@ -87,8 +87,8 @@ async def user(request):
                 data['response'] = {"numTotalResults": 1,
                                     "resultType": "eu.crg.ega.microservice.dto.lega.v1.users.LocalEgaUser",
                                     "result": [{'username': d.get("username", None),
-                                                'password_hash': d.get("password_hash", None),
-                                                'pubkey': d.get("pubkey", None),
+                                                'passwordHash': d.get("password_hash", None),
+                                                'sshPublicKey': d.get("pubkey", None),
                                                 'uid': int(d.get("uid", None)),
                                                 'gecos': d.get("gecos", "EGA User"),
                                                 "enabled": None}]}
@@ -107,8 +107,8 @@ async def user(request):
                 data['response'] = {"numTotalResults": 1,
                                     "resultType": "eu.crg.ega.microservice.dto.lega.v1.users.LocalEgaUser",
                                     "result": [{'username': d.get("username", None),
-                                                'password_hash': d.get("password_hash", None),
-                                                'pubkey': d.get("pubkey", None),
+                                                'passwordHash': d.get("password_hash", None),
+                                                'sshPublicKey': d.get("pubkey", None),
                                                 'uid': int(d.get("uid", None)),
                                                 'gecos': d.get("gecos", "EGA User"),
                                                 "enabled": None}]}
