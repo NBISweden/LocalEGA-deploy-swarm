@@ -10,6 +10,9 @@ public enum Config {
     SSL_KEY("ssl.key"),
     EGA_SEC("ega.sec"),
     EGA2_SEC("ega2.sec"),
+    EGA_SEC_PASS("ega.sec.pass"),
+    EGA2_SEC_PASS("ega2.sec.pass"),
+    EGA_SHARED_PASS("ega.shared.pass"),
     CONF_INI("conf.ini"),
     KEYS_INI_ENC("keys.ini.enc");
 
