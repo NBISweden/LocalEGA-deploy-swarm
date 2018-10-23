@@ -20,6 +20,7 @@ public class CreateConfIniConfigurationTask extends LocalEGATask {
                 "createInboxConfiguration",
                 "createIngestConfiguration",
                 "createKeysConfiguration",
+                "createRESConfiguration",
                 "createMinioConfiguration");
     }
 

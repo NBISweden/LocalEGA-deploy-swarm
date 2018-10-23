@@ -70,7 +70,7 @@ services:
     depends_on:
       - mq
     environment:
-      - CEGA_ENDPOINT
+      - CEGA_ENDPOINT=http://cega-users/lega/v1/legas/users/%s?idType=username
       - CEGA_ENDPOINT_CREDS
     volumes:
       - inbox:/ega/inbox
@@ -171,6 +171,39 @@ services:
       - source: conf.ini
         target: /etc/ega/conf.ini
     entrypoint: ["gosu", "lega", "ega-verify"]
+
+  res:
+    image: cscfi/ega-res:latest
+    hostname: res
+    networks:
+      - lega
+    ports:
+      - "8081:8080"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        window: 120s
+    depends_on:
+      - s3
+      - keys
+    environment:
+      - SPRING_PROFILES_ACTIVE=no-oss,LocalEGA
+      - EGA_EGA_EXTERNAL_URL=
+      - EGA_EGA_CRAM_FASTA_A=
+      - EGA_EGA_CRAM_FASTA_B=
+      - EGA_EBI_FIRE_URL=
+      - EGA_EBI_FIRE_ARCHIVE=
+      - EGA_EBI_FIRE_KEY=
+      - SERVICE_ARCHIVE_CLASS=
+      - EGA_SHAREDPASS_PATH=/etc/ega/pgp/ega.shared.pass
+      - EGA_EBI_AWS_ENDPOINT_URL=http://s3:9000
+      - EGA_EBI_AWS_ACCESS_KEY=
+      - EGA_EBI_AWS_ACCESS_SECRET=
+      - EGA_EBI_AWS_ENDPOINT_REGION=
+    configs:
+      - source: ega.shared.pass
+        target: /etc/ega/pgp/ega.shared.pass
 
   s3:
     image: minio/minio:latest
