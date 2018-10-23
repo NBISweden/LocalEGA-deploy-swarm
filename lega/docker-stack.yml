@@ -44,10 +44,10 @@ services:
         delay: 5s
         window: 120s
     environment:
-      - DB_INSTANCE
-      - POSTGRES_USER
+      - DB_INSTANCE=db
+      - POSTGRES_DB=lega
+      - POSTGRES_USER=lega
       - POSTGRES_PASSWORD
-      - POSTGRES_DB
     configs:
       - source: db.sql
         target: /docker-entrypoint-initdb.d/ega.sql
