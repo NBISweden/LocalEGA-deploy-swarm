@@ -7,14 +7,18 @@ import com.rabbitmq.client.ConnectionFactory;
 import io.minio.MinioClient;
 import io.minio.errors.*;
 import org.apache.commons.collections4.IterableUtils;
+import org.apache.commons.io.FileUtils;
 import org.gradle.api.GradleException;
+import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.TaskAction;
 import org.xmlpull.v1.XmlPullParserException;
 import se.nbis.lega.deployment.Groups;
 import se.nbis.lega.deployment.LocalEGATask;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.KeyManagementException;
@@ -33,15 +37,26 @@ public class IngestFileTask extends LocalEGATask {
     @TaskAction
     public void run() throws IOException, NoSuchAlgorithmException, KeyManagementException, URISyntaxException, TimeoutException, InvalidKeyException, XmlPullParserException, InvalidPortException, ErrorResponseException, NoResponseException, InvalidBucketNameException, InsufficientDataException, InvalidEndpointException, InternalException, InterruptedException {
         String host = getHost();
-        int before = getFilesAmount(host);
+        int expectedAmount = getFilesAmount(host) + 1;
         ingest(host);
 
         int maxAttempts = 60;
-        while ((getFilesAmount(host) != before + 1)) {
+        while ((getFilesAmount(host) != expectedAmount)) {
             if (maxAttempts-- == 0) {
                 throw new GradleException("File is not ingested!");
             }
             Thread.sleep(1000);
+        }
+        URL resURL = new URL(String.format("http://%s:8081/file?sourceKey=%s&sourceIV=%s&filePath=%s",
+                host,
+                readTrace("sessionKey"),
+                readTrace("iv"),
+                expectedAmount));
+        File downloadedFile = getProject().file(".tmp/data.raw.out");
+        FileUtils.copyURLToFile(resURL, downloadedFile);
+        boolean equals = FileUtils.contentEquals(getRawFile(), downloadedFile);
+        if (!equals) {
+            throw new GradleException("The retrieved file doesn't match the original one!");
         }
     }
 
@@ -76,6 +91,11 @@ public class IngestFileTask extends LocalEGATask {
             return 0;
         }
         return IterableUtils.size(minioClient.listObjects("lega"));
+    }
+
+    @InputFile
+    public File getRawFile() {
+        return getProject().file(".tmp/data.raw");
     }
 
 }
