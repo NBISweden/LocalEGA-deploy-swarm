@@ -20,6 +20,7 @@ public class CreateConfIniConfigurationTask extends LocalEGATask {
                 "createInboxConfiguration",
                 "createIngestConfiguration",
                 "createKeysConfiguration",
+                "createRESConfiguration",
                 "createMinioConfiguration");
     }
 
@@ -32,8 +33,6 @@ public class CreateConfIniConfigurationTask extends LocalEGATask {
     private void generateConfIni() throws IOException {
         String s3AccessKey = readTrace("S3_ACCESS_KEY");
         String s3SecretKey = readTrace("S3_SECRET_KEY");
-        String dbInstance = readTrace("DB_INSTANCE");
-        String postgresUser = readTrace("POSTGRES_USER");
         String postgresPassword = readTrace("POSTGRES_PASSWORD");
         File confIni = getProject().file(".tmp/conf.ini");
         FileUtils.write(confIni, String.format("[DEFAULT]\n" +
@@ -75,7 +74,7 @@ public class CreateConfIniConfigurationTask extends LocalEGATask {
                         "try = 30\n" +
                         "\n" +
                         "[eureka]\n" +
-                        "endpoint = http://cega-eureka:8761", s3AccessKey, s3SecretKey, dbInstance, postgresUser, postgresPassword),
+                        "endpoint = http://cega-eureka:8761", s3AccessKey, s3SecretKey, "db", "lega", postgresPassword),
                 Charset.defaultCharset());
     }
 

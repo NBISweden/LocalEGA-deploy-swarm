@@ -23,6 +23,11 @@ public abstract class LocalEGATask extends DefaultTask {
         Security.addProvider(new BouncyCastleProvider());
     }
 
+    public Map<String, String> getTraceAsMap() throws IOException {
+        File traceFile = getProject().file(".tmp/.trace");
+        return readFileAsMap(traceFile);
+    }
+
     protected String getHost() {
         String host = System.getenv("DOCKER_HOST");
         return host == null ? "localhost" : host.substring(6).split(":")[0];
@@ -57,11 +62,6 @@ public abstract class LocalEGATask extends DefaultTask {
     protected String readTrace(String key) throws IOException {
         File traceFile = getProject().file(".tmp/.trace");
         return readTrace(traceFile, key);
-    }
-
-    protected Map<String, String> getTraceAsMap() throws IOException {
-        File traceFile = getProject().file(".tmp/.trace");
-        return readFileAsMap(traceFile);
     }
 
     protected Map<String, String> readFileAsMap(File file) throws IOException {
