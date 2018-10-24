@@ -19,7 +19,9 @@ public class CreateMQConfigurationTask extends LocalEGATask {
         createConfig(Config.RABBITMQ_CONFIG.getName(), getProject().file("mq/rabbitmq.config"));
         createConfig(Config.ENTRYPOINT_SH.getName(), getProject().file("mq/entrypoint.sh"));
         String cegaMQPassword = readTrace(getProject().file("../cega/.tmp/.trace"), "CEGA_MQ_PASSWORD");
-        writeTrace("CEGA_CONNECTION", String.format("amqp://lega:%s@cega-mq:5672/lega", cegaMQPassword));
+        if (cegaMQPassword != null) {
+            writeTrace("CEGA_CONNECTION", String.format("amqp://lega:%s@cega-mq:5672/lega", cegaMQPassword));
+        }
     }
 
 }

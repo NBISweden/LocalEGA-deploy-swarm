@@ -28,6 +28,11 @@ public abstract class LocalEGATask extends DefaultTask {
         return readFileAsMap(traceFile);
     }
 
+    public String readTrace(String key) throws IOException {
+        File traceFile = getProject().file(".tmp/.trace");
+        return readTrace(traceFile, key);
+    }
+
     protected String getHost() {
         String host = System.getenv("DOCKER_HOST");
         return host == null ? "localhost" : host.substring(6).split(":")[0];
@@ -57,11 +62,6 @@ public abstract class LocalEGATask extends DefaultTask {
         } catch (FileNotFoundException e) {
             return null;
         }
-    }
-
-    protected String readTrace(String key) throws IOException {
-        File traceFile = getProject().file(".tmp/.trace");
-        return readTrace(traceFile, key);
     }
 
     protected Map<String, String> readFileAsMap(File file) throws IOException {

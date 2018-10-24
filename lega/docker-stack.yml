@@ -70,7 +70,7 @@ services:
     depends_on:
       - mq
     environment:
-      - CEGA_ENDPOINT=http://cega-users/lega/v1/legas/users/%s?idType=username
+      - CEGA_ENDPOINT
       - CEGA_ENDPOINT_CREDS
     volumes:
       - inbox:/ega/inbox

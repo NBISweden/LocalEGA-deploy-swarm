@@ -48,8 +48,8 @@ run all subsequent commands against the Docker Swarm Manager and not against the
 
 The bootstrapping (generating of required configuration files, keys, credentials, etc.) is as simple as
 `gradle bootstrap`. You may also bootstrap `cega` or `lega` parts separately by calling `gradle createCEGAConfiguration`
-and `gradle createLEGAConfiguration` correspondingly, or you can even bootstrap different microservices separately, e.g.
-`gradle createLEGAInboxConfiguration`. To clear the configuration execute `gradle clean` (or you can clean only the
+and `gradle :lega:createConfiguration` correspondingly, or you can even bootstrap different microservices separately, e.g.
+`gradle :cega:createConfiguration`. To clear the configuration execute `gradle clean` (or you can clean only the
 subprojects as well).
 
 During bootstrapping, two test users are generated: `john` and `jane`. Credentials, keys and other config information
