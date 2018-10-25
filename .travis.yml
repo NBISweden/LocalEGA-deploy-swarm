@@ -27,4 +27,5 @@ install:
 
 script:
   - sleep 180
+  - gradle ls
   - gradle ingest
