@@ -25,5 +25,17 @@ install:
   - gradle deploy
 
 script:
-  - sleep 120
+  - sleep 300
+  - gradle ls
   - gradle ingest
+
+after_script:
+  - docker service logs lega_s3
+  - docker service logs lega_db
+  - docker service logs lega_mq
+  - docker service logs lega_inbox
+  - docker service logs lega_ingest
+  - docker service logs lega_keys
+  - docker service logs lega_verify
+  - docker service logs lega_id-mapper
+  - docker service logs lega_res

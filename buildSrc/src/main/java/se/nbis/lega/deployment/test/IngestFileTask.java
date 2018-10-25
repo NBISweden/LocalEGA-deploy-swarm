@@ -19,6 +19,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.KeyManagementException;
@@ -40,7 +42,7 @@ public class IngestFileTask extends LocalEGATask {
         int expectedAmount = getFilesAmount(host) + 1;
         ingest(host);
 
-        int maxAttempts = 60;
+        int maxAttempts = 120;
         while ((getFilesAmount(host) != expectedAmount)) {
             if (maxAttempts-- == 0) {
                 throw new GradleException("File is not ingested!");
@@ -62,8 +64,19 @@ public class IngestFileTask extends LocalEGATask {
 
     private void ingest(String host) throws IOException, URISyntaxException, NoSuchAlgorithmException, KeyManagementException, TimeoutException {
         String mqPassword = readTrace(getProject().file("cega/.tmp/.trace"), "CEGA_MQ_PASSWORD");
+        String mqConnectionString;
+        String username;
+        if (mqPassword != null) {
+            mqConnectionString = String.format("amqp://lega:%s@%s:5672/lega", mqPassword, host);
+            username = "john";
+        } else {
+            mqConnectionString = System.getenv("CEGA_CONNECTION");
+            String password = mqConnectionString.split(":")[2].split("@")[0];
+            mqConnectionString = mqConnectionString.replace(password, URLEncoder.encode(password, Charset.defaultCharset().displayName()));
+            username = "dummy";
+        }
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setUri(String.format("amqp://lega:%s@%s:5672/lega", mqPassword, host));
+        factory.setUri(mqConnectionString);
         Connection connectionFactory = factory.newConnection();
         Channel channel = connectionFactory.createChannel();
         AMQP.BasicProperties properties = new AMQP.BasicProperties().builder().
@@ -77,7 +90,7 @@ public class IngestFileTask extends LocalEGATask {
         channel.basicPublish("localega.v1",
                 "files",
                 properties,
-                String.format("{\"user\":\"john\",\"filepath\":\"data.raw.enc\",\"stable_id\":\"%s\"}", stableId).getBytes());
+                String.format("{\"user\":\"%s\",\"filepath\":\"data.raw.enc\",\"stable_id\":\"%s\"}", username, stableId).getBytes());
 
         channel.close();
         connectionFactory.close();

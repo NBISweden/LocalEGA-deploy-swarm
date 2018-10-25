@@ -16,7 +16,10 @@ public class CreateInboxConfigurationTask extends LocalEGATask {
     @TaskAction
     public void run() throws IOException {
         String cegaRESTPassword = readTrace(getProject().file("../cega/.tmp/.trace"), "CEGA_REST_PASSWORD");
-        writeTrace("CEGA_ENDPOINT_CREDS", "lega:" + cegaRESTPassword);
+        if (cegaRESTPassword != null) {
+            writeTrace("CEGA_ENDPOINT", "http://cega-users/lega/v1/legas/users/%s?idType=username");
+            writeTrace("CEGA_ENDPOINT_CREDS", "lega:" + cegaRESTPassword);
+        }
     }
 
 }
