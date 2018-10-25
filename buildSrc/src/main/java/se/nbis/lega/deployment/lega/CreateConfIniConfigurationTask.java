@@ -39,10 +39,10 @@ public class CreateConfIniConfigurationTask extends LocalEGATask {
                         "log = console\n" +
                         "\n" +
                         "[keyserver]\n" +
-                        "port = 8443\n" +
+                        "port = 8080\n" +
                         "\n" +
                         "[quality_control]\n" +
-                        "keyserver_endpoint = https://keys:8443/retrieve/%%s/private\n" +
+                        "keyserver_endpoint = http://keys:8080/keys/retrieve/%%s/private/bin?idFormat=hex\n" +
                         "\n" +
                         "[inbox]\n" +
                         "location = /ega/inbox/%%s\n" +
@@ -58,7 +58,7 @@ public class CreateConfIniConfigurationTask extends LocalEGATask {
                         "\n" +
                         "[outgestion]\n" +
                         "# Just for test\n" +
-                        "keyserver_endpoint = https://keys:8443/retrieve/%%s/private\n" +
+                        "keyserver_endpoint = http://keys:8080/keys/retrieve/%%s/private/bin?idFormat=hex\n" +
                         "\n" +
                         "## Connecting to Local EGA\n" +
                         "[broker]\n" +
