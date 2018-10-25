@@ -42,7 +42,7 @@ public class IngestFileTask extends LocalEGATask {
         int expectedAmount = getFilesAmount(host) + 1;
         ingest(host);
 
-        int maxAttempts = 60;
+        int maxAttempts = 120;
         while ((getFilesAmount(host) != expectedAmount)) {
             if (maxAttempts-- == 0) {
                 throw new GradleException("File is not ingested!");
