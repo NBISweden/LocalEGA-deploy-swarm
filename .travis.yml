@@ -19,7 +19,6 @@ cache:
 
 before_install:
   - docker swarm init
-  - docker network inspect cega_cega &>/dev/null || docker network create -d overlay cega_cega &>/dev/null
 
 install:
   - gradle bootstrap
