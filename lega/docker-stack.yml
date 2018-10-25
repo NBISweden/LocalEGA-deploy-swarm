@@ -160,7 +160,6 @@ services:
     depends_on:
       - db
       - mq
-      - inbox
       - keys
       - s3
     environment:

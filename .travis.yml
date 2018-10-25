@@ -26,7 +26,7 @@ install:
   - gradle :lega:deployStack
 
 script:
-  - sleep 180
+  - sleep 240
   - gradle ls
   - gradle ingest
 
