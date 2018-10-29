@@ -88,6 +88,10 @@ public abstract class LocalEGATask extends DefaultTask {
         exec(true, "docker volume rm", name);
     }
 
+    protected void removeNetwork(String name) throws IOException {
+        exec(true, "docker network rm", name);
+    }
+
     protected void createConfig(String name, File file) throws IOException {
         exec("docker config create", name, file.getAbsolutePath());
     }

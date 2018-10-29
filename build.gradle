@@ -6,7 +6,7 @@ import se.nbis.lega.deployment.test.UploadFileTask
 task purge() {
     setGroup "swarm"
 
-    dependsOn ":lega:removeVolumes"
+    dependsOn ":lega:removeVolumes", ":lega:removeNetworks"
 }
 
 task clean() {

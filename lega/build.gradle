@@ -1,7 +1,4 @@
-import se.nbis.lega.deployment.ClearConfigurationTask
-import se.nbis.lega.deployment.DeployStackTask
-import se.nbis.lega.deployment.RemoveStackTask
-import se.nbis.lega.deployment.RemoveVolumesTask
+import se.nbis.lega.deployment.*
 import se.nbis.lega.deployment.lega.*
 
 import java.util.stream.Collectors
@@ -10,6 +7,12 @@ task removeVolumes(type: RemoveVolumesTask) {
     setGroup "lega"
 
     setVolumes Arrays.stream(Volume.values()).map { v -> v.getName() }.collect(Collectors.toSet())
+}
+
+task removeNetworks(type: RemoveNetworksTask) {
+    setGroup "lega"
+
+    setNetworks Arrays.stream(Network.values()).map { v -> v.getName() }.collect(Collectors.toSet())
 }
 
 task clearConfiguration(type: ClearConfigurationTask) {
@@ -42,8 +45,22 @@ task createConfiguration {
     dependsOn clearConfiguration, createConfIni, createKeysIni
 }
 
+task createCEGANetwork() {
+    setGroup "lega"
+
+    doLast {
+        exec {
+            ignoreExitValue = true
+            executable "docker"
+            args "network", "create", "-d", "overlay", "cega_cega"
+        }
+    }
+}
+
 task deployStack(type: DeployStackTask) {
     setGroup "lega"
+
+    dependsOn createCEGANetwork
 
     setComposeFile file("docker-stack.yml").absolutePath
     setStackName "lega"

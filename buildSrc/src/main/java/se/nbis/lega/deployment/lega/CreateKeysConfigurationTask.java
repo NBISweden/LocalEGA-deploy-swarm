@@ -86,7 +86,15 @@ public class CreateKeysConfigurationTask extends LocalEGATask {
     private void generateSSLCertificate() throws IOException, GeneralSecurityException, OperatorCreationException {
         KeyPair keyPair = KeyUtils.generateKeyPair("ssh-rsa", 4096);
 
-        X500Name subject = new X500NameBuilder(BCStyle.INSTANCE).addRDN(BCStyle.CN, "keys").build();
+        X500Name subject = new X500NameBuilder(BCStyle.INSTANCE)
+                .addRDN(BCStyle.C, "NO")
+                .addRDN(BCStyle.ST, "Norway")
+                .addRDN(BCStyle.L, "Oslo")
+                .addRDN(BCStyle.O, "UiO")
+                .addRDN(BCStyle.OU, "IFI")
+                .addRDN(BCStyle.CN, "LocalEGA")
+                .addRDN(BCStyle.EmailAddress, "ega@nbis.se")
+                .build();
         SecureRandom random = new SecureRandom();
         byte[] id = new byte[20];
         random.nextBytes(id);
