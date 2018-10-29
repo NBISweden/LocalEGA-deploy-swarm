@@ -58,8 +58,7 @@ can be found under `.tmp` folder of each subproject.
 ## Deploying
 
 After successful bootstrapping, deploying should be as simple as `gradle deploy`. Again, you can deploy `cega` and
-`lega` parts separately, but because of dependency on `cega`, `lega` part can be deployed only after the deployment of
-`cega`. Updating of stacks can be done completely independently though.
+`lega` parts separately. Updating of stacks can be done completely independently as well.
 
 To make sure that the system is deploy you can execute `gradle ls`.
 

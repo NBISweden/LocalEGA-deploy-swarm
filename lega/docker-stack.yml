@@ -34,7 +34,7 @@ services:
     command: ["rabbitmq-server"]
 
   db:
-    image: postgres:9.6
+    image: postgres:10
     hostname: db
     networks:
       - lega
@@ -44,13 +44,31 @@ services:
         delay: 5s
         window: 120s
     environment:
-      - DB_INSTANCE=db
-      - POSTGRES_DB=lega
-      - POSTGRES_USER=lega
-      - POSTGRES_PASSWORD
+      - PGDATA=/ega/data
+      - DB_LEGA_IN_PASSWORD
+      - DB_LEGA_OUT_PASSWORD
+      - SSL_SUBJ=/C=NO/ST=Norway/L=Oslo/O=UiO/OU=IFI/CN=LocalEGA/emailAddress=ega@nbis.se
+    volumes:
+      - db:/ega/data
     configs:
-      - source: db.sql
-        target: /docker-entrypoint-initdb.d/ega.sql
+      - source: postgresql.conf
+        target: /etc/ega/pg.conf
+      - source: main.sql
+        target: /docker-entrypoint-initdb.d/main.sql
+      - source: grants.sql
+        target: /docker-entrypoint-initdb.d/grants.sql
+      - source: download.sql
+        target: /docker-entrypoint-initdb.d/download.sql
+      - source: ebi.sql
+        target: /docker-entrypoint-initdb.d/ebi.sql
+      - source: qc.sql
+        target: /docker-entrypoint-initdb.d/qc.sql
+      - source: db.entrypoint.sh
+        target: /usr/bin/ega-entrypoint.sh
+        uid: '999'
+        gid: '999'
+        mode: 0555
+    entrypoint: ["/bin/bash", "/usr/bin/ega-entrypoint.sh"]
 
   inbox:
     image: nbisweden/ega-mina-inbox:latest
@@ -238,6 +256,7 @@ services:
 volumes:
   inbox:
   s3:
+  db:
   portainer:
 
 configs:
@@ -247,7 +266,19 @@ configs:
     external: true
   lega.entrypoint.sh:
     external: true
-  db.sql:
+  postgresql.conf:
+    external: true
+  main.sql:
+    external: true
+  grants.sql:
+    external: true
+  download.sql:
+    external: true
+  ebi.sql:
+    external: true
+  qc.sql:
+    external: true
+  db.entrypoint.sh:
     external: true
   conf.ini:
     external: true

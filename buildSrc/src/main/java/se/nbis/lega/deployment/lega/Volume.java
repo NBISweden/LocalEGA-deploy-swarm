@@ -4,6 +4,7 @@ public enum Volume {
 
     LEGA_INBOX("lega_inbox"),
     LEGA_S3("lega_s3"),
+    LEGA_DB("lega_db"),
     LEGA_PORTAINER("lega_portainer");
 
     private String name;
