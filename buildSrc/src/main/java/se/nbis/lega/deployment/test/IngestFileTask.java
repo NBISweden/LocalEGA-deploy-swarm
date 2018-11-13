@@ -53,11 +53,13 @@ public class IngestFileTask extends LocalEGATask {
             Thread.sleep(1000);
         }
         System.out.println("File seems to be ingested successfully: trying to download it...");
-        URL resURL = new URL(String.format("http://%s:8081/file?sourceKey=%s&sourceIV=%s&filePath=%s",
+        String url = String.format("http://%s:8081/file?sourceKey=%s&sourceIV=%s&filePath=%s",
                 host,
                 readTrace("sessionKey"),
                 readTrace("iv"),
-                expectedAmount));
+                expectedAmount);
+        System.out.println("URL : " + url);
+        URL resURL = new URL(url);
         File downloadedFile = getProject().file(".tmp/data.raw.out");
         FileUtils.copyURLToFile(resURL, downloadedFile);
         boolean equals = FileUtils.contentEquals(getRawFile(), downloadedFile);
