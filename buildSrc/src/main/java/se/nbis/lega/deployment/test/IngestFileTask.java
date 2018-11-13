@@ -6,6 +6,8 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import io.minio.MinioClient;
 import io.minio.errors.*;
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.GradleException;
@@ -38,6 +40,7 @@ public class IngestFileTask extends LocalEGATask {
 
     @TaskAction
     public void run() throws IOException, NoSuchAlgorithmException, KeyManagementException, URISyntaxException, TimeoutException, InvalidKeyException, XmlPullParserException, InvalidPortException, ErrorResponseException, NoResponseException, InvalidBucketNameException, InsufficientDataException, InvalidEndpointException, InternalException, InterruptedException {
+        System.out.println("Starting ingestion...");
         String host = getHost();
         int expectedAmount = getFilesAmount(host) + 1;
         ingest(host);
@@ -49,6 +52,7 @@ public class IngestFileTask extends LocalEGATask {
             }
             Thread.sleep(1000);
         }
+        System.out.println("File seems to be ingested successfully: trying to download it...");
         URL resURL = new URL(String.format("http://%s:8081/file?sourceKey=%s&sourceIV=%s&filePath=%s",
                 host,
                 readTrace("sessionKey"),
@@ -60,6 +64,10 @@ public class IngestFileTask extends LocalEGATask {
         if (!equals) {
             throw new GradleException("The retrieved file doesn't match the original one!");
         }
+        System.out.println("File is downloaded successfully!");
+        byte[] bytes = DigestUtils.sha256(FileUtils.openInputStream(downloadedFile));
+        System.out.println("Checksum: " + Hex.encodeHexString(bytes));
+        System.out.println("Files are identical.");
     }
 
     private void ingest(String host) throws IOException, URISyntaxException, NoSuchAlgorithmException, KeyManagementException, TimeoutException {

@@ -23,6 +23,7 @@ public class UploadFileTask extends LocalEGATask {
     @TaskAction
     public void run() throws IOException {
         String host = getHost();
+        System.out.println("Connecting to " + host);
         SSHClient ssh = new SSHClient();
         ssh.addHostKeyVerifier(new PromiscuousVerifier());
         ssh.connect(host, 2222);
@@ -31,6 +32,7 @@ public class UploadFileTask extends LocalEGATask {
         } catch (UserAuthException e) {
             ssh.authPublickey("dummy", "dummy.sec");
         }
+        System.out.println("Uploading a file...");
         SFTPClient client = ssh.newSFTPClient();
         client.put(getEncFile().getAbsolutePath(), "data.raw.enc");
         ssh.close();
