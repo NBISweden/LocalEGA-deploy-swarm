@@ -34,7 +34,7 @@ settings from [this list](https://docs.docker.com/machine/drivers/openstack/) (t
 `gradle provision -PopenStackConfig=/absolute/path/to/openstack.properties`. 
 
 By default one manager and one worker node are created. To increase the amount of workers, `workers` option can be 
-used, e.g.: `gradle provision -Pworkers=8 PopenStackConfig=/absolute/path/to/openstack.properties`. 
+used, e.g.: `gradle provision -Pworkers=8 -PopenStackConfig=/absolute/path/to/openstack.properties`. 
 
 Note that it may take a while to provision the cluster in OpenStack. To see how many nodes are ready one can run
 `gradle list`. 
