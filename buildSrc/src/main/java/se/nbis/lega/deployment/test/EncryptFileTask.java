@@ -26,6 +26,7 @@ public class EncryptFileTask extends LocalEGATask {
 
     @TaskAction
     public void run() throws IOException, PGPException {
+        System.out.println("Encrypting the file with Crypt4GH...");
         byte[] digest = DigestUtils.sha256(FileUtils.openInputStream(getRawFile()));
         String key = FileUtils.readFileToString(new File("lega/.tmp/pgp/ega.pub"), Charset.defaultCharset());
         FileOutputStream fileOutputStream = new FileOutputStream(getEncFile());
