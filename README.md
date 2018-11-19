@@ -81,3 +81,6 @@ deployment. It's accessible at 30000 port.
 
 There's a short demo recorded with explanations on provisioning and deployment process:
 [![Demo](https://img.youtube.com/vi/8hvXxqW8uP0/0.jpg)](https://www.youtube.com/watch?v=8hvXxqW8uP0)
+
+Also there's an updated Asciinema recording:
+[![asciicast](https://asciinema.org/a/211883.svg)](https://asciinema.org/a/211883)
