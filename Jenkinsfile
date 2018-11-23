@@ -17,6 +17,7 @@ pipeline {
   stages {
     stage('') {
       steps {
+        sh 'docker-machine ls'
         sh 'docker-machine create --driver openstack ${GIT_COMMIT}'
         sleep 10
         sh 'docker-machine rm -y ${GIT_COMMIT}'
