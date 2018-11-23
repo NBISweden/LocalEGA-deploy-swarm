@@ -19,10 +19,12 @@ pipeline {
       steps {
         sh 'docker-machine create --driver openstack ${GIT_COMMIT}'
       }
+    }
     stage('Bootstrap') {
       steps {
         sh 'docker-machine env ${GIT_COMMIT}'
       }
+    }
     stage('Remove VM') {
       steps {
         sh 'docker-machine rm -y ${GIT_COMMIT}'
