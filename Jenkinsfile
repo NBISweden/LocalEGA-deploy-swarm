@@ -23,6 +23,7 @@ pipeline {
     stage('Bootstrap') {
       steps {
         sh 'eval "$(docker-machine env ${GIT_COMMIT})"'
+        sh 'docker swarm init'
         sh 'gradle bootstrap'
       }
     }
