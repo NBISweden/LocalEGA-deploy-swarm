@@ -1,5 +1,7 @@
 pipeline {
+  
   agent any
+  
   environment {
     OS_USERNAME=credentials('OS_USERNAME')
     OS_PASSWORD=credentials('OS_PASSWORD')
@@ -14,6 +16,7 @@ pipeline {
     OS_FLAVOR_NAME='m1.large'
     OS_IMAGE_ID='dd945baa-d1a6-481f-b358-91908bc60930'
   }
+  
   stages {
     stage('Create VM') {
       steps {
@@ -51,9 +54,11 @@ pipeline {
       }
     }
   }
+  
   post('Remove VM') { 
     cleanup { 
       sh 'docker-machine rm -y ${GIT_COMMIT}'
     }
   }
+  
 }
