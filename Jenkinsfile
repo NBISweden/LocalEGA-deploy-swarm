@@ -37,6 +37,16 @@ pipeline {
         sh '''
           eval "$(docker-machine env ${GIT_COMMIT})"
           gradle deploy
+          sleep 60
+          gradle ls
+        '''
+      }
+    }
+    stage('Test') {
+      steps {
+        sh '''
+          eval "$(docker-machine env ${GIT_COMMIT})"
+          gradle ingest
         '''
       }
     }
