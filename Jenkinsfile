@@ -13,8 +13,6 @@ pipeline {
     OS_SSH_USER='ubuntu'
     OS_FLAVOR_NAME='m1.large'
     OS_IMAGE_ID='dd945baa-d1a6-481f-b358-91908bc60930'
-    OS_KEYPAIR_NAME='swarm'
-    OS_PRIVATE_KEY_FILE=credentials('swarm.pem')
   }
   stages {
     stage('') {
