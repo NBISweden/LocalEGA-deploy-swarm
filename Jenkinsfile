@@ -26,10 +26,10 @@ pipeline {
         sh 'gradle bootstrap'
       }
     }
-    stage('Remove VM') {
-      steps {
-        sh 'docker-machine rm -y ${GIT_COMMIT}'
-      }
+  }
+  post('Remove VM') { 
+    cleanup { 
+      sh 'docker-machine rm -y ${GIT_COMMIT}'
     }
   }
 }
