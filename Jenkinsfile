@@ -15,11 +15,16 @@ pipeline {
     OS_IMAGE_ID='dd945baa-d1a6-481f-b358-91908bc60930'
   }
   stages {
-    stage('') {
+    stage('Create VM') {
       steps {
-        sh 'docker-machine ls'
         sh 'docker-machine create --driver openstack ${GIT_COMMIT}'
-        sleep 10
+      }
+    stage('Bootstrap') {
+      steps {
+        sh 'docker-machine env ${GIT_COMMIT}'
+      }
+    stage('Remove VM') {
+      steps {
         sh 'docker-machine rm -y ${GIT_COMMIT}'
       }
     }
