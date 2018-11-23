@@ -2,7 +2,7 @@ pipeline {
   agent any
   environment {
     OS_USERNAME=credentials('OS_USERNAME')
-    OS_PASSWORD=credentials('OS_USERNAME')
+    OS_PASSWORD=credentials('OS_PASSWORD')
     OS_TENANT_ID='894cf709b66549bd9f35968bdbff90d3'
     OS_DOMAIN_NAME='dataporten'
     OS_AUTH_URL='https://api.uh-iaas.no:5000/v3'
