@@ -23,7 +23,7 @@ pipeline {
     stage('Bootstrap') {
       steps {
         script {
-          eval ${docker-machine env ${GIT_COMMIT}}
+          eval $(docker-machine env ${GIT_COMMIT})
           docker swarm init
           gradle bootstrap
         }
