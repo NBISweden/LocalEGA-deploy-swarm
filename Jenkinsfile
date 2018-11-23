@@ -17,15 +17,26 @@ pipeline {
   stages {
     stage('Create VM') {
       steps {
-        sh 'docker-machine create --driver openstack ${GIT_COMMIT}'
+        sh '''
+          docker-machine create --driver openstack ${GIT_COMMIT}
+          eval "$(docker-machine env ${GIT_COMMIT})"
+          docker swarm init
+        '''
       }
     }
     stage('Bootstrap') {
       steps {
         sh '''
           eval "$(docker-machine env ${GIT_COMMIT})"
-          docker swarm init
           gradle bootstrap
+        '''
+      }
+    }
+    stage('Deploy') {
+      steps {
+        sh '''
+          eval "$(docker-machine env ${GIT_COMMIT})"
+          gradle deploy
         '''
       }
     }
