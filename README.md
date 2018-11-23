@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/NBISweden/LocalEGA-deploy-swarm.svg?branch=master)](https://travis-ci.com/NBISweden/LocalEGA-deploy-swarm)
+[![Build Status](https://jenkins.norgene.no/job/LocalEGA-deploy-swarm/job/jenkins/badge/icon)](https://jenkins.norgene.no/job/LocalEGA-deploy-swarm/job/jenkins/)
 
 # Docker Swarm Deployment
 
