@@ -22,7 +22,8 @@ pipeline {
     }
     stage('Bootstrap') {
       steps {
-        sh 'docker-machine env ${GIT_COMMIT}'
+        sh 'eval $(docker-machine env ${GIT_COMMIT})'
+        gradle bootstrap
       }
     }
     stage('Remove VM') {
