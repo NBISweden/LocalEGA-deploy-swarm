@@ -1,4 +1,4 @@
-[![Build Status](https://jenkins.norgene.no/job/LocalEGA-deploy-swarm/job/jenkins/badge/icon)](https://jenkins.norgene.no/job/LocalEGA-deploy-swarm/job/jenkins/)
+[![Build Status](https://jenkins.norgene.no/job/LocalEGA-deploy-swarm/job/master/badge/icon)](https://jenkins.norgene.no/job/LocalEGA-deploy-swarm/job/master/)
 
 # Docker Swarm Deployment
 
