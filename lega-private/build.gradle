@@ -25,9 +25,9 @@ task createMQConfiguration(type: CreateMQConfigurationTask)
 
 task createDBConfiguration(type: CreateDBConfigurationTask)
 
-task createInboxConfiguration(type: CreateInboxConfigurationTask)
+//task createInboxConfiguration(type: CreateInboxConfigurationTask)
 
-task createIngestConfiguration(type: CreateIngestConfigurationTask)
+//task createIngestConfiguration(type: CreateIngestConfigurationTask)
 
 task createKeysConfiguration(type: CreateKeysConfigurationTask)
 
@@ -35,9 +35,9 @@ task createMinioConfiguration(type: CreateMinioConfigurationTask)
 
 task createConfIni(type: CreateConfIniConfigurationTask)
 
-task createKeysIni(type: CreateKeysIniConfigurationTask)
+//task createKeysIni(type: CreateKeysIniConfigurationTask)
 
-task createRESConfiguration(type: CreateRESConfigurationTask)
+//task createRESConfiguration(type: CreateRESConfigurationTask)
 
 task createConfiguration {
     setGroup "lega-private"
