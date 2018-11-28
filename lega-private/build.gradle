@@ -42,7 +42,7 @@ task createConfIni(type: CreateConfIniConfigurationTask)
 task createConfiguration {
     setGroup "lega-private"
 
-    dependsOn clearConfiguration, createConfIni, createKeysIni
+    dependsOn clearConfiguration, createConfIni
 }
 
 task createCEGANetwork() {
