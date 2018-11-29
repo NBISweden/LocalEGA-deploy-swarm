@@ -35,9 +35,9 @@ task createMinioConfiguration(type: CreateMinioConfigurationTask)
 
 task createConfIni(type: CreateConfIniConfigurationTask)
 
-//task createKeysIni(type: CreateKeysIniConfigurationTask)
+task createKeysIni(type: CreateKeysIniConfigurationTask)
 
-//task createRESConfiguration(type: CreateRESConfigurationTask)
+task createRESConfiguration(type: CreateRESConfigurationTask)
 
 task createConfiguration {
     setGroup "lega-private"

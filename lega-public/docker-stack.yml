@@ -1,8 +1,10 @@
 version: '3.3'
 
 networks:
-  lega:
+  lega-public:
     driver: overlay
+  lega-private:
+    external: true
   cega_cega:
     external: true
 
@@ -12,7 +14,8 @@ services:
     image: rabbitmq:3.6.14-management
     hostname: mq
     networks:
-      - lega
+      - lega-public
+      - lega-private
       - cega_cega
     ports:
       - "15672:15672"
@@ -24,11 +27,11 @@ services:
     environment:
       - CEGA_CONNECTION
     configs:
-      - source: lega.defs.json
+      - source: lega-public.defs.json
         target: /etc/rabbitmq/defs.json
-      - source: lega.rabbitmq.config
+      - source: lega-public.rabbitmq.config
         target: /etc/rabbitmq/rabbitmq.config
-      - source: lega.entrypoint.sh
+      - source: lega-public.entrypoint.sh
         target: /usr/bin/ega-entrypoint.sh
     entrypoint: ["/bin/bash", "/usr/bin/ega-entrypoint.sh"]
     command: ["rabbitmq-server"]
@@ -37,7 +40,7 @@ services:
 #    image: postgres:10
 #    hostname: db
 #    networks:
-#      - lega
+#      - lega-public
 #    deploy:
 #      restart_policy:
 #        condition: on-failure
@@ -74,7 +77,7 @@ services:
     image: nbisweden/ega-mina-inbox:latest
     hostname: ega-inbox
     networks:
-      - lega
+      - lega-public
       - cega_cega
     ports:
       - "2222:2222"
@@ -96,7 +99,8 @@ services:
   id-mapper:
     image: nbisweden/ega-base:latest
     networks:
-      - lega
+      - lega-public
+      - lega-private
     deploy:
       restart_policy:
         condition: on-failure
@@ -108,12 +112,13 @@ services:
     configs:
       - source: conf.ini
         target: /etc/ega/conf.ini
-    entrypoint: ["gosu", "lega", "ega-id-mapper"]
+    entrypoint: ["gosu", "lega-public", "ega-id-mapper"]
 
   ingest:
     image: nbisweden/ega-base:latest
     networks:
-      - lega
+      - lega-public
+      - lega-private
     deploy:
       placement:
         constraints: [node.role == manager]
@@ -133,43 +138,43 @@ services:
     configs:
       - source: conf.ini
         target: /etc/ega/conf.ini
-    entrypoint: ["gosu", "lega", "ega-ingest"]
+    entrypoint: ["gosu", "lega-public", "ega-ingest"]
 
-  keys:
-    image: cscfi/ega-keyserver:latest
-    hostname: keys
-    networks:
-      - lega
-      - cega_cega
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        window: 120s
-    environment:
-      - SPRING_PROFILES_ACTIVE=no-oss
-      - EGA_KEY_PATH=/etc/ega/pgp/ega.sec,/etc/ega/pgp/ega2.sec
-      - EGA_KEYPASS_PATH=/etc/ega/pgp/ega.sec.pass,/etc/ega/pgp/ega2.sec.pass
-      - EGA_SHAREDPASS_PATH=/etc/ega/pgp/ega.shared.pass
-      - EGA_PUBLICKEY_URL=
-      - EGA_LEGACY_PATH=
-    configs:
-      - source: ega.sec
-        target: /etc/ega/pgp/ega.sec
-      - source: ega2.sec
-        target: /etc/ega/pgp/ega2.sec
-      - source: ega.sec.pass
-        target: /etc/ega/pgp/ega.sec.pass
-      - source: ega2.sec.pass
-        target: /etc/ega/pgp/ega2.sec.pass
-      - source: ega.shared.pass
-        target: /etc/ega/pgp/ega.shared.pass
+#  keys:
+#    image: cscfi/ega-keyserver:latest
+#    hostname: keys
+#    networks:
+#      - lega-public
+#      - cega_cega
+#    deploy:
+#      restart_policy:
+#        condition: on-failure
+#        delay: 5s
+#        window: 120s
+#    environment:
+#      - SPRING_PROFILES_ACTIVE=no-oss
+#      - EGA_KEY_PATH=/etc/ega/pgp/ega.sec,/etc/ega/pgp/ega2.sec
+#      - EGA_KEYPASS_PATH=/etc/ega/pgp/ega.sec.pass,/etc/ega/pgp/ega2.sec.pass
+#      - EGA_SHAREDPASS_PATH=/etc/ega/pgp/ega.shared.pass
+#      - EGA_PUBLICKEY_URL=
+#      - EGA_LEGACY_PATH=
+#    configs:
+#      - source: ega.sec
+#        target: /etc/ega/pgp/ega.sec
+#      - source: ega2.sec
+#        target: /etc/ega/pgp/ega2.sec
+#      - source: ega.sec.pass
+#        target: /etc/ega/pgp/ega.sec.pass
+#      - source: ega2.sec.pass
+#        target: /etc/ega/pgp/ega2.sec.pass
+#      - source: ega.shared.pass
+#        target: /etc/ega/pgp/ega.shared.pass
 
 #  verify:
 #    image: nbisweden/ega-base:latest
 #    hostname: verify
 #    networks:
-#      - lega
+#      - lega-public
 #    deploy:
 #      restart_policy:
 #        condition: on-failure
@@ -187,46 +192,46 @@ services:
 #    configs:
 #      - source: conf.ini
 #        target: /etc/ega/conf.ini
-#    entrypoint: ["gosu", "lega", "ega-verify"]
+#    entrypoint: ["gosu", "lega-public", "ega-verify"]
 
-  res:
-    image: cscfi/ega-res:latest
-    hostname: res
-    networks:
-      - lega
-    ports:
-      - "8081:8080"
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        window: 120s
-    depends_on:
-      - s3
-      - keys
-    environment:
-      - SPRING_PROFILES_ACTIVE=no-oss,LocalEGA
-      - EGA_EGA_EXTERNAL_URL=
-      - EGA_EGA_CRAM_FASTA_A=
-      - EGA_EGA_CRAM_FASTA_B=
-      - EGA_EBI_FIRE_URL=
-      - EGA_EBI_FIRE_ARCHIVE=
-      - EGA_EBI_FIRE_KEY=
-      - SERVICE_ARCHIVE_CLASS=
-      - EGA_SHAREDPASS_PATH=/etc/ega/pgp/ega.shared.pass
-      - EGA_EBI_AWS_ENDPOINT_URL=http://s3:9000
-      - EGA_EBI_AWS_ACCESS_KEY=
-      - EGA_EBI_AWS_ACCESS_SECRET=
-      - EGA_EBI_AWS_ENDPOINT_REGION=
-    configs:
-      - source: ega.shared.pass
-        target: /etc/ega/pgp/ega.shared.pass
+#  res:
+#    image: cscfi/ega-res:latest
+#    hostname: res
+#    networks:
+#      - lega-public
+#    ports:
+#      - "8081:8080"
+#    deploy:
+#      restart_policy:
+#        condition: on-failure
+#        delay: 5s
+#        window: 120s
+#    depends_on:
+#      - s3
+#      - keys
+#    environment:
+#      - SPRING_PROFILES_ACTIVE=no-oss,LocalEGA
+#      - EGA_EGA_EXTERNAL_URL=
+#      - EGA_EGA_CRAM_FASTA_A=
+#      - EGA_EGA_CRAM_FASTA_B=
+#      - EGA_EBI_FIRE_URL=
+#      - EGA_EBI_FIRE_ARCHIVE=
+#      - EGA_EBI_FIRE_KEY=
+#      - SERVICE_ARCHIVE_CLASS=
+#      - EGA_SHAREDPASS_PATH=/etc/ega/pgp/ega.shared.pass
+#      - EGA_EBI_AWS_ENDPOINT_URL=http://s3:9000
+#      - EGA_EBI_AWS_ACCESS_KEY=
+#      - EGA_EBI_AWS_ACCESS_SECRET=
+#      - EGA_EBI_AWS_ENDPOINT_REGION=
+#    configs:
+#      - source: ega.shared.pass
+#        target: /etc/ega/pgp/ega.shared.pass
 
 #  s3:
 #    image: minio/minio:latest
 #    hostname: s3
 #    networks:
-#      - lega
+#      - lega-public
 #    ports:
 #      - "9000:9000"
 #    deploy:
@@ -260,11 +265,11 @@ volumes:
   portainer:
 
 configs:
-  lega.defs.json:
+  lega-public.defs.json:
     external: true
-  lega.rabbitmq.config:
+  lega-public.rabbitmq.config:
     external: true
-  lega.entrypoint.sh:
+  lega-public.entrypoint.sh:
     external: true
   postgresql.conf:
     external: true
