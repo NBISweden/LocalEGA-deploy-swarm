@@ -26,8 +26,8 @@ public class CreateLegaPublicConfIniConfigurationTask extends LocalEGATask {
 
     @TaskAction
     public void run() throws IOException {
-        generateConfIni();
-        createConfig(Config.CONF_INI.getName(), getProject().file(".tmp/conf.ini"));
+//        generateConfIni();
+//        createConfig(Config.CONF_INI.getName(), getProject().file(".tmp/conf.ini"));
     }
 
     private void generateConfIni() throws IOException {
