@@ -107,7 +107,7 @@ services:
         delay: 5s
         window: 120s
     depends_on:
-      - db
+      - lega-private_db
       - mq
     configs:
       - source: conf.ini
@@ -127,9 +127,9 @@ services:
         delay: 5s
         window: 120s
     depends_on:
-      - db
+      - lega-private_db
       - mq
-      - s3
+      - lega-private_s3
     environment:
       - S3_ACCESS_KEY
       - S3_SECRET_KEY
@@ -260,8 +260,8 @@ services:
 
 volumes:
   inbox:
-  s3:
-  db:
+#  s3:
+#  db:
   portainer:
 
 configs:
@@ -271,35 +271,35 @@ configs:
     external: true
   lega-public.entrypoint.sh:
     external: true
-  postgresql.conf:
-    external: true
-  main.sql:
-    external: true
-  grants.sql:
-    external: true
-  download.sql:
-    external: true
-  ebi.sql:
-    external: true
-  qc.sql:
-    external: true
-  db.entrypoint.sh:
-    external: true
+#  postgresql.conf:
+#    external: true
+#  main.sql:
+#    external: true
+#  grants.sql:
+#    external: true
+#  download.sql:
+#    external: true
+#  ebi.sql:
+#    external: true
+#  qc.sql:
+#    external: true
+#  db.entrypoint.sh:
+#    external: true
   conf.ini:
     external: true
-  keys.ini.enc:
-    external: true
-  ssl.cert:
-    external: true
-  ssl.key:
-    external: true
-  ega.sec:
-    external: true
-  ega2.sec:
-    external: true
-  ega.sec.pass:
-    external: true
-  ega2.sec.pass:
-    external: true
-  ega.shared.pass:
-    external: true
+#  keys.ini.enc:
+#    external: true
+#  ssl.cert:
+#    external: true
+#  ssl.key:
+#    external: true
+#  ega.sec:
+#    external: true
+#  ega2.sec:
+#    external: true
+#  ega.sec.pass:
+#    external: true
+#  ega2.sec.pass:
+#    external: true
+#  ega.shared.pass:
+#    external: true

@@ -183,7 +183,7 @@ services:
         window: 120s
     depends_on:
       - db
-      - mq
+      - lega-public_mq
       - keys
       - s3
     environment:
@@ -273,18 +273,18 @@ services:
 
 
 volumes:
-  inbox:
+#  inbox:
   s3:
   db:
   portainer:
 
 configs:
-  lega-private.defs.json:
-    external: true
-  lega-private.rabbitmq.config:
-    external: true
-  lega-private.entrypoint.sh:
-    external: true
+#  lega-private.defs.json:
+#    external: true
+#  lega-private.rabbitmq.config:
+#    external: true
+#  lega-private.entrypoint.sh:
+#    external: true
   postgresql.conf:
     external: true
   main.sql:
@@ -299,14 +299,14 @@ configs:
     external: true
   db.entrypoint.sh:
     external: true
-  conf.ini:
-    external: true
-  keys.ini.enc:
-    external: true
-  ssl.cert:
-    external: true
-  ssl.key:
-    external: true
+#  conf.ini:
+#    external: true
+#  keys.ini.enc:
+#    external: true
+#  ssl.cert:
+#    external: true
+#  ssl.key:
+#    external: true
   ega.sec:
     external: true
   ega2.sec:

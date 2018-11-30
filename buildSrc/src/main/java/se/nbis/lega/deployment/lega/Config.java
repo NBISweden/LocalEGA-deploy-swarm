@@ -2,9 +2,9 @@ package se.nbis.lega.deployment.lega;
 
 public enum Config {
 
-    DEFS_JSON("lega.defs.json"),
-    RABBITMQ_CONFIG("lega.rabbitmq.config"),
-    ENTRYPOINT_SH("lega.entrypoint.sh"),
+    DEFS_JSON("lega-public.defs.json"),
+    RABBITMQ_CONFIG("lega-public.rabbitmq.config"),
+    ENTRYPOINT_SH("lega-public.entrypoint.sh"),
     POSTGRESQL_CONF("postgresql.conf"),
     MAIN_SQL("main.sql"),
     GRANTS_SQL("grants.sql"),
