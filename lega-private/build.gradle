@@ -33,7 +33,7 @@ task createKeysConfiguration(type: CreateKeysConfigurationTask)
 
 task createMinioConfiguration(type: CreateMinioConfigurationTask)
 
-task createConfIni(type: CreateConfIniConfigurationTask)
+task createConfIni(type: CreateLegaPrivateConfIniConfigurationTask)
 
 task createKeysIni(type: CreateKeysIniConfigurationTask)
 

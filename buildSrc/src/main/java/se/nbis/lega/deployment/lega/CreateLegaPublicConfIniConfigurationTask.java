@@ -9,18 +9,18 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-public class CreateConfIniConfigurationTask extends LocalEGATask {
+public class CreateLegaPublicConfIniConfigurationTask extends LocalEGATask {
 
-    public CreateConfIniConfigurationTask() {
+    public CreateLegaPublicConfIniConfigurationTask() {
         super();
         this.setGroup(Groups.LEGA.name());
         this.dependsOn("clearConfiguration",
                 "createMQConfiguration",
-                "createDBConfiguration",
+//                "createDBConfiguration",
                 "createInboxConfiguration",
                 "createIngestConfiguration",
-                "createKeysConfiguration",
-                "createRESConfiguration",
+//                "createKeysConfiguration",
+//                "createRESConfiguration",
                 "createMinioConfiguration");
     }
 
