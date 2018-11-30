@@ -11,7 +11,7 @@ public class CreateDBConfigurationTask extends LocalEGATask {
 
     public CreateDBConfigurationTask() {
         super();
-        this.setGroup(Groups.LEGA.name());
+        this.setGroup(Groups.LEGA_PRIVATE.name());
     }
 
     @TaskAction

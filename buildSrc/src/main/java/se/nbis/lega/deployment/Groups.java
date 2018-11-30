@@ -2,6 +2,6 @@ package se.nbis.lega.deployment;
 
 public enum Groups {
 
-    CLUSTER, LEGA, CEGA, TEST
+    CLUSTER, LEGA_PUBLIC,LEGA_PRIVATE, CEGA, TEST
 
 }

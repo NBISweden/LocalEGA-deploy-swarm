@@ -8,7 +8,7 @@ public class CreateRESConfigurationTask extends LocalEGATask {
 
     public CreateRESConfigurationTask() {
         super();
-        this.setGroup(Groups.LEGA.name());
+        this.setGroup(Groups.LEGA_PRIVATE.name());
     }
 
     @TaskAction

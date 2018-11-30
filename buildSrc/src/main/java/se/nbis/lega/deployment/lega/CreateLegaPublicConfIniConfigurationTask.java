@@ -13,7 +13,7 @@ public class CreateLegaPublicConfIniConfigurationTask extends LocalEGATask {
 
     public CreateLegaPublicConfIniConfigurationTask() {
         super();
-        this.setGroup(Groups.LEGA.name());
+        this.setGroup(Groups.LEGA_PUBLIC.name());
         this.dependsOn("clearConfiguration",
                 "createMQConfiguration",
 //                "createDBConfiguration",

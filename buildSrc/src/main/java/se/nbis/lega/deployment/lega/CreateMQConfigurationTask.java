@@ -10,7 +10,7 @@ public class CreateMQConfigurationTask extends LocalEGATask {
 
     public CreateMQConfigurationTask() {
         super();
-        this.setGroup(Groups.LEGA.name());
+        this.setGroup(Groups.LEGA_PUBLIC.name());
     }
 
     @TaskAction

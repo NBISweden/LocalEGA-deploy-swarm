@@ -10,7 +10,7 @@ public class CreateMinioConfigurationTask extends LocalEGATask {
 
     public CreateMinioConfigurationTask() {
         super();
-        this.setGroup(Groups.LEGA.name());
+        this.setGroup(Groups.LEGA_PRIVATE.name());
     }
 
     @TaskAction

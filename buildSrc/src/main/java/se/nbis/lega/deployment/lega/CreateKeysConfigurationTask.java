@@ -54,7 +54,7 @@ public class CreateKeysConfigurationTask extends LocalEGATask {
 
     public CreateKeysConfigurationTask() {
         super();
-        this.setGroup(Groups.LEGA.name());
+        this.setGroup(Groups.LEGA_PRIVATE.name());
     }
 
     @TaskAction

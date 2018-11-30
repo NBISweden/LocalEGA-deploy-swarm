@@ -11,7 +11,7 @@ public class CreateIngestConfigurationTask extends LocalEGATask {
 
     public CreateIngestConfigurationTask() {
         super();
-        this.setGroup(Groups.LEGA.name());
+        this.setGroup(Groups.LEGA_PUBLIC.name());
     }
 
     @TaskAction

@@ -249,17 +249,17 @@ services:
       - s3:/data
     command: server /data
 
-#  portainer:
-#    image: portainer/portainer:latest
-#    ports:
-#        - "30000:9000"
-#    command: --no-auth
-#    deploy:
-#      placement:
-#        constraints: [node.role == manager]
-#    volumes:
-#      - /var/run/docker.sock:/var/run/docker.sock
-#      - portainer:/data
+  portainer:
+    image: portainer/portainer:latest
+    ports:
+        - "30000:9000"
+    command: --no-auth
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer:/data
 
 #  mediator-server:
 #    image: uiobmi/mediator.server:latest
