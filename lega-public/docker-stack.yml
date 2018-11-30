@@ -3,7 +3,7 @@ version: '3.3'
 networks:
   lega-public:
     driver: overlay
-  lega-private:
+  lega-private_lega-private:
     external: true
   cega_cega:
     external: true
@@ -15,7 +15,7 @@ services:
     hostname: mq
     networks:
       - lega-public
-      - lega-private
+      - lega-private_lega-private
       - cega_cega
     ports:
       - "15672:15672"
@@ -100,7 +100,7 @@ services:
     image: nbisweden/ega-base:latest
     networks:
       - lega-public
-      - lega-private
+      - lega-private_lega-private
     deploy:
       restart_policy:
         condition: on-failure
@@ -118,7 +118,7 @@ services:
     image: nbisweden/ega-base:latest
     networks:
       - lega-public
-      - lega-private
+      - lega-private_lega-private
     deploy:
       placement:
         constraints: [node.role == manager]

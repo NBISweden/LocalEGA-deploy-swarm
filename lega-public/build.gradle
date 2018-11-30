@@ -57,10 +57,23 @@ task createCEGANetwork() {
     }
 }
 
+task createLEGAPrivateNetwork() {
+    setGroup "lega-public"
+
+    doLast {
+        exec {
+            ignoreExitValue = true
+            executable "docker"
+            args "network", "create", "-d", "overlay", "lega-private_lega-private"
+        }
+    }
+}
+
 task deployStack(type: DeployStackTask) {
     setGroup "lega-public"
 
     dependsOn createCEGANetwork
+    dependsOn createLEGAPrivateNetwork
 
     setComposeFile file("docker-stack.yml").absolutePath
     setStackName "lega-public"
