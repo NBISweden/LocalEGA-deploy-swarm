@@ -287,12 +287,12 @@ configs:
 #    external: true
   conf.ini:
     external: true
-#  keys.ini.enc:
-#    external: true
-#  ssl.cert:
-#    external: true
-#  ssl.key:
-#    external: true
+  keys.ini.enc:
+    external: true
+  ssl.cert:
+    external: true
+  ssl.key:
+    external: true
 #  ega.sec:
 #    external: true
 #  ega2.sec:
