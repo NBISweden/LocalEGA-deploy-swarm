@@ -18,7 +18,7 @@ task removeNetworks(type: RemoveNetworksTask) {
 task clearConfiguration(type: ClearConfigurationTask) {
     setGroup "lega-private"
 
-    setConfigs Arrays.stream(Config.values()).map { c -> c.getName() }.collect(Collectors.toSet())
+    setConfigs Arrays.stream(LegaPrivateConfig.values()).map { c -> c.getName() }.collect(Collectors.toSet())
 }
 
 task createMQConfiguration(type: CreateMQConfigurationTask)
