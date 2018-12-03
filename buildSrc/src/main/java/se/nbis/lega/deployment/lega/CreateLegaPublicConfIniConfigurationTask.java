@@ -18,10 +18,11 @@ public class CreateLegaPublicConfIniConfigurationTask extends LocalEGATask {
                 "createMQConfiguration",
 //                "createDBConfiguration",
                 "createInboxConfiguration",
-                "createIngestConfiguration",
+                "createIngestConfiguration"
 //                "createKeysConfiguration",
 //                "createRESConfiguration",
-                "createMinioConfiguration");
+//                "createMinioConfiguration"
+                );
     }
 
     @TaskAction

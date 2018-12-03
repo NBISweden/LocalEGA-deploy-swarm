@@ -299,8 +299,8 @@ configs:
     external: true
   db.entrypoint.sh:
     external: true
-#  conf.ini:
-#    external: true
+  conf.ini:
+    external: true
 #  keys.ini.enc:
 #    external: true
 #  ssl.cert:
