@@ -3,8 +3,8 @@ version: '3.3'
 networks:
   lega-private:
     driver: overlay
-  lega-public_lega-public:
-    external: true
+#  lega-public_lega-public:
+#    external: true
   cega_cega:
     external: true
 
