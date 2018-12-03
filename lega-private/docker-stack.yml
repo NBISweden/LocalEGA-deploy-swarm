@@ -1,10 +1,10 @@
 version: '3.3'
 
 networks:
-  lega-private:
-    driver: overlay
-#  lega-public_lega-public:
-#    external: true
+  lega-private_lega-private:
+    external: true
+  lega-public_lega-public:
+    external: true
   cega_cega:
     external: true
 
@@ -40,8 +40,8 @@ services:
     image: postgres:10
     hostname: db
     networks:
-      - lega-private
-#      - lega-public_lega-public
+      - lega-private_lega-private
+      - lega-public_lega-public
     deploy:
       restart_policy:
         condition: on-failure
@@ -143,8 +143,8 @@ services:
     image: cscfi/ega-keyserver:latest
     hostname: keys
     networks:
-      - lega-private
-#      - lega-public_lega-public
+      - lega-private_lega-private
+      - lega-public_lega-public
       - cega_cega
     deploy:
       restart_policy:
@@ -174,8 +174,8 @@ services:
     image: nbisweden/ega-base:latest
     hostname: verify
     networks:
-      - lega-private
-#      - lega-public_lega-public
+      - lega-private_lega-private
+      - lega-public_lega-public
     deploy:
       restart_policy:
         condition: on-failure
@@ -199,8 +199,8 @@ services:
     image: cscfi/ega-res:latest
     hostname: res
     networks:
-      - lega-private
-#      - lega-public_lega-public
+      - lega-private_lega-private
+      - lega-public_lega-public
     ports:
       - "8081:8080"
     deploy:
@@ -233,8 +233,8 @@ services:
     image: minio/minio:latest
     hostname: s3
     networks:
-      - lega-private
-#      - lega-public_lega-public
+      - lega-private_lega-private
+      - lega-public_lega-public
     ports:
       - "9000:9000"
     deploy:

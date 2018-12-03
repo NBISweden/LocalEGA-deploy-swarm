@@ -1,10 +1,10 @@
 version: '3.3'
 
 networks:
-  lega-public:
-    driver: overlay
-#  lega-private_lega-private:
-#    external: true
+  lega-public_lega-public:
+    external: true
+  lega-private_lega-private:
+    external: true
   cega_cega:
     external: true
 
@@ -14,8 +14,8 @@ services:
     image: rabbitmq:3.6.14-management
     hostname: mq
     networks:
-      - lega-public
-#      - lega-private_lega-private
+      - lega-public_lega-public
+      - lega-private_lega-private
       - cega_cega
     ports:
       - "15672:15672"
@@ -40,7 +40,7 @@ services:
 #    image: postgres:10
 #    hostname: db
 #    networks:
-#      - lega-public
+#      - lega-public_lega-public
 #    deploy:
 #      restart_policy:
 #        condition: on-failure
@@ -77,7 +77,7 @@ services:
     image: nbisweden/ega-mina-inbox:latest
     hostname: ega-inbox
     networks:
-      - lega-public
+      - lega-public_lega-public
       - cega_cega
     ports:
       - "2222:2222"
@@ -99,8 +99,8 @@ services:
   id-mapper:
     image: nbisweden/ega-base:latest
     networks:
-      - lega-public
-#      - lega-private_lega-private
+      - lega-public_lega-public
+      - lega-private_lega-private
     deploy:
       restart_policy:
         condition: on-failure
@@ -117,8 +117,8 @@ services:
   ingest:
     image: nbisweden/ega-base:latest
     networks:
-      - lega-public
-#      - lega-private_lega-private
+      - lega-public_lega-public
+      - lega-private_lega-private
     deploy:
       placement:
         constraints: [node.role == manager]
@@ -144,7 +144,7 @@ services:
 #    image: cscfi/ega-keyserver:latest
 #    hostname: keys
 #    networks:
-#      - lega-public
+#      - lega-public_lega-public
 #      - cega_cega
 #    deploy:
 #      restart_policy:
@@ -174,7 +174,7 @@ services:
 #    image: nbisweden/ega-base:latest
 #    hostname: verify
 #    networks:
-#      - lega-public
+#      - lega-public_lega-public
 #    deploy:
 #      restart_policy:
 #        condition: on-failure
@@ -198,7 +198,7 @@ services:
 #    image: cscfi/ega-res:latest
 #    hostname: res
 #    networks:
-#      - lega-public
+#      - lega-public_lega-public
 #    ports:
 #      - "8081:8080"
 #    deploy:
@@ -231,7 +231,7 @@ services:
 #    image: minio/minio:latest
 #    hostname: s3
 #    networks:
-#      - lega-public
+#      - lega-public_lega-public
 #    ports:
 #      - "9000:9000"
 #    deploy:
