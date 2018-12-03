@@ -112,8 +112,15 @@ public class IngestFileTask extends LocalEGATask {
 //        TODO remove these 2 lines 
         System.out.println(accessKey);
         System.out.println(secretKey);
-        MinioClient minioClient = new MinioClient(String.format("http://%s:9000", host), accessKey, secretKey);
+        MinioClient minioClient = null;
+        try {
+            minioClient = new MinioClient(String.format("http://%s:9000", host), accessKey, secretKey);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
         if (!minioClient.bucketExists("lega-private")) {
+            System.out.println("!bucketExists");
             return 0;
         }
         return IterableUtils.size(minioClient.listObjects("lega-private"));
