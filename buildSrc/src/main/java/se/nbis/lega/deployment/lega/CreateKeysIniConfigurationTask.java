@@ -42,7 +42,7 @@ public class CreateKeysIniConfigurationTask extends LocalEGATask {
 
         encryptAES(getProject().file(".tmp/keys.ini"), getProject().file(".tmp/keys.ini.enc"), keysPassphrase);
 
-        createConfig(Config.KEYS_INI_ENC.getName(), getProject().file(".tmp/keys.ini.enc"));
+        createConfig(LegaPrivateConfig.KEYS_INI_ENC.getName(), getProject().file(".tmp/keys.ini.enc"));
     }
 
     private void generateKeysIni() throws IOException {
