@@ -260,7 +260,7 @@ services:
 
 volumes:
   inbox:
-#  s3:
+  s3:
 #  db:
   portainer:
 
@@ -293,13 +293,13 @@ configs:
     external: true
   ssl.key:
     external: true
-#  ega.sec:
-#    external: true
-#  ega2.sec:
-#    external: true
-#  ega.sec.pass:
-#    external: true
-#  ega2.sec.pass:
-#    external: true
-#  ega.shared.pass:
-#    external: true
+  ega.sec:
+    external: true
+  ega2.sec:
+    external: true
+  ega.sec.pass:
+    external: true
+  ega2.sec.pass:
+    external: true
+  ega.shared.pass:
+    external: true
