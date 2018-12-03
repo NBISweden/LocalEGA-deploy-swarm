@@ -60,6 +60,8 @@ public abstract class LocalEGATask extends DefaultTask {
             }
             return null;
         } catch (FileNotFoundException e) {
+            // TODO remove
+            System.out.println(e.getMessage());
             return null;
         }
     }

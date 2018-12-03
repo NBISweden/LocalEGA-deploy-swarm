@@ -109,6 +109,9 @@ public class IngestFileTask extends LocalEGATask {
     private int getFilesAmount(String host) throws XmlPullParserException, IOException, InvalidPortException, InvalidEndpointException, InsufficientDataException, NoSuchAlgorithmException, NoResponseException, InternalException, InvalidKeyException, InvalidBucketNameException, ErrorResponseException {
         String accessKey = readTrace(getProject().file("lega-private/.tmp/.trace"), "S3_ACCESS_KEY");
         String secretKey = readTrace(getProject().file("lega-private/.tmp/.trace"), "S3_SECRET_KEY");
+//        TODO remove these 2 lines 
+        System.out.println(accessKey);
+        System.out.println(secretKey);
         MinioClient minioClient = new MinioClient(String.format("http://%s:9000", host), accessKey, secretKey);
         if (!minioClient.bucketExists("lega-private")) {
             return 0;
