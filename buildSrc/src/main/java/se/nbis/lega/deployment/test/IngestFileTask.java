@@ -77,7 +77,7 @@ public class IngestFileTask extends LocalEGATask {
         String mqConnectionString;
         String username;
         if (mqPassword != null) {
-            mqConnectionString = String.format("amqp://lega:%s@%s:5672/lega", mqPassword, host);
+            mqConnectionString = String.format("amqp://lega-public:%s@%s:5672/lega", mqPassword, host);
             username = "john";
         } else {
             mqConnectionString = System.getenv("CEGA_CONNECTION");
@@ -107,13 +107,13 @@ public class IngestFileTask extends LocalEGATask {
     }
 
     private int getFilesAmount(String host) throws XmlPullParserException, IOException, InvalidPortException, InvalidEndpointException, InsufficientDataException, NoSuchAlgorithmException, NoResponseException, InternalException, InvalidKeyException, InvalidBucketNameException, ErrorResponseException {
-        String accessKey = readTrace(getProject().file("lega/.tmp/.trace"), "S3_ACCESS_KEY");
-        String secretKey = readTrace(getProject().file("lega/.tmp/.trace"), "S3_SECRET_KEY");
+        String accessKey = readTrace(getProject().file("lega-private/.tmp/.trace"), "S3_ACCESS_KEY");
+        String secretKey = readTrace(getProject().file("lega-private/.tmp/.trace"), "S3_SECRET_KEY");
         MinioClient minioClient = new MinioClient(String.format("http://%s:9000", host), accessKey, secretKey);
-        if (!minioClient.bucketExists("lega")) {
+        if (!minioClient.bucketExists("lega-private")) {
             return 0;
         }
-        return IterableUtils.size(minioClient.listObjects("lega"));
+        return IterableUtils.size(minioClient.listObjects("lega-private"));
     }
 
     @InputFile
