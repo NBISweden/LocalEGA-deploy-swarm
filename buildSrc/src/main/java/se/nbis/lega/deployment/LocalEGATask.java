@@ -35,7 +35,11 @@ public abstract class LocalEGATask extends DefaultTask {
 
     protected String getHost() {
         String host = System.getenv("DOCKER_HOST");
-        return host == null ? "localhost" : host.substring(6).split(":")[0];
+        String ret = host == null ? "localhost" : host.substring(6).split(":")[0];
+        //TODO remove
+        System.out.println(host);
+        System.out.println(ret);
+        return ret;
     }
 
     protected String getProperty(String key) {
