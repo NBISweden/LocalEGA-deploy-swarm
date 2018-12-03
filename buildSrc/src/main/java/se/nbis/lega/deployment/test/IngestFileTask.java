@@ -119,11 +119,11 @@ public class IngestFileTask extends LocalEGATask {
             e.printStackTrace();
             throw e;
         }
-        if (!minioClient.bucketExists("lega-private")) {
+        if (!minioClient.bucketExists("lega-public")) {
             System.out.println("!bucketExists");
             return 0;
         }
-        int size = IterableUtils.size(minioClient.listObjects("lega-private"));
+        int size = IterableUtils.size(minioClient.listObjects("lega-public"));
         System.out.println(size);
         return size;
     }
