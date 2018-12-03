@@ -41,7 +41,7 @@ services:
     hostname: db
     networks:
       - lega-private
-      - lega-public_lega-public
+#      - lega-public_lega-public
     deploy:
       restart_policy:
         condition: on-failure
@@ -144,7 +144,7 @@ services:
     hostname: keys
     networks:
       - lega-private
-      - lega-public_lega-public
+#      - lega-public_lega-public
       - cega_cega
     deploy:
       restart_policy:
@@ -175,7 +175,7 @@ services:
     hostname: verify
     networks:
       - lega-private
-      - lega-public_lega-public
+#      - lega-public_lega-public
     deploy:
       restart_policy:
         condition: on-failure
@@ -193,14 +193,14 @@ services:
     configs:
       - source: conf.ini
         target: /etc/ega/conf.ini
-    entrypoint: ["gosu", "lega-public_lega-public", "ega-verify"]
+    entrypoint: ["gosu", "lega-private", "ega-verify"]
 
   res:
     image: cscfi/ega-res:latest
     hostname: res
     networks:
       - lega-private
-      - lega-public_lega-public
+#      - lega-public_lega-public
     ports:
       - "8081:8080"
     deploy:
@@ -234,7 +234,7 @@ services:
     hostname: s3
     networks:
       - lega-private
-      - lega-public_lega-public
+#      - lega-public_lega-public
     ports:
       - "9000:9000"
     deploy:
