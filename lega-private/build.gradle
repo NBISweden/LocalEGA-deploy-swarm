@@ -42,7 +42,7 @@ task createRESConfiguration(type: CreateRESConfigurationTask)
 task createConfiguration {
     setGroup "lega-private"
 
-    dependsOn clearConfiguration, createConfIni
+    dependsOn clearConfiguration, createConfIni, createKeysIni
 }
 
 task createCEGANetwork() {

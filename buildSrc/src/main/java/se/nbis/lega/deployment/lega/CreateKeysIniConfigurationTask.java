@@ -25,10 +25,10 @@ public class CreateKeysIniConfigurationTask extends LocalEGATask {
         super();
         this.setGroup(Groups.LEGA_PRIVATE.name());
         this.dependsOn("clearConfiguration",
-                "createMQConfiguration",
+//                "createMQConfiguration",
                 "createDBConfiguration",
-                "createInboxConfiguration",
-                "createIngestConfiguration",
+//                "createInboxConfiguration",
+//                "createIngestConfiguration",
                 "createKeysConfiguration",
                 "createRESConfiguration",
                 "createMinioConfiguration");
