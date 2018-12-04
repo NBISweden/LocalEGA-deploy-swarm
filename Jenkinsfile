@@ -40,7 +40,7 @@ pipeline {
         sh '''
           eval "$(docker-machine env ${GIT_COMMIT})"
           gradle deploy
-          sleep 360
+          sleep 60
           gradle ls
         '''
       }
