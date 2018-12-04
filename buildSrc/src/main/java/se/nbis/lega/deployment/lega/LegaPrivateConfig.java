@@ -2,6 +2,9 @@ package se.nbis.lega.deployment.lega;
 
 public enum LegaPrivateConfig {
 
+    DEFS_JSON("lega-private.defs.json"),
+    RABBITMQ_CONFIG("lega-private.rabbitmq.config"),
+    ENTRYPOINT_SH("lega-private.entrypoint.sh"),
     POSTGRESQL_CONF("postgresql.conf"),
     MAIN_SQL("main.sql"),
     GRANTS_SQL("grants.sql"),

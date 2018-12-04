@@ -1,14 +1,11 @@
 package se.nbis.lega.deployment.lega;
 
-import org.apache.commons.io.FileUtils;
-import org.gradle.api.tasks.TaskAction;
-import se.nbis.lega.deployment.Groups;
-import se.nbis.lega.deployment.LegaPrivateTask;
-import se.nbis.lega.deployment.LocalEGATask;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import org.apache.commons.io.FileUtils;
+import org.gradle.api.tasks.TaskAction;
+import se.nbis.lega.deployment.LegaPrivateTask;
 
 public class CreateLegaPrivateConfIniConfigurationTask extends LegaPrivateTask {
 
@@ -28,6 +25,9 @@ public class CreateLegaPrivateConfIniConfigurationTask extends LegaPrivateTask {
     public void run() throws IOException {
         generateConfIni();
         createConfig(LegaPrivateConfig.CONF_INI.getName(), getProject().file(".tmp/conf.ini"));
+        createConfig(LegaPrivateConfig.DEFS_JSON.getName(), getProject().file("private_mq/defs.json"));
+        createConfig(LegaPrivateConfig.RABBITMQ_CONFIG.getName(), getProject().file("private_mq/rabbitmq.config"));
+//        createConfig(LegaPrivateConfig.ENTRYPOINT_SH.getName(), getProject().file("mq/entrypoint.sh"));
     }
 
     private void generateConfIni() throws IOException {
