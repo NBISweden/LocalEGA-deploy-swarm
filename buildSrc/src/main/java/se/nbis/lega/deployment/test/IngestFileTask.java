@@ -16,7 +16,6 @@ import org.gradle.api.tasks.TaskAction;
 import org.xmlpull.v1.XmlPullParserException;
 import se.nbis.lega.deployment.Groups;
 import se.nbis.lega.deployment.LocalEGATask;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -109,16 +108,11 @@ public class IngestFileTask extends LocalEGATask {
     private int getFilesAmount(String host) throws XmlPullParserException, IOException, InvalidPortException, InvalidEndpointException, InsufficientDataException, NoSuchAlgorithmException, NoResponseException, InternalException, InvalidKeyException, InvalidBucketNameException, ErrorResponseException {
         String accessKey = readTrace(getProject().file("lega-public/.tmp/.trace"), "S3_ACCESS_KEY");
         String secretKey = readTrace(getProject().file("lega-public/.tmp/.trace"), "S3_SECRET_KEY");
-//        TODO remove these 2 lines 
-        System.out.println(accessKey);
+        // TODO remove these 2 lines
+        System.out.println("S3_ACCESS_KEY: "+accessKey);
         MinioClient minioClient = null;
-        try {
-            minioClient = new MinioClient(String.format("http://%s:9000", host), accessKey, secretKey);
-            System.out.println(secretKey);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
-        }
+        minioClient = new MinioClient(String.format("http://%s:9000", host), accessKey, secretKey);
+        System.out.println("S3_SECRET_KEY: "+secretKey);
         if (!minioClient.bucketExists("lega-public")) {
             System.out.println("!bucketExists");
             return 0;

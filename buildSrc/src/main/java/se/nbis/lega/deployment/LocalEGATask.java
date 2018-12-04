@@ -8,7 +8,7 @@ import org.apache.commons.io.FileUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.gradle.api.DefaultTask;
-
+import org.gradle.api.Project;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -22,23 +22,37 @@ public abstract class LocalEGATask extends DefaultTask {
     static {
         Security.addProvider(new BouncyCastleProvider());
     }
-
+    
+    public LocalEGATask() {
+        super();
+        this.setGroup(Groups.LEGA_PUBLIC.name());
+    }
+    
     public Map<String, String> getTraceAsMap() throws IOException {
         File traceFile = getProject().file(".tmp/.trace");
         return readFileAsMap(traceFile);
     }
 
     public String readTrace(String key) throws IOException {
-        File traceFile = getProject().file(".tmp/.trace");
+        Project project = getProject();
+        return readTrace(project, key);
+    }
+
+    /**
+     * @param project
+     * @param key
+     * @return
+     * @throws IOException
+     */
+    public String readTrace(Project project, String key) throws IOException {
+        File traceFile = project.file(".tmp/.trace");
         return readTrace(traceFile, key);
     }
+    
 
     protected String getHost() {
         String host = System.getenv("DOCKER_HOST");
         String ret = host == null ? "localhost" : host.substring(6).split(":")[0];
-        //TODO remove
-        System.out.println(host);
-        System.out.println(ret);
         return ret;
     }
 
@@ -47,9 +61,34 @@ public abstract class LocalEGATask extends DefaultTask {
     }
 
     protected void writeTrace(String key, String value) throws IOException {
-        File traceFile = getProject().file(".tmp/.trace");
+        Project project = getProject();
+        writeTrace(project, key, value);
+    }
+
+    /**
+     * @param project
+     * @param key
+     * @param value
+     * @throws IOException
+     */
+    public void writeTrace(Project project, String key, String value) throws IOException {
+            File traceFile = project.file(".tmp/.trace");
+            writeTrace(traceFile, key, value);
+    }
+
+    /**
+     * @param traceFile
+     * @param key
+     * @param value
+     * @throws IOException
+     */
+    public void writeTrace(File traceFile, String key, String value) throws IOException {
         String existingValue = readTrace(traceFile, key);
         if (existingValue == null) {
+            //TODO REmove
+            System.out.println("writing "
+                    + traceFile
+                    + "key:value "+key+":"+value);
             FileUtils.writeLines(traceFile, Collections.singleton(String.format("%s=%s", key, value)), true);
         }
     }
@@ -59,13 +98,16 @@ public abstract class LocalEGATask extends DefaultTask {
             List<String> lines = FileUtils.readLines(traceFile, Charset.defaultCharset());
             for (String line : lines) {
                 if (line.startsWith(key)) {
-                    return line.split("=")[1].trim();
+                    String value = line.split("=")[1].trim();
+                    System.out.println("readTrace"+ traceFile+"  key:value "+key+":"+value);
+                    return value;
                 }
             }
+            System.out.println("readTrace:"+ traceFile+" Key:"+key+" null");
             return null;
         } catch (FileNotFoundException e) {
             // TODO remove
-            System.out.println(e.getMessage());
+            System.out.println("readTrace:"+ traceFile+e.getMessage());
             return null;
         }
     }

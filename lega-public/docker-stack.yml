@@ -112,7 +112,7 @@ services:
     configs:
       - source: conf.ini
         target: /etc/ega/conf.ini
-    entrypoint: ["gosu", "lega-public", "ega-id-mapper"]
+    entrypoint: ["gosu", "lega", "ega-id-mapper"]
 
   ingest:
     image: nbisweden/ega-base:latest
@@ -138,7 +138,7 @@ services:
     configs:
       - source: conf.ini
         target: /etc/ega/conf.ini
-    entrypoint: ["gosu", "lega-public", "ega-ingest"]
+    entrypoint: ["gosu", "lega", "ega-ingest"]
 
 #  keys:
 #    image: cscfi/ega-keyserver:latest

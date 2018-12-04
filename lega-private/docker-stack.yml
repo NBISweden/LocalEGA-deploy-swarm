@@ -193,7 +193,7 @@ services:
     configs:
       - source: conf.ini
         target: /etc/ega/conf.ini
-    entrypoint: ["gosu", "lega-private", "ega-verify"]
+    entrypoint: ["gosu", "lega", "ega-verify"]
 
   res:
     image: cscfi/ega-res:latest

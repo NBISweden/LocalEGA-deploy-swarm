@@ -5,7 +5,6 @@ import se.nbis.lega.deployment.Groups;
 import se.nbis.lega.deployment.LocalEGATask;
 
 import java.io.IOException;
-import java.util.UUID;
 
 public class CreateIngestConfigurationTask extends LocalEGATask {
 
@@ -16,8 +15,7 @@ public class CreateIngestConfigurationTask extends LocalEGATask {
 
     @TaskAction
     public void run() throws IOException {
-        writeTrace("S3_ACCESS_KEY", UUID.randomUUID().toString().replace("-", ""));
-        writeTrace("S3_SECRET_KEY", UUID.randomUUID().toString().replace("-", ""));
+       
     }
 
 }
