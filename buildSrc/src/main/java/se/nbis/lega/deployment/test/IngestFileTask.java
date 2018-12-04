@@ -31,6 +31,9 @@ import java.util.concurrent.TimeoutException;
 
 public class IngestFileTask extends LocalEGATask {
 
+    private static final String S3_SECRET_KEY = "S3_SECRET_KEY";
+    private static final String S3_ACCESS_KEY = "S3_ACCESS_KEY";
+
     public IngestFileTask() {
         super();
         this.setGroup(Groups.TEST.name());
@@ -106,8 +109,8 @@ public class IngestFileTask extends LocalEGATask {
     }
 
     private int getFilesAmount(String host) throws XmlPullParserException, IOException, InvalidPortException, InvalidEndpointException, InsufficientDataException, NoSuchAlgorithmException, NoResponseException, InternalException, InvalidKeyException, InvalidBucketNameException, ErrorResponseException {
-        String accessKey = readTrace(getProject().file("lega-public/.tmp/.trace"), "S3_ACCESS_KEY");
-        String secretKey = readTrace(getProject().file("lega-public/.tmp/.trace"), "S3_SECRET_KEY");
+        String accessKey = readTrace(getProject().file("lega-private/.tmp/.trace"), S3_ACCESS_KEY);
+        String secretKey = readTrace(getProject().file("lega-private/.tmp/.trace"), S3_SECRET_KEY);
         // TODO remove these 2 lines
         System.out.println("S3_ACCESS_KEY: "+accessKey);
         MinioClient minioClient = null;
