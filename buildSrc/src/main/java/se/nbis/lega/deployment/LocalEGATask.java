@@ -19,13 +19,11 @@ import java.util.*;
 
 public abstract class LocalEGATask extends DefaultTask {
 
+    public static final String S3_SECRET_KEY = "S3_SECRET_KEY";
+    public static final String S3_ACCESS_KEY = "S3_ACCESS_KEY";
+
     static {
         Security.addProvider(new BouncyCastleProvider());
-    }
-    
-    public LocalEGATask() {
-        super();
-        this.setGroup(Groups.LEGA_PUBLIC.name());
     }
     
     public Map<String, String> getTraceAsMap() throws IOException {
@@ -35,20 +33,9 @@ public abstract class LocalEGATask extends DefaultTask {
 
     public String readTrace(String key) throws IOException {
         Project project = getProject();
-        return readTrace(project, key);
-    }
-
-    /**
-     * @param project
-     * @param key
-     * @return
-     * @throws IOException
-     */
-    public String readTrace(Project project, String key) throws IOException {
         File traceFile = project.file(".tmp/.trace");
         return readTrace(traceFile, key);
     }
-    
 
     protected String getHost() {
         String host = System.getenv("DOCKER_HOST");
@@ -62,18 +49,8 @@ public abstract class LocalEGATask extends DefaultTask {
 
     protected void writeTrace(String key, String value) throws IOException {
         Project project = getProject();
-        writeTrace(project, key, value);
-    }
-
-    /**
-     * @param project
-     * @param key
-     * @param value
-     * @throws IOException
-     */
-    public void writeTrace(Project project, String key, String value) throws IOException {
-            File traceFile = project.file(".tmp/.trace");
-            writeTrace(traceFile, key, value);
+        File traceFile = project.file(".tmp/.trace");
+        writeTrace(traceFile, key, value);
     }
 
     /**

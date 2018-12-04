@@ -1,22 +1,19 @@
 package se.nbis.lega.deployment.test;
 
+import java.io.File;
+import java.io.IOException;
+import org.gradle.api.tasks.InputFile;
+import org.gradle.api.tasks.TaskAction;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.sftp.SFTPClient;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
 import net.schmizz.sshj.userauth.UserAuthException;
-import org.gradle.api.tasks.InputFile;
-import org.gradle.api.tasks.TaskAction;
-import se.nbis.lega.deployment.Groups;
-import se.nbis.lega.deployment.LocalEGATask;
+import se.nbis.lega.deployment.TestTask;
 
-import java.io.File;
-import java.io.IOException;
-
-public class UploadFileTask extends LocalEGATask {
+public class UploadFileTask extends TestTask {
 
     public UploadFileTask() {
         super();
-        this.setGroup(Groups.TEST.name());
         this.dependsOn("encrypt");
     }
 

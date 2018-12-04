@@ -1,21 +1,5 @@
 package se.nbis.lega.deployment.test;
 
-import com.rabbitmq.client.AMQP;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
-import io.minio.MinioClient;
-import io.minio.errors.*;
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.collections4.IterableUtils;
-import org.apache.commons.io.FileUtils;
-import org.gradle.api.GradleException;
-import org.gradle.api.tasks.InputFile;
-import org.gradle.api.tasks.TaskAction;
-import org.xmlpull.v1.XmlPullParserException;
-import se.nbis.lega.deployment.Groups;
-import se.nbis.lega.deployment.LocalEGATask;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -28,15 +12,32 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.collections4.IterableUtils;
+import org.apache.commons.io.FileUtils;
+import org.gradle.api.GradleException;
+import org.gradle.api.tasks.InputFile;
+import org.gradle.api.tasks.TaskAction;
+import org.xmlpull.v1.XmlPullParserException;
+import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
+import io.minio.MinioClient;
+import io.minio.errors.ErrorResponseException;
+import io.minio.errors.InsufficientDataException;
+import io.minio.errors.InternalException;
+import io.minio.errors.InvalidBucketNameException;
+import io.minio.errors.InvalidEndpointException;
+import io.minio.errors.InvalidPortException;
+import io.minio.errors.NoResponseException;
+import se.nbis.lega.deployment.TestTask;
 
-public class IngestFileTask extends LocalEGATask {
-
-    private static final String S3_SECRET_KEY = "S3_SECRET_KEY";
-    private static final String S3_ACCESS_KEY = "S3_ACCESS_KEY";
+public class IngestFileTask extends TestTask {
 
     public IngestFileTask() {
         super();
-        this.setGroup(Groups.TEST.name());
         this.dependsOn("upload");
     }
 
@@ -79,7 +80,7 @@ public class IngestFileTask extends LocalEGATask {
         String mqConnectionString;
         String username;
         if (mqPassword != null) {
-            mqConnectionString = String.format("amqp://lega-public:%s@%s:5672/lega", mqPassword, host);
+            mqConnectionString = String.format("amqp://lega:%s@%s:5672/lega", mqPassword, host);
             username = "john";
         } else {
             mqConnectionString = System.getenv("CEGA_CONNECTION");
@@ -112,15 +113,15 @@ public class IngestFileTask extends LocalEGATask {
         String accessKey = readTrace(getProject().file("lega-private/.tmp/.trace"), S3_ACCESS_KEY);
         String secretKey = readTrace(getProject().file("lega-private/.tmp/.trace"), S3_SECRET_KEY);
         // TODO remove these 2 lines
-        System.out.println("S3_ACCESS_KEY: "+accessKey);
+        System.out.println(S3_ACCESS_KEY+": "+accessKey);
         MinioClient minioClient = null;
         minioClient = new MinioClient(String.format("http://%s:9000", host), accessKey, secretKey);
-        System.out.println("S3_SECRET_KEY: "+secretKey);
-        if (!minioClient.bucketExists("lega-public")) {
+        System.out.println(S3_SECRET_KEY + ": "+secretKey);
+        if (!minioClient.bucketExists("lega")) {
             System.out.println("!bucketExists");
             return 0;
         }
-        int size = IterableUtils.size(minioClient.listObjects("lega-public"));
+        int size = IterableUtils.size(minioClient.listObjects("lega"));
         System.out.println(size);
         return size;
     }

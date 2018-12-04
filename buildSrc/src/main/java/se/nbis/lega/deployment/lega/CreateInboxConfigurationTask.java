@@ -1,17 +1,10 @@
 package se.nbis.lega.deployment.lega;
 
-import org.gradle.api.tasks.TaskAction;
-import se.nbis.lega.deployment.Groups;
-import se.nbis.lega.deployment.LocalEGATask;
-
 import java.io.IOException;
+import org.gradle.api.tasks.TaskAction;
+import se.nbis.lega.deployment.LegaPublicTask;
 
-public class CreateInboxConfigurationTask extends LocalEGATask {
-
-    public CreateInboxConfigurationTask() {
-        super();
-        this.setGroup(Groups.LEGA_PUBLIC.name());
-    }
+public class CreateInboxConfigurationTask extends LegaPublicTask {
 
     @TaskAction
     public void run() throws IOException {

@@ -1,18 +1,11 @@
 package se.nbis.lega.deployment.lega;
 
-import org.gradle.api.tasks.TaskAction;
-import se.nbis.lega.deployment.Groups;
-import se.nbis.lega.deployment.LocalEGATask;
-
 import java.io.IOException;
 import java.util.UUID;
+import org.gradle.api.tasks.TaskAction;
+import se.nbis.lega.deployment.LegaPrivateTask;
 
-public class CreateDBConfigurationTask extends LocalEGATask {
-
-    public CreateDBConfigurationTask() {
-        super();
-        this.setGroup(Groups.LEGA_PRIVATE.name());
-    }
+public class CreateDBConfigurationTask extends LegaPrivateTask {
 
     @TaskAction
     public void run() throws IOException {

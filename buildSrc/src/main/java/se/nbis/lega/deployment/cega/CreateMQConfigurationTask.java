@@ -1,11 +1,5 @@
 package se.nbis.lega.deployment.cega;
 
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.io.FileUtils;
-import org.gradle.api.tasks.TaskAction;
-import se.nbis.lega.deployment.Groups;
-import se.nbis.lega.deployment.LocalEGATask;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -13,13 +7,12 @@ import java.nio.charset.Charset;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.UUID;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.FileUtils;
+import org.gradle.api.tasks.TaskAction;
+import se.nbis.lega.deployment.CegaTask;
 
-public class CreateMQConfigurationTask extends LocalEGATask {
-
-    public CreateMQConfigurationTask() {
-        super();
-        this.setGroup(Groups.CEGA.name());
-    }
+public class CreateMQConfigurationTask extends CegaTask {
 
     @TaskAction
     public void run() throws IOException {

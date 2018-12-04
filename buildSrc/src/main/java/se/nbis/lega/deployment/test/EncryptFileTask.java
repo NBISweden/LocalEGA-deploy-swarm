@@ -1,6 +1,9 @@
 package se.nbis.lega.deployment.test;
 
-import no.ifi.uio.crypt4gh.stream.Crypt4GHOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
@@ -8,19 +11,13 @@ import org.bouncycastle.openpgp.PGPException;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
-import se.nbis.lega.deployment.Groups;
-import se.nbis.lega.deployment.LocalEGATask;
+import no.ifi.uio.crypt4gh.stream.Crypt4GHOutputStream;
+import se.nbis.lega.deployment.TestTask;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.charset.Charset;
-
-public class EncryptFileTask extends LocalEGATask {
+public class EncryptFileTask extends TestTask {
 
     public EncryptFileTask() {
         super();
-        this.setGroup(Groups.TEST.name());
         this.dependsOn("file");
     }
 

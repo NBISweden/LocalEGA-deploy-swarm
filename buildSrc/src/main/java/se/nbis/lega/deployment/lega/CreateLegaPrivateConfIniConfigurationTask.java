@@ -3,17 +3,17 @@ package se.nbis.lega.deployment.lega;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.tasks.TaskAction;
 import se.nbis.lega.deployment.Groups;
+import se.nbis.lega.deployment.LegaPrivateTask;
 import se.nbis.lega.deployment.LocalEGATask;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-public class CreateLegaPrivateConfIniConfigurationTask extends LocalEGATask {
+public class CreateLegaPrivateConfIniConfigurationTask extends LegaPrivateTask {
 
     public CreateLegaPrivateConfIniConfigurationTask() {
         super();
-        this.setGroup(Groups.LEGA_PRIVATE.name());
         this.dependsOn("clearConfiguration",
 //                "createMQConfiguration",
                 "createDBConfiguration",
@@ -31,8 +31,8 @@ public class CreateLegaPrivateConfIniConfigurationTask extends LocalEGATask {
     }
 
     private void generateConfIni() throws IOException {
-        String s3AccessKey = readTrace("S3_ACCESS_KEY");
-        String s3SecretKey = readTrace("S3_SECRET_KEY");
+        String s3AccessKey = readTrace(S3_ACCESS_KEY);
+        String s3SecretKey = readTrace(S3_SECRET_KEY);
         String postgresPassword = readTrace("DB_LEGA_IN_PASSWORD");
         File confIni = getProject().file(".tmp/conf.ini");
         FileUtils.write(confIni, String.format("[DEFAULT]\n" +

@@ -3,17 +3,17 @@ package se.nbis.lega.deployment.lega;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.tasks.TaskAction;
 import se.nbis.lega.deployment.Groups;
+import se.nbis.lega.deployment.LegaPublicTask;
 import se.nbis.lega.deployment.LocalEGATask;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-public class CreateLegaPublicConfIniConfigurationTask extends LocalEGATask {
+public class CreateLegaPublicConfIniConfigurationTask extends LegaPublicTask {
 
     public CreateLegaPublicConfIniConfigurationTask() {
         super();
-        this.setGroup(Groups.LEGA_PUBLIC.name());
         this.dependsOn("clearConfiguration",
                 "createMQConfiguration",
 //                "createDBConfiguration",

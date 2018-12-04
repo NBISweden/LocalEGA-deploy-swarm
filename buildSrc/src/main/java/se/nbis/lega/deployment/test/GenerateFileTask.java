@@ -1,23 +1,17 @@
 package se.nbis.lega.deployment.test;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
-import se.nbis.lega.deployment.Groups;
-import se.nbis.lega.deployment.LocalEGATask;
+import se.nbis.lega.deployment.TestTask;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+public class GenerateFileTask extends TestTask {
 
-public class GenerateFileTask extends LocalEGATask {
-
-    public GenerateFileTask() {
-        super();
-        this.setGroup(Groups.TEST.name());
-    }
 
     @TaskAction
     public void run() throws IOException {

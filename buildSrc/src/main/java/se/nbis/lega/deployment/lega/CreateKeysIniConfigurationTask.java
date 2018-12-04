@@ -1,13 +1,5 @@
 package se.nbis.lega.deployment.lega;
 
-import org.apache.commons.io.FileUtils;
-import org.gradle.api.tasks.TaskAction;
-import se.nbis.lega.deployment.Groups;
-import se.nbis.lega.deployment.LocalEGATask;
-
-import javax.crypto.*;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.PBEParameterSpec;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -18,12 +10,22 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.util.UUID;
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.PBEParameterSpec;
+import org.apache.commons.io.FileUtils;
+import org.gradle.api.tasks.TaskAction;
+import se.nbis.lega.deployment.LegaPrivateTask;
 
-public class CreateKeysIniConfigurationTask extends LocalEGATask {
+public class CreateKeysIniConfigurationTask extends LegaPrivateTask {
 
     public CreateKeysIniConfigurationTask() {
         super();
-        this.setGroup(Groups.LEGA_PRIVATE.name());
         this.dependsOn("clearConfiguration",
 //                "createMQConfiguration",
                 "createDBConfiguration",

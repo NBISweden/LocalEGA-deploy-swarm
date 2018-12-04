@@ -1,13 +1,5 @@
 package se.nbis.lega.deployment.cega;
 
-import net.schmizz.sshj.common.Buffer;
-import org.apache.commons.codec.digest.Crypt;
-import org.apache.commons.io.FileUtils;
-import org.apache.sshd.common.config.keys.KeyUtils;
-import org.gradle.api.tasks.TaskAction;
-import se.nbis.lega.deployment.Groups;
-import se.nbis.lega.deployment.LocalEGATask;
-
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -16,13 +8,14 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.UUID;
+import org.apache.commons.codec.digest.Crypt;
+import org.apache.commons.io.FileUtils;
+import org.apache.sshd.common.config.keys.KeyUtils;
+import org.gradle.api.tasks.TaskAction;
+import net.schmizz.sshj.common.Buffer;
+import se.nbis.lega.deployment.CegaTask;
 
-public class CreateUsersConfigurationTask extends LocalEGATask {
-
-    public CreateUsersConfigurationTask() {
-        super();
-        this.setGroup(Groups.CEGA.name());
-    }
+public class CreateUsersConfigurationTask extends CegaTask {
 
     @TaskAction
     public void run() throws IOException, GeneralSecurityException {
