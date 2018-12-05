@@ -10,31 +10,31 @@ networks:
 
 services:
 
-  mq:
-    image: rabbitmq:3.6.14-management
-    hostname: mq
-    networks:
-      - lega-public_lega-public
-      - lega-private_lega-private
-    ports:
-    - "15671:15672"
-    - "5671:5672"
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        window: 120s
-    environment:
-      - CEGA_CONNECTION
-    configs:
-      - source: lega-private.defs.json
-        target: /etc/rabbitmq/defs.json
-      - source: lega-private.rabbitmq.config
-        target: /etc/rabbitmq/rabbitmq.config
-#      - source: lega-private.entrypoint.sh
-#        target: /usr/bin/ega-entrypoint.sh
-#    entrypoint: ["/bin/bash", "/usr/bin/ega-entrypoint.sh"]
-    command: ["rabbitmq-server"]
+#  mq:
+#    image: rabbitmq:3.6.14-management
+#    hostname: mq
+#    networks:
+#      - lega-public_lega-public
+#      - lega-private_lega-private
+#    ports:
+#    - "15671:15672"
+#    - "5671:5672"
+#    deploy:
+#      restart_policy:
+#        condition: on-failure
+#        delay: 5s
+#        window: 120s
+#    environment:
+#      - CEGA_CONNECTION
+#    configs:
+#      - source: lega-private.defs.json
+#        target: /etc/rabbitmq/defs.json
+#      - source: lega-private.rabbitmq.config
+#        target: /etc/rabbitmq/rabbitmq.config
+##      - source: lega-private.entrypoint.sh
+##        target: /usr/bin/ega-entrypoint.sh
+##    entrypoint: ["/bin/bash", "/usr/bin/ega-entrypoint.sh"]
+#    command: ["rabbitmq-server"]
 
   db:
     image: postgres:10
