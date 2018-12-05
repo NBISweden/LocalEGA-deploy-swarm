@@ -74,71 +74,6 @@ services:
         mode: 0555
     entrypoint: ["/bin/bash", "/usr/bin/ega-entrypoint.sh"]
 
-#  inbox:
-#    image: nbisweden/ega-mina-inbox:latest
-#    hostname: ega-inbox
-#    networks:
-#      - lega-public_lega-public
-#      - cega_cega
-#    ports:
-#      - "2222:2222"
-#    deploy:
-#      placement:
-#        constraints: [node.role == manager]
-#      restart_policy:
-#        condition: on-failure
-#        delay: 5s
-#        window: 120s
-#    depends_on:
-#      - mq
-#    environment:
-#      - CEGA_ENDPOINT
-#      - CEGA_ENDPOINT_CREDS
-#    volumes:
-#      - inbox:/ega/inbox
-
-#  id-mapper:
-#    image: nbisweden/ega-base:latest
-#    networks:
-#      - lega-public_lega-public
-#    deploy:
-#      restart_policy:
-#        condition: on-failure
-#        delay: 5s
-#        window: 120s
-#    depends_on:
-#      - db
-#      - mq
-#    configs:
-#      - source: conf.ini
-#        target: /etc/ega/conf.ini
-#    entrypoint: ["gosu", "lega-public_lega-public", "ega-id-mapper"]
-
-#  ingest:
-#    image: nbisweden/ega-base:latest
-#    networks:
-#      - lega-public_lega-public
-#    deploy:
-#      placement:
-#        constraints: [node.role == manager]
-#      restart_policy:
-#        condition: on-failure
-#        delay: 5s
-#        window: 120s
-#    depends_on:
-#      - db
-#      - mq
-#      - s3
-#    environment:
-#      - S3_ACCESS_KEY
-#      - S3_SECRET_KEY
-#    volumes:
-#       - inbox:/ega/inbox
-#    configs:
-#      - source: conf.ini
-#        target: /etc/ega/conf.ini
-#    entrypoint: ["gosu", "lega-public_lega-public", "ega-ingest"]
-
   keys:
     image: cscfi/ega-keyserver:latest
     hostname: keys
@@ -261,19 +196,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer:/data
 
-#  mediator-server:
-#    image: uiobmi/mediator.server:latest
-#    container_name: mediator-server
-#    hostname: mediator-server
-#    ports:
-##    - "8080:8080"
-#    - "6006:6006"
-#    networks:
-#      - lega-public_lega-public
-
-
 volumes:
-#  inbox:
   s3:
   db:
   portainer:
