@@ -86,26 +86,17 @@ public class CreateKeysConfigurationTask extends LegaPrivateTask {
     private void generateSSLCertificate() throws IOException, GeneralSecurityException, OperatorCreationException {
         KeyPair keyPair = KeyUtils.generateKeyPair("ssh-rsa", 4096);
 
-        X500Name subject = new X500NameBuilder(BCStyle.INSTANCE)
-                .addRDN(BCStyle.C, "NO")
-                .addRDN(BCStyle.ST, "Norway")
-                .addRDN(BCStyle.L, "Oslo")
-                .addRDN(BCStyle.O, "UiO")
-                .addRDN(BCStyle.OU, "IFI")
-                .addRDN(BCStyle.CN, "LocalEGA")
-                .addRDN(BCStyle.EmailAddress, "ega@nbis.se")
-                .build();
+        X500Name subject = new X500NameBuilder(BCStyle.INSTANCE).addRDN(BCStyle.C, "NO").addRDN(BCStyle.ST, "Norway")
+                        .addRDN(BCStyle.L, "Oslo").addRDN(BCStyle.O, "UiO").addRDN(BCStyle.OU, "IFI")
+                        .addRDN(BCStyle.CN, "LocalEGA").addRDN(BCStyle.EmailAddress, "ega@nbis.se").build();
         SecureRandom random = new SecureRandom();
         byte[] id = new byte[20];
         random.nextBytes(id);
         BigInteger serial = new BigInteger(160, random);
-        X509v3CertificateBuilder certificate = new JcaX509v3CertificateBuilder(
-                subject,
-                serial,
-                Date.from(LocalDate.of(2018, 1, 1).atStartOfDay(ZoneOffset.UTC).toInstant()),
-                Date.from(LocalDate.of(2020, 1, 1).atStartOfDay(ZoneOffset.UTC).toInstant()),
-                subject,
-                keyPair.getPublic());
+        X509v3CertificateBuilder certificate = new JcaX509v3CertificateBuilder(subject, serial,
+                        Date.from(LocalDate.of(2018, 1, 1).atStartOfDay(ZoneOffset.UTC).toInstant()),
+                        Date.from(LocalDate.of(2020, 1, 1).atStartOfDay(ZoneOffset.UTC).toInstant()), subject,
+                        keyPair.getPublic());
 
         ContentSigner signer = new JcaContentSignerBuilder("SHA256withRSA").build(keyPair.getPrivate());
         X509CertificateHolder holder = certificate.build(signer);
@@ -152,19 +143,10 @@ public class CreateKeysConfigurationTask extends LegaPrivateTask {
         RSAKeyPairGenerator keyPairGenerator = new RSAKeyPairGenerator();
 
         keyPairGenerator.init(
-                new RSAKeyGenerationParameters(
-                        BigInteger.valueOf(0x10001),
-                        new SecureRandom(),
-                        4096,
-                        12
-                )
-        );
+                        new RSAKeyGenerationParameters(BigInteger.valueOf(0x10001), new SecureRandom(), 4096, 12));
 
-        PGPKeyPair rsaKeyPair = new BcPGPKeyPair(
-                PGPPublicKey.RSA_GENERAL,
-                keyPairGenerator.generateKeyPair(),
-                new Date()
-        );
+        PGPKeyPair rsaKeyPair =
+                        new BcPGPKeyPair(PGPPublicKey.RSA_GENERAL, keyPairGenerator.generateKeyPair(), new Date());
 
         PGPSignatureSubpacketGenerator signHashGenerator = new PGPSignatureSubpacketGenerator();
         signHashGenerator.setKeyFlags(false, KeyFlags.SIGN_DATA | KeyFlags.CERTIFY_OTHER);
@@ -176,20 +158,15 @@ public class CreateKeysConfigurationTask extends LegaPrivateTask {
         PGPDigestCalculator sha1DigestCalculator = new BcPGPDigestCalculatorProvider().get(HashAlgorithmTags.SHA1);
         PGPDigestCalculator sha512DigestCalculator = new BcPGPDigestCalculatorProvider().get(HashAlgorithmTags.SHA512);
 
-        PBESecretKeyEncryptor secretKeyEncryptor = (
-                new BcPBESecretKeyEncryptorBuilder(PGPEncryptedData.AES_256, sha512DigestCalculator)
-        ).build(passphrase);
+        PBESecretKeyEncryptor secretKeyEncryptor =
+                        (new BcPBESecretKeyEncryptorBuilder(PGPEncryptedData.AES_256, sha512DigestCalculator))
+                                        .build(passphrase);
 
-        return new PGPKeyRingGenerator(
-                PGPSignature.NO_CERTIFICATION,
-                rsaKeyPair,
-                userId,
-                sha1DigestCalculator,
-                encryptHashGenerator.generate(),
-                null,
-                new BcPGPContentSignerBuilder(rsaKeyPair.getPublicKey().getAlgorithm(), HashAlgorithmTags.SHA512),
-                secretKeyEncryptor
-        );
+        return new PGPKeyRingGenerator(PGPSignature.NO_CERTIFICATION, rsaKeyPair, userId, sha1DigestCalculator,
+                        encryptHashGenerator.generate(), null,
+                        new BcPGPContentSignerBuilder(rsaKeyPair.getPublicKey().getAlgorithm(),
+                                        HashAlgorithmTags.SHA512),
+                        secretKeyEncryptor);
     }
 
     private byte[] armorByteArray(byte[] data) throws IOException {

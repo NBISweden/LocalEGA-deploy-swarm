@@ -41,7 +41,8 @@ public class CreateUsersConfigurationTask extends CegaTask {
         String uid = String.valueOf(Math.abs(new SecureRandom().nextInt()));
 
         File userYML = getProject().file(String.format(".tmp/users/%s.yml", username));
-        FileUtils.writeLines(userYML, Arrays.asList("---", "password_hash: " + hash, "pubkey: " + sshKeyString, "uid: " + uid));
+        FileUtils.writeLines(userYML,
+                        Arrays.asList("---", "password_hash: " + hash, "pubkey: " + sshKeyString, "uid: " + uid));
         writePublicKey(keyPair, getProject().file(String.format(".tmp/users/%s.pub", username)));
         writePrivateKey(keyPair, getProject().file(String.format(".tmp/users/%s.sec", username)));
 

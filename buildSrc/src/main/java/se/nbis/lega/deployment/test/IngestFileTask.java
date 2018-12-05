@@ -42,7 +42,10 @@ public class IngestFileTask extends TestTask {
     }
 
     @TaskAction
-    public void run() throws IOException, NoSuchAlgorithmException, KeyManagementException, URISyntaxException, TimeoutException, InvalidKeyException, XmlPullParserException, InvalidPortException, ErrorResponseException, NoResponseException, InvalidBucketNameException, InsufficientDataException, InvalidEndpointException, InternalException, InterruptedException {
+    public void run() throws IOException, NoSuchAlgorithmException, KeyManagementException, URISyntaxException,
+                    TimeoutException, InvalidKeyException, XmlPullParserException, InvalidPortException,
+                    ErrorResponseException, NoResponseException, InvalidBucketNameException, InsufficientDataException,
+                    InvalidEndpointException, InternalException, InterruptedException {
         System.out.println("Starting ingestion...");
         String host = getHost();
         int expectedAmount = getFilesAmount(host) + 1;
@@ -56,11 +59,8 @@ public class IngestFileTask extends TestTask {
             Thread.sleep(1000);
         }
         System.out.println("File seems to be ingested successfully: trying to download it...");
-        String url = String.format("http://%s:8081/file?sourceKey=%s&sourceIV=%s&filePath=%s",
-                host,
-                readTrace("sessionKey"),
-                readTrace("iv"),
-                expectedAmount);
+        String url = String.format("http://%s:8081/file?sourceKey=%s&sourceIV=%s&filePath=%s", host,
+                        readTrace("sessionKey"), readTrace("iv"), expectedAmount);
         System.out.println("URL : " + url);
         URL resURL = new URL(url);
         File downloadedFile = getProject().file(".tmp/data.raw.out");
@@ -75,7 +75,8 @@ public class IngestFileTask extends TestTask {
         System.out.println("Files are identical.");
     }
 
-    private void ingest(String host) throws IOException, URISyntaxException, NoSuchAlgorithmException, KeyManagementException, TimeoutException {
+    private void ingest(String host) throws IOException, URISyntaxException, NoSuchAlgorithmException,
+                    KeyManagementException, TimeoutException {
         String mqPassword = readTrace(getProject().file(CEGA_TMP_TRACE), CEGA_MQ_PASSWORD);
         String mqConnectionString;
         String username;
@@ -85,31 +86,30 @@ public class IngestFileTask extends TestTask {
         } else {
             mqConnectionString = System.getenv(CEGA_CONNECTION);
             String password = mqConnectionString.split(":")[2].split("@")[0];
-            mqConnectionString = mqConnectionString.replace(password, URLEncoder.encode(password, Charset.defaultCharset().displayName()));
+            mqConnectionString = mqConnectionString.replace(password,
+                            URLEncoder.encode(password, Charset.defaultCharset().displayName()));
             username = "dummy";
         }
         ConnectionFactory factory = new ConnectionFactory();
         factory.setUri(mqConnectionString);
         Connection connectionFactory = factory.newConnection();
         Channel channel = connectionFactory.createChannel();
-        AMQP.BasicProperties properties = new AMQP.BasicProperties().builder().
-                deliveryMode(2).
-                contentType("application/json").
-                contentEncoding(StandardCharsets.UTF_8.displayName()).
-                build();
+        AMQP.BasicProperties properties = new AMQP.BasicProperties().builder().deliveryMode(2)
+                        .contentType("application/json").contentEncoding(StandardCharsets.UTF_8.displayName()).build();
 
 
         String stableId = "EGAF" + UUID.randomUUID().toString().replace("-", "");
-        channel.basicPublish("localega.v1",
-                "files",
-                properties,
-                String.format("{\"user\":\"%s\",\"filepath\":\"data.raw.enc\",\"stable_id\":\"%s\"}", username, stableId).getBytes());
+        channel.basicPublish("localega.v1", "files", properties,
+                        String.format("{\"user\":\"%s\",\"filepath\":\"data.raw.enc\",\"stable_id\":\"%s\"}", username,
+                                        stableId).getBytes());
 
         channel.close();
         connectionFactory.close();
     }
 
-    private int getFilesAmount(String host) throws XmlPullParserException, IOException, InvalidPortException, InvalidEndpointException, InsufficientDataException, NoSuchAlgorithmException, NoResponseException, InternalException, InvalidKeyException, InvalidBucketNameException, ErrorResponseException {
+    private int getFilesAmount(String host) throws XmlPullParserException, IOException, InvalidPortException,
+                    InvalidEndpointException, InsufficientDataException, NoSuchAlgorithmException, NoResponseException,
+                    InternalException, InvalidKeyException, InvalidBucketNameException, ErrorResponseException {
         File traceFile = getProject().file(LEGA_PRIVATE_TMP_TRACE);
         String accessKey = readTrace(traceFile, S3_ACCESS_KEY);
         String secretKey = readTrace(traceFile, S3_SECRET_KEY);

@@ -1,5 +1,22 @@
 package se.nbis.lega.deployment;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.attribute.PosixFilePermission;
+import java.security.KeyPair;
+import java.security.Security;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
@@ -9,13 +26,6 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
-import java.io.*;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.attribute.PosixFilePermission;
-import java.security.KeyPair;
-import java.security.Security;
-import java.util.*;
 
 public abstract class LocalEGATask extends DefaultTask {
 
@@ -31,7 +41,7 @@ public abstract class LocalEGATask extends DefaultTask {
     static {
         Security.addProvider(new BouncyCastleProvider());
     }
-    
+
     public Map<String, String> getTraceAsMap() throws IOException {
         File traceFile = getProject().file(TMP_TRACE);
         return readFileAsMap(traceFile);
@@ -126,11 +136,13 @@ public abstract class LocalEGATask extends DefaultTask {
         return exec(ignoreExitCode, null, command, arguments);
     }
 
-    protected List<String> exec(Map<String, String> environment, String command, String... arguments) throws IOException {
+    protected List<String> exec(Map<String, String> environment, String command, String... arguments)
+                    throws IOException {
         return exec(false, environment, command, arguments);
     }
 
-    protected List<String> exec(boolean ignoreExitCode, Map<String, String> environment, String command, String... arguments) throws IOException {
+    protected List<String> exec(boolean ignoreExitCode, Map<String, String> environment, String command,
+                    String... arguments) throws IOException {
         Map<String, String> systemEnvironment = new HashMap<>(System.getenv());
         if (environment != null) {
             systemEnvironment.putAll(environment);

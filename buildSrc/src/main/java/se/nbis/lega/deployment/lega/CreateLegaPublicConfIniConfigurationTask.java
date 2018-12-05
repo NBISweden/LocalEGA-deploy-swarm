@@ -8,16 +8,12 @@ public class CreateLegaPublicConfIniConfigurationTask extends LegaPublicTask {
 
     public CreateLegaPublicConfIniConfigurationTask() {
         super();
-        this.dependsOn("clearConfiguration",
-                "createMQConfiguration",
-                "createInboxConfiguration",
-                "createIngestConfiguration"
-                );
+        this.dependsOn("clearConfiguration", "createMQConfiguration", "createInboxConfiguration",
+                        "createIngestConfiguration");
     }
 
     @TaskAction
-    public void run() throws IOException {
-    }
+    public void run() throws IOException {}
 
 
 }
