@@ -25,10 +25,6 @@ task createMQConfiguration(type: CreateMQConfigurationTask)
 
 task createDBConfiguration(type: CreateDBConfigurationTask)
 
-//task createInboxConfiguration(type: CreateInboxConfigurationTask)
-
-//task createIngestConfiguration(type: CreateIngestConfigurationTask)
-
 task createKeysConfiguration(type: CreateKeysConfigurationTask)
 
 task createMinioConfiguration(type: CreateMinioConfigurationTask)

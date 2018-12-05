@@ -23,21 +23,13 @@ task clearConfiguration(type: ClearConfigurationTask) {
 
 task createMQConfiguration(type: CreateMQConfigurationTask)
 
-//task createDBConfiguration(type: CreateDBConfigurationTask)
-
 task createInboxConfiguration(type: CreateInboxConfigurationTask)
 
 task createIngestConfiguration(type: CreateIngestConfigurationTask)
 
-//task createKeysConfiguration(type: CreateKeysConfigurationTask)
-
 task createMinioConfiguration(type: CreateMinioConfigurationTask)
 
 task createConfIni(type: CreateLegaPublicConfIniConfigurationTask)
-
-//task createKeysIni(type: CreateKeysIniConfigurationTask)
-
-//task createRESConfiguration(type: CreateRESConfigurationTask)
 
 task createConfiguration {
     setGroup "lega-public"
