@@ -25,7 +25,6 @@ import org.apache.commons.io.FileUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.gradle.api.DefaultTask;
-import org.gradle.api.Project;
 
 public abstract class LocalEGATask extends DefaultTask {
 
@@ -48,15 +47,13 @@ public abstract class LocalEGATask extends DefaultTask {
     }
 
     public String readTrace(String key) throws IOException {
-        Project project = getProject();
-        File traceFile = project.file(TMP_TRACE);
+        File traceFile = getProject().file(TMP_TRACE);
         return readTrace(traceFile, key);
     }
 
     protected String getHost() {
         String host = System.getenv("DOCKER_HOST");
-        String ret = host == null ? "localhost" : host.substring(6).split(":")[0];
-        return ret;
+        return host == null ? "localhost" : host.substring(6).split(":")[0];
     }
 
     protected String getProperty(String key) {
@@ -64,17 +61,10 @@ public abstract class LocalEGATask extends DefaultTask {
     }
 
     protected void writeTrace(String key, String value) throws IOException {
-        Project project = getProject();
-        File traceFile = project.file(TMP_TRACE);
+        File traceFile = getProject().file(TMP_TRACE);
         writeTrace(traceFile, key, value);
     }
 
-    /**
-     * @param traceFile
-     * @param key
-     * @param value
-     * @throws IOException
-     */
     public void writeTrace(File traceFile, String key, String value) throws IOException {
         String existingValue = readTrace(traceFile, key);
         if (existingValue == null) {

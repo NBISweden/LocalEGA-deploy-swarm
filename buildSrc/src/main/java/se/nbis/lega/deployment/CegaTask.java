@@ -1,6 +1,3 @@
-/**
- * 
- */
 package se.nbis.lega.deployment;
 
 /**
