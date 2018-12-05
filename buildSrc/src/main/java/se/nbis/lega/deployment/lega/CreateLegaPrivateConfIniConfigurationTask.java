@@ -12,10 +12,7 @@ public class CreateLegaPrivateConfIniConfigurationTask extends LegaPrivateTask {
     public CreateLegaPrivateConfIniConfigurationTask() {
         super();
         this.dependsOn("clearConfiguration",
-//                "createMQConfiguration",
                 "createDBConfiguration",
-//                "createInboxConfiguration",
-//                "createIngestConfiguration",
                 "createKeysConfiguration",
                 "createRESConfiguration",
                 "createMinioConfiguration");
@@ -27,7 +24,6 @@ public class CreateLegaPrivateConfIniConfigurationTask extends LegaPrivateTask {
         createConfig(LegaPrivateConfig.CONF_INI.getName(), getProject().file(".tmp/conf.ini"));
         createConfig(LegaPrivateConfig.DEFS_JSON.getName(), getProject().file("private_mq/defs.json"));
         createConfig(LegaPrivateConfig.RABBITMQ_CONFIG.getName(), getProject().file("private_mq/rabbitmq.config"));
-//        createConfig(LegaPrivateConfig.ENTRYPOINT_SH.getName(), getProject().file("mq/entrypoint.sh"));
     }
 
     private void generateConfIni() throws IOException {
@@ -37,36 +33,36 @@ public class CreateLegaPrivateConfIniConfigurationTask extends LegaPrivateTask {
         File confIni = getProject().file(".tmp/conf.ini");
         FileUtils.write(confIni, String.format("[DEFAULT]\n" +
                         "log = console\n" +
-                        "\n" +
+                        System.lineSeparator() +
                         "[keyserver]\n" +
                         "port = 8080\n" +
-                        "\n" +
+                        System.lineSeparator() +
                         "[quality_control]\n" +
                         "keyserver_endpoint = http://keys:8080/keys/retrieve/%%s/private/bin?idFormat=hex\n" +
-                        "\n" +
+                        System.lineSeparator() +
                         "[inbox]\n" +
                         "location = /ega/inbox/%%s\n" +
                         "mode = 2750\n" +
-                        "\n" +
+                        System.lineSeparator() +
                         "[vault]\n" +
                         "driver = S3Storage\n" +
                         "url = http://s3:9000\n" +
                         "access_key = %s\n" +
                         "secret_key = %s\n" +
                         "#region = lega\n" +
-                        "\n" +
-                        "\n" +
+                        System.lineSeparator() +
+                        System.lineSeparator() +
                         "[outgestion]\n" +
                         "# Just for test\n" +
                         "keyserver_endpoint = http://keys:8080/keys/retrieve/%%s/private/bin?idFormat=hex\n" +
-                        "\n" +
+                        System.lineSeparator() +
                         "## Connecting to Local EGA\n" +
                         "[broker]\n" +
                         "host = mq\n" +
                         "connection_attempts = 30\n" +
                         "# delay in seconds\n" +
                         "retry_delay = 10\n" +
-                        "\n" +
+                        System.lineSeparator() +
                         "[postgres]\n" +
                         "host = db\n" +
                         "port = 5432\n" +
@@ -75,7 +71,7 @@ public class CreateLegaPrivateConfIniConfigurationTask extends LegaPrivateTask {
                         "database = lega\n" +
                         "try = 30\n" +
                         "sslmode = require\n" +
-                        "\n" +
+                        System.lineSeparator() +
                         "[eureka]\n" +
                         "endpoint = http://cega-eureka:8761", s3AccessKey, s3SecretKey, postgresPassword),
                 Charset.defaultCharset());

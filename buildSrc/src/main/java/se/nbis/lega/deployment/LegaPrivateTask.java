@@ -1,6 +1,3 @@
-/**
- * 
- */
 package se.nbis.lega.deployment;
 
 /**
@@ -8,9 +5,6 @@ package se.nbis.lega.deployment;
  */
 public abstract class LegaPrivateTask extends LocalEGATask {
 
-    /**
-     * 
-     */
     public LegaPrivateTask() {
         super();
         this.setGroup(Groups.LEGA_PRIVATE.name());

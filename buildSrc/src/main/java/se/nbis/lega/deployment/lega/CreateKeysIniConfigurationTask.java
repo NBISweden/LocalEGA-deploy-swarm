@@ -52,12 +52,12 @@ public class CreateKeysIniConfigurationTask extends LegaPrivateTask {
         File keysIni = getProject().file(".tmp/keys.ini");
         FileUtils.write(keysIni, String.format("[DEFAULT]\n" +
                         "active : key.1\n" +
-                        "\n" +
+                        System.lineSeparator() +
                         "[key.1]\n" +
                         "path : /etc/ega/pgp/ega.sec\n" +
                         "passphrase : %s\n" +
                         "expire: 30/MAR/19 08:00:00\n" +
-                        "\n" +
+                        System.lineSeparator() +
                         "[key.2]\n" +
                         "path : /etc/ega/pgp/ega2.sec\n" +
                         "passphrase : %s\n" +

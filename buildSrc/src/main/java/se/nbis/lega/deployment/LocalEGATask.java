@@ -19,21 +19,27 @@ import java.util.*;
 
 public abstract class LocalEGATask extends DefaultTask {
 
+    public static final String TMP_TRACE = ".tmp/.trace";
+    public static final String CEGA_TMP_TRACE = "cega/.tmp/.trace";
+    public static final String LEGA_PRIVATE_TMP_TRACE = "lega-private/.tmp/.trace";
     public static final String S3_SECRET_KEY = "S3_SECRET_KEY";
     public static final String S3_ACCESS_KEY = "S3_ACCESS_KEY";
+    public static final String CEGA_MQ_PASSWORD = "CEGA_MQ_PASSWORD";
+    public static final String CEGA_CONNECTION = "CEGA_CONNECTION";
+    public static final String LEGA = "lega";
 
     static {
         Security.addProvider(new BouncyCastleProvider());
     }
     
     public Map<String, String> getTraceAsMap() throws IOException {
-        File traceFile = getProject().file(".tmp/.trace");
+        File traceFile = getProject().file(TMP_TRACE);
         return readFileAsMap(traceFile);
     }
 
     public String readTrace(String key) throws IOException {
         Project project = getProject();
-        File traceFile = project.file(".tmp/.trace");
+        File traceFile = project.file(TMP_TRACE);
         return readTrace(traceFile, key);
     }
 
@@ -49,7 +55,7 @@ public abstract class LocalEGATask extends DefaultTask {
 
     protected void writeTrace(String key, String value) throws IOException {
         Project project = getProject();
-        File traceFile = project.file(".tmp/.trace");
+        File traceFile = project.file(TMP_TRACE);
         writeTrace(traceFile, key, value);
     }
 
@@ -62,10 +68,6 @@ public abstract class LocalEGATask extends DefaultTask {
     public void writeTrace(File traceFile, String key, String value) throws IOException {
         String existingValue = readTrace(traceFile, key);
         if (existingValue == null) {
-            //TODO REmove
-            System.out.println("writing "
-                    + traceFile
-                    + "key:value "+key+":"+value);
             FileUtils.writeLines(traceFile, Collections.singleton(String.format("%s=%s", key, value)), true);
         }
     }
@@ -75,16 +77,11 @@ public abstract class LocalEGATask extends DefaultTask {
             List<String> lines = FileUtils.readLines(traceFile, Charset.defaultCharset());
             for (String line : lines) {
                 if (line.startsWith(key)) {
-                    String value = line.split("=")[1].trim();
-                    System.out.println("readTrace"+ traceFile+"  key:value "+key+":"+value);
-                    return value;
+                    return line.split("=")[1].trim();
                 }
             }
-            System.out.println("readTrace:"+ traceFile+" Key:"+key+" null");
             return null;
         } catch (FileNotFoundException e) {
-            // TODO remove
-            System.out.println("readTrace:"+ traceFile+e.getMessage());
             return null;
         }
     }
@@ -148,12 +145,12 @@ public abstract class LocalEGATask extends DefaultTask {
             executor.execute(commandLine, systemEnvironment);
             String output = outputStream.toString();
             System.out.println(output);
-            return Arrays.asList(output.split("\n"));
+            return Arrays.asList(output.split(System.lineSeparator()));
         } catch (ExecuteException e) {
             String output = outputStream.toString();
             System.out.println(output);
             if (ignoreExitCode) {
-                return Arrays.asList(output.split("\n"));
+                return Arrays.asList(output.split(System.lineSeparator()));
             } else {
                 throw e;
             }

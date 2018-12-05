@@ -2,11 +2,8 @@ package se.nbis.lega.deployment;
 
 public enum Groups {
 
-    CLUSTER("cluster"), 
-    LEGA_PUBLIC("lega-public"), 
-    LEGA_PRIVATE("lega-private"), 
-    CEGA("cega"), 
-    TEST("test");
+    CLUSTER("cluster"), LEGA_PUBLIC("lega-public"), LEGA_PRIVATE("lega-private"), CEGA(
+            "cega"), TEST("test");
 
     private String name;
 
@@ -17,6 +14,4 @@ public enum Groups {
     public String getName() {
         return name;
     }
-
-
 }

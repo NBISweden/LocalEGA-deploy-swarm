@@ -76,14 +76,14 @@ public class IngestFileTask extends TestTask {
     }
 
     private void ingest(String host) throws IOException, URISyntaxException, NoSuchAlgorithmException, KeyManagementException, TimeoutException {
-        String mqPassword = readTrace(getProject().file("cega/.tmp/.trace"), "CEGA_MQ_PASSWORD");
+        String mqPassword = readTrace(getProject().file(CEGA_TMP_TRACE), CEGA_MQ_PASSWORD);
         String mqConnectionString;
         String username;
         if (mqPassword != null) {
             mqConnectionString = String.format("amqp://lega:%s@%s:5672/lega", mqPassword, host);
             username = "john";
         } else {
-            mqConnectionString = System.getenv("CEGA_CONNECTION");
+            mqConnectionString = System.getenv(CEGA_CONNECTION);
             String password = mqConnectionString.split(":")[2].split("@")[0];
             mqConnectionString = mqConnectionString.replace(password, URLEncoder.encode(password, Charset.defaultCharset().displayName()));
             username = "dummy";
@@ -110,19 +110,14 @@ public class IngestFileTask extends TestTask {
     }
 
     private int getFilesAmount(String host) throws XmlPullParserException, IOException, InvalidPortException, InvalidEndpointException, InsufficientDataException, NoSuchAlgorithmException, NoResponseException, InternalException, InvalidKeyException, InvalidBucketNameException, ErrorResponseException {
-        String accessKey = readTrace(getProject().file("lega-private/.tmp/.trace"), S3_ACCESS_KEY);
-        String secretKey = readTrace(getProject().file("lega-private/.tmp/.trace"), S3_SECRET_KEY);
-        // TODO remove these 2 lines
-        System.out.println(S3_ACCESS_KEY+": "+accessKey);
-        MinioClient minioClient = null;
-        minioClient = new MinioClient(String.format("http://%s:9000", host), accessKey, secretKey);
-        System.out.println(S3_SECRET_KEY + ": "+secretKey);
-        if (!minioClient.bucketExists("lega")) {
-            System.out.println("!bucketExists");
+        File traceFile = getProject().file(LEGA_PRIVATE_TMP_TRACE);
+        String accessKey = readTrace(traceFile, S3_ACCESS_KEY);
+        String secretKey = readTrace(traceFile, S3_SECRET_KEY);
+        MinioClient minioClient = new MinioClient(String.format("http://%s:9000", host), accessKey, secretKey);
+        if (!minioClient.bucketExists(LEGA)) {
             return 0;
         }
-        int size = IterableUtils.size(minioClient.listObjects("lega"));
-        System.out.println(size);
+        int size = IterableUtils.size(minioClient.listObjects(LEGA));
         return size;
     }
 
