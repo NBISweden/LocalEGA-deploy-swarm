@@ -1,43 +1,47 @@
 version: '3.3'
 
 networks:
-  lega:
-    driver: overlay
-  cega_cega:
+  lega-private:
+    external: true
+  lega-public:
+    external: true
+  cega:
     external: true
 
 services:
 
-  mq:
-    image: rabbitmq:3.6.14-management
-    hostname: mq
-    networks:
-      - lega
-      - cega_cega
-    ports:
-      - "15672:15672"
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        window: 120s
-    environment:
-      - CEGA_CONNECTION
-    configs:
-      - source: lega.defs.json
-        target: /etc/rabbitmq/defs.json
-      - source: lega.rabbitmq.config
-        target: /etc/rabbitmq/rabbitmq.config
-      - source: lega.entrypoint.sh
-        target: /usr/bin/ega-entrypoint.sh
-    entrypoint: ["/bin/bash", "/usr/bin/ega-entrypoint.sh"]
-    command: ["rabbitmq-server"]
+#  mq:
+#    image: rabbitmq:3.6.14-management
+#    hostname: mq
+#    networks:
+#      - lega-public
+#      - lega-private
+#    ports:
+#    - "15671:15672"
+#    - "5671:5672"
+#    deploy:
+#      restart_policy:
+#        condition: on-failure
+#        delay: 5s
+#        window: 120s
+#    environment:
+#      - CEGA_CONNECTION
+#    configs:
+#      - source: lega-private.defs.json
+#        target: /etc/rabbitmq/defs.json
+#      - source: lega-private.rabbitmq.config
+#        target: /etc/rabbitmq/rabbitmq.config
+##      - source: lega-private.entrypoint.sh
+##        target: /usr/bin/ega-entrypoint.sh
+##    entrypoint: ["/bin/bash", "/usr/bin/ega-entrypoint.sh"]
+#    command: ["rabbitmq-server"]
 
   db:
     image: postgres:10
     hostname: db
     networks:
-      - lega
+      - lega-private
+      - lega-public
     deploy:
       restart_policy:
         condition: on-failure
@@ -70,77 +74,13 @@ services:
         mode: 0555
     entrypoint: ["/bin/bash", "/usr/bin/ega-entrypoint.sh"]
 
-  inbox:
-    image: nbisweden/ega-mina-inbox:latest
-    hostname: ega-inbox
-    networks:
-      - lega
-      - cega_cega
-    ports:
-      - "2222:2222"
-    deploy:
-      placement:
-        constraints: [node.role == manager]
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        window: 120s
-    depends_on:
-      - mq
-    environment:
-      - CEGA_ENDPOINT
-      - CEGA_ENDPOINT_CREDS
-    volumes:
-      - inbox:/ega/inbox
-
-  id-mapper:
-    image: nbisweden/ega-base:latest
-    networks:
-      - lega
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        window: 120s
-    depends_on:
-      - db
-      - mq
-    configs:
-      - source: conf.ini
-        target: /etc/ega/conf.ini
-    entrypoint: ["gosu", "lega", "ega-id-mapper"]
-
-  ingest:
-    image: nbisweden/ega-base:latest
-    networks:
-      - lega
-    deploy:
-      placement:
-        constraints: [node.role == manager]
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        window: 120s
-    depends_on:
-      - db
-      - mq
-      - s3
-    environment:
-      - S3_ACCESS_KEY
-      - S3_SECRET_KEY
-    volumes:
-       - inbox:/ega/inbox
-    configs:
-      - source: conf.ini
-        target: /etc/ega/conf.ini
-    entrypoint: ["gosu", "lega", "ega-ingest"]
-
   keys:
     image: cscfi/ega-keyserver:latest
     hostname: keys
     networks:
-      - lega
-      - cega_cega
+      - lega-private
+      - lega-public
+      - cega
     deploy:
       restart_policy:
         condition: on-failure
@@ -169,7 +109,8 @@ services:
     image: nbisweden/ega-base:latest
     hostname: verify
     networks:
-      - lega
+      - lega-private
+      - lega-public
     deploy:
       restart_policy:
         condition: on-failure
@@ -177,7 +118,7 @@ services:
         window: 120s
     depends_on:
       - db
-      - mq
+      - lega-public_mq
       - keys
       - s3
     environment:
@@ -193,7 +134,8 @@ services:
     image: cscfi/ega-res:latest
     hostname: res
     networks:
-      - lega
+      - lega-private
+      - lega-public
     ports:
       - "8081:8080"
     deploy:
@@ -226,7 +168,8 @@ services:
     image: minio/minio:latest
     hostname: s3
     networks:
-      - lega
+      - lega-private
+      - lega-public
     ports:
       - "9000:9000"
     deploy:
@@ -244,7 +187,7 @@ services:
   portainer:
     image: portainer/portainer:latest
     ports:
-        - "30000:9000"
+        - "40000:9000"
     command: --no-auth
     deploy:
       placement:
@@ -254,18 +197,17 @@ services:
       - portainer:/data
 
 volumes:
-  inbox:
   s3:
   db:
   portainer:
 
 configs:
-  lega.defs.json:
+  lega-private.defs.json:
     external: true
-  lega.rabbitmq.config:
+  lega-private.rabbitmq.config:
     external: true
-  lega.entrypoint.sh:
-    external: true
+#  lega-private.entrypoint.sh:
+#    external: true
   postgresql.conf:
     external: true
   main.sql:
@@ -282,12 +224,12 @@ configs:
     external: true
   conf.ini:
     external: true
-  keys.ini.enc:
-    external: true
-  ssl.cert:
-    external: true
-  ssl.key:
-    external: true
+#  keys.ini.enc:
+#    external: true
+#  ssl.cert:
+#    external: true
+#  ssl.key:
+#    external: true
   ega.sec:
     external: true
   ega2.sec:

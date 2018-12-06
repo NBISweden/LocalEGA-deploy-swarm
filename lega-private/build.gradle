@@ -4,71 +4,50 @@ import se.nbis.lega.deployment.lega.*
 import java.util.stream.Collectors
 
 task removeVolumes(type: RemoveVolumesTask) {
-    setGroup "lega"
+    setGroup "lega-private"
 
     setVolumes Arrays.stream(Volume.values()).map { v -> v.getName() }.collect(Collectors.toSet())
 }
 
 task removeNetworks(type: RemoveNetworksTask) {
-    setGroup "lega"
+    setGroup "lega-private"
 
     setNetworks Arrays.stream(Network.values()).map { v -> v.getName() }.collect(Collectors.toSet())
 }
 
 task clearConfiguration(type: ClearConfigurationTask) {
-    setGroup "lega"
+    setGroup "lega-private"
 
-    setConfigs Arrays.stream(Config.values()).map { c -> c.getName() }.collect(Collectors.toSet())
+    setConfigs Arrays.stream(LegaPrivateConfig.values()).map { c -> c.getName() }.collect(Collectors.toSet())
 }
 
-task createMQConfiguration(type: CreateMQConfigurationTask)
-
 task createDBConfiguration(type: CreateDBConfigurationTask)
-
-task createInboxConfiguration(type: CreateInboxConfigurationTask)
-
-task createIngestConfiguration(type: CreateIngestConfigurationTask)
 
 task createKeysConfiguration(type: CreateKeysConfigurationTask)
 
 task createMinioConfiguration(type: CreateMinioConfigurationTask)
 
-task createConfIni(type: CreateConfIniConfigurationTask)
+task createConfIni(type: CreateLegaPrivateConfIniConfigurationTask)
 
 task createKeysIni(type: CreateKeysIniConfigurationTask)
 
 task createRESConfiguration(type: CreateRESConfigurationTask)
 
 task createConfiguration {
-    setGroup "lega"
+    setGroup "lega-private"
 
     dependsOn clearConfiguration, createConfIni, createKeysIni
 }
-
-task createCEGANetwork() {
-    setGroup "lega"
-
-    doLast {
-        exec {
-            ignoreExitValue = true
-            executable "docker"
-            args "network", "create", "-d", "overlay", "cega_cega"
-        }
-    }
-}
-
 task deployStack(type: DeployStackTask) {
-    setGroup "lega"
-
-    dependsOn createCEGANetwork
+    setGroup "lega-private"
 
     setComposeFile file("docker-stack.yml").absolutePath
-    setStackName "lega"
+    setStackName "lega-private"
     setEnvironment getTraceAsMap()
 }
 
 task removeStack(type: RemoveStackTask) {
-    setGroup "lega"
+    setGroup "lega-private"
 
-    setStackName "lega"
+    setStackName "lega-private"
 }

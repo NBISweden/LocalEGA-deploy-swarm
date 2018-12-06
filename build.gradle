@@ -3,16 +3,20 @@ import se.nbis.lega.deployment.test.GenerateFileTask
 import se.nbis.lega.deployment.test.IngestFileTask
 import se.nbis.lega.deployment.test.UploadFileTask
 
+plugins {
+    id 'com.gradle.build-scan' version '2.0.2'
+}
+
 task purge() {
     setGroup "swarm"
 
-    dependsOn ":lega:removeVolumes", ":lega:removeNetworks"
+    dependsOn ":lega-public:removeVolumes", ":lega-public:removeNetworks", ":lega-private:removeVolumes", ":lega-private:removeNetworks"
 }
 
 task clean() {
     setGroup "swarm"
 
-    dependsOn ":cega:clearConfiguration", ":lega:clearConfiguration"
+    dependsOn ":cega:clearConfiguration", ":lega-public:clearConfiguration", ":lega-private:clearConfiguration"
     doLast {
         new File(".tmp").deleteDir()
     }
@@ -21,13 +25,13 @@ task clean() {
 task bootstrap() {
     setGroup "swarm"
 
-    dependsOn ":cega:createConfiguration", ":lega:createConfiguration"
+    dependsOn ":cega:createConfiguration", ":lega-public:createConfiguration", ":lega-private:createConfiguration" , ":createNetworks"
 }
 
 task deploy() {
     setGroup "swarm"
 
-    dependsOn ":cega:deployStack", ":lega:deployStack"
+    dependsOn ":cega:deployStack", ":lega-public:deployStack", ":lega-private:deployStack"
 }
 
 task rm() {
@@ -36,7 +40,7 @@ task rm() {
     doLast {
         exec {
             executable "docker"
-            args "stack", "rm", "lega"
+            args "stack", "rm", "lega-public", "lega-private"
         }
         sleep 10000
         exec {
@@ -64,3 +68,48 @@ task encrypt(type: EncryptFileTask)
 task upload(type: UploadFileTask)
 
 task ingest(type: IngestFileTask)
+
+task createCEGANetwork() {
+    setGroup "swarm"
+
+    doLast {
+        exec {
+            ignoreExitValue = true
+            executable "docker"
+            args "network", "create", "-d", "overlay", "cega"
+        }
+    }
+}
+
+task createLEGAPublicNetwork() {
+    setGroup "swarm"
+
+    doLast {
+        exec {
+            ignoreExitValue = true
+            executable "docker"
+            args "network", "create", "-d", "overlay", "lega-public"
+        }
+    }
+}
+
+task createLEGAPrivateNetwork() {
+    setGroup "swarm"
+
+    doLast {
+        exec {
+            ignoreExitValue = true
+            executable "docker"
+            args "network", "create", "-d", "overlay", "lega-private"
+        }
+    }
+}
+
+
+task createNetworks() {
+    setGroup "swarm"
+    
+    dependsOn createCEGANetwork
+    dependsOn createLEGAPublicNetwork
+    dependsOn createLEGAPrivateNetwork
+}

@@ -1,23 +1,17 @@
 package se.nbis.lega.deployment.lega;
 
-import org.gradle.api.tasks.TaskAction;
-import se.nbis.lega.deployment.Groups;
-import se.nbis.lega.deployment.LocalEGATask;
-
+import java.io.File;
 import java.io.IOException;
-import java.util.UUID;
+import org.gradle.api.tasks.TaskAction;
+import se.nbis.lega.deployment.LegaPublicTask;
 
-public class CreateIngestConfigurationTask extends LocalEGATask {
-
-    public CreateIngestConfigurationTask() {
-        super();
-        this.setGroup(Groups.LEGA.name());
-    }
+public class CreateIngestConfigurationTask extends LegaPublicTask {
 
     @TaskAction
     public void run() throws IOException {
-        writeTrace("S3_ACCESS_KEY", UUID.randomUUID().toString().replace("-", ""));
-        writeTrace("S3_SECRET_KEY", UUID.randomUUID().toString().replace("-", ""));
+        File traceFile = getProject().getParent().file(LEGA_PRIVATE_TMP_TRACE);
+        writeTrace(S3_ACCESS_KEY, readTrace(traceFile, S3_ACCESS_KEY));
+        writeTrace(S3_SECRET_KEY, readTrace(traceFile, S3_SECRET_KEY));
     }
 
 }

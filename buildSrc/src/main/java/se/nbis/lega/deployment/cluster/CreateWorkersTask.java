@@ -1,7 +1,6 @@
 package se.nbis.lega.deployment.cluster;
 
 import org.gradle.api.tasks.TaskAction;
-
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;

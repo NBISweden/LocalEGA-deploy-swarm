@@ -1,0 +1,146 @@
+version: '3.3'
+
+networks:
+  lega-public:
+    external: true
+  lega-private:
+    external: true
+  cega:
+    external: true
+
+services:
+
+  mq:
+    image: rabbitmq:3.6.14-management
+    hostname: mq
+    networks:
+      - lega-public
+      - lega-private
+      - cega
+    ports:
+      - "15672:15672"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        window: 120s
+    environment:
+      - CEGA_CONNECTION
+    configs:
+      - source: lega-public.defs.json
+        target: /etc/rabbitmq/defs.json
+      - source: lega-public.rabbitmq.config
+        target: /etc/rabbitmq/rabbitmq.config
+      - source: lega-public.entrypoint.sh
+        target: /usr/bin/ega-entrypoint.sh
+    entrypoint: ["/bin/bash", "/usr/bin/ega-entrypoint.sh"]
+    command: ["rabbitmq-server"]
+
+  inbox:
+    image: nbisweden/ega-mina-inbox:latest
+    hostname: ega-inbox
+    networks:
+      - lega-public
+      - cega
+    ports:
+      - "2222:2222"
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        window: 120s
+    depends_on:
+      - mq
+    environment:
+      - CEGA_ENDPOINT
+      - CEGA_ENDPOINT_CREDS
+    volumes:
+      - inbox:/ega/inbox
+
+  id-mapper:
+    image: nbisweden/ega-base:latest
+    networks:
+      - lega-public
+      - lega-private
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        window: 120s
+    depends_on:
+      - lega-private_db
+      - mq
+    configs:
+      - source: conf.ini
+        target: /etc/ega/conf.ini
+    entrypoint: ["gosu", "lega", "ega-id-mapper"]
+
+  ingest:
+    image: nbisweden/ega-base:latest
+    networks:
+      - lega-public
+      - lega-private
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        window: 120s
+    depends_on:
+      - lega-private_db
+      - mq
+      - lega-private_s3
+    environment:
+      - S3_ACCESS_KEY
+      - S3_SECRET_KEY
+    volumes:
+       - inbox:/ega/inbox
+    configs:
+      - source: conf.ini
+        target: /etc/ega/conf.ini
+    entrypoint: ["gosu", "lega", "ega-ingest"]
+
+  portainer:
+    image: portainer/portainer:latest
+    ports:
+        - "30000:9000"
+    command: --no-auth
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer:/data
+
+volumes:
+  inbox:
+  portainer:
+
+configs:
+  lega-public.defs.json:
+    external: true
+  lega-public.rabbitmq.config:
+    external: true
+  lega-public.entrypoint.sh:
+    external: true
+  conf.ini:
+    external: true
+  keys.ini.enc:
+    external: true
+  ssl.cert:
+    external: true
+  ssl.key:
+    external: true
+  ega.sec:
+    external: true
+  ega2.sec:
+    external: true
+  ega.sec.pass:
+    external: true
+  ega2.sec.pass:
+    external: true
+  ega.shared.pass:
+    external: true

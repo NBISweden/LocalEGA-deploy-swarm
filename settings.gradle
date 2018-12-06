@@ -11,4 +11,5 @@ rootProject.name = 'LocalEGA-deploy-swarm'
 
 include 'cluster'
 include 'cega'
-include 'lega'
+include 'lega-public'
+include 'lega-private'

@@ -2,7 +2,7 @@ package se.nbis.lega.deployment.lega;
 
 public enum Network {
 
-    CEGA("cega_cega");
+    CEGA("cega");
 
     private String name;
 

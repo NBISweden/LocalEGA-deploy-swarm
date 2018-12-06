@@ -1,10 +1,10 @@
 package se.nbis.lega.deployment.lega;
 
-public enum Config {
+public enum LegaPrivateConfig {
 
-    DEFS_JSON("lega.defs.json"),
-    RABBITMQ_CONFIG("lega.rabbitmq.config"),
-    ENTRYPOINT_SH("lega.entrypoint.sh"),
+    DEFS_JSON("lega-private.defs.json"),
+    RABBITMQ_CONFIG("lega-private.rabbitmq.config"),
+    ENTRYPOINT_SH("lega-private.entrypoint.sh"),
     POSTGRESQL_CONF("postgresql.conf"),
     MAIN_SQL("main.sql"),
     GRANTS_SQL("grants.sql"),
@@ -24,7 +24,7 @@ public enum Config {
 
     private String name;
 
-    Config(String name) {
+    LegaPrivateConfig(String name) {
         this.name = name;
     }
 
