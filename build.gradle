@@ -4,7 +4,7 @@ import se.nbis.lega.deployment.test.IngestFileTask
 import se.nbis.lega.deployment.test.UploadFileTask
 
 plugins {
-    id 'com.gradle.build-scan' version '1.16' 
+    id 'com.gradle.build-scan' version '2.0.2' 
 }
 
 task purge() {
