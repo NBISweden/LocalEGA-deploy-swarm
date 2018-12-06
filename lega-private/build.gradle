@@ -21,8 +21,6 @@ task clearConfiguration(type: ClearConfigurationTask) {
     setConfigs Arrays.stream(LegaPrivateConfig.values()).map { c -> c.getName() }.collect(Collectors.toSet())
 }
 
-task createMQConfiguration(type: CreateMQConfigurationTask)
-
 task createDBConfiguration(type: CreateDBConfigurationTask)
 
 task createKeysConfiguration(type: CreateKeysConfigurationTask)

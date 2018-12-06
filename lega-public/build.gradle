@@ -27,8 +27,6 @@ task createInboxConfiguration(type: CreateInboxConfigurationTask)
 
 task createIngestConfiguration(type: CreateIngestConfigurationTask)
 
-task createMinioConfiguration(type: CreateMinioConfigurationTask)
-
 task createConfIni(type: CreateLegaPublicConfIniConfigurationTask)
 
 task createConfiguration {
