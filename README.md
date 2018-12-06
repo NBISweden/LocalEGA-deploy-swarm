@@ -6,7 +6,7 @@
 
 ## Prerequisites
 
-The deployment tool of LocalEGA for Docker Swarm is based on [Gradle](https://gradle.org/), so you will need Gradle to
+The deployment tool of LocalEGA for Docker Swarm is based on [Gradle](https://gradle.org/), so you will need Gradle 5 to
 be installed on your machine in order to use it. On MacOS with Homebrew it can be done by executing
 `brew install gradle`. Please, refer to official documentation to find instruction for other platforms.
 
