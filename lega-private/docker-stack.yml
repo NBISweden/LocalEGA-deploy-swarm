@@ -1,11 +1,11 @@
 version: '3.3'
 
 networks:
-  lega-private_lega-private:
+  lega-private:
     external: true
-  lega-public_lega-public:
+  lega-public:
     external: true
-  cega_cega:
+  cega:
     external: true
 
 services:
@@ -14,8 +14,8 @@ services:
 #    image: rabbitmq:3.6.14-management
 #    hostname: mq
 #    networks:
-#      - lega-public_lega-public
-#      - lega-private_lega-private
+#      - lega-public
+#      - lega-private
 #    ports:
 #    - "15671:15672"
 #    - "5671:5672"
@@ -40,8 +40,8 @@ services:
     image: postgres:10
     hostname: db
     networks:
-      - lega-private_lega-private
-      - lega-public_lega-public
+      - lega-private
+      - lega-public
     deploy:
       restart_policy:
         condition: on-failure
@@ -78,9 +78,9 @@ services:
     image: cscfi/ega-keyserver:latest
     hostname: keys
     networks:
-      - lega-private_lega-private
-      - lega-public_lega-public
-      - cega_cega
+      - lega-private
+      - lega-public
+      - cega
     deploy:
       restart_policy:
         condition: on-failure
@@ -109,8 +109,8 @@ services:
     image: nbisweden/ega-base:latest
     hostname: verify
     networks:
-      - lega-private_lega-private
-      - lega-public_lega-public
+      - lega-private
+      - lega-public
     deploy:
       restart_policy:
         condition: on-failure
@@ -134,8 +134,8 @@ services:
     image: cscfi/ega-res:latest
     hostname: res
     networks:
-      - lega-private_lega-private
-      - lega-public_lega-public
+      - lega-private
+      - lega-public
     ports:
       - "8081:8080"
     deploy:
@@ -168,8 +168,8 @@ services:
     image: minio/minio:latest
     hostname: s3
     networks:
-      - lega-private_lega-private
-      - lega-public_lega-public
+      - lega-private
+      - lega-public
     ports:
       - "9000:9000"
     deploy:

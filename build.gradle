@@ -25,7 +25,7 @@ task clean() {
 task bootstrap() {
     setGroup "swarm"
 
-    dependsOn ":cega:createConfiguration", ":lega-public:createConfiguration", ":lega-private:createConfiguration"
+    dependsOn ":cega:createConfiguration", ":lega-public:createConfiguration", ":lega-private:createConfiguration" , ":createNetworks"
 }
 
 task deploy() {
@@ -68,3 +68,48 @@ task encrypt(type: EncryptFileTask)
 task upload(type: UploadFileTask)
 
 task ingest(type: IngestFileTask)
+
+task createCEGANetwork() {
+    setGroup "swarm"
+
+    doLast {
+        exec {
+            ignoreExitValue = true
+            executable "docker"
+            args "network", "create", "-d", "overlay", "cega"
+        }
+    }
+}
+
+task createLEGAPublicNetwork() {
+    setGroup "swarm"
+
+    doLast {
+        exec {
+            ignoreExitValue = true
+            executable "docker"
+            args "network", "create", "-d", "overlay", "lega-public"
+        }
+    }
+}
+
+task createLEGAPrivateNetwork() {
+    setGroup "swarm"
+
+    doLast {
+        exec {
+            ignoreExitValue = true
+            executable "docker"
+            args "network", "create", "-d", "overlay", "lega-private"
+        }
+    }
+}
+
+
+task createNetworks() {
+    setGroup "swarm"
+    
+    dependsOn createCEGANetwork
+    dependsOn createLEGAPublicNetwork
+    dependsOn createLEGAPrivateNetwork
+}

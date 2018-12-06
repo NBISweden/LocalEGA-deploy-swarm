@@ -1,11 +1,11 @@
 version: '3.3'
 
 networks:
-  lega-public_lega-public:
+  lega-public:
     external: true
-  lega-private_lega-private:
+  lega-private:
     external: true
-  cega_cega:
+  cega:
     external: true
 
 services:
@@ -14,9 +14,9 @@ services:
     image: rabbitmq:3.6.14-management
     hostname: mq
     networks:
-      - lega-public_lega-public
-      - lega-private_lega-private
-      - cega_cega
+      - lega-public
+      - lega-private
+      - cega
     ports:
       - "15672:15672"
     deploy:
@@ -40,8 +40,8 @@ services:
     image: nbisweden/ega-mina-inbox:latest
     hostname: ega-inbox
     networks:
-      - lega-public_lega-public
-      - cega_cega
+      - lega-public
+      - cega
     ports:
       - "2222:2222"
     deploy:
@@ -62,8 +62,8 @@ services:
   id-mapper:
     image: nbisweden/ega-base:latest
     networks:
-      - lega-public_lega-public
-      - lega-private_lega-private
+      - lega-public
+      - lega-private
     deploy:
       restart_policy:
         condition: on-failure
@@ -80,8 +80,8 @@ services:
   ingest:
     image: nbisweden/ega-base:latest
     networks:
-      - lega-public_lega-public
-      - lega-private_lega-private
+      - lega-public
+      - lega-private
     deploy:
       placement:
         constraints: [node.role == manager]

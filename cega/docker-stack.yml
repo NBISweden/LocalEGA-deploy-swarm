@@ -3,7 +3,7 @@ version: '3.3'
 networks:
 
   cega:
-    driver: overlay
+    external: true
 
 services:
 

@@ -38,49 +38,8 @@ task createConfiguration {
 
     dependsOn clearConfiguration, createConfIni, createKeysIni
 }
-
-task createCEGANetwork() {
-    setGroup "lega-private"
-
-    doLast {
-        exec {
-            ignoreExitValue = true
-            executable "docker"
-            args "network", "create", "-d", "overlay", "cega_cega"
-        }
-    }
-}
-
-task createLEGAPublicNetwork() {
-    setGroup "lega-private"
-
-    doLast {
-        exec {
-            ignoreExitValue = true
-            executable "docker"
-            args "network", "create", "-d", "overlay", "lega-public_lega-public"
-        }
-    }
-}
-
-task createLEGAPrivateNetwork() {
-    setGroup "lega-private"
-
-    doLast {
-        exec {
-            ignoreExitValue = true
-            executable "docker"
-            args "network", "create", "-d", "overlay", "lega-private_lega-private"
-        }
-    }
-}
-
 task deployStack(type: DeployStackTask) {
     setGroup "lega-private"
-
-    dependsOn createCEGANetwork
-    dependsOn createLEGAPublicNetwork
-    dependsOn createLEGAPrivateNetwork
 
     setComposeFile file("docker-stack.yml").absolutePath
     setStackName "lega-private"
