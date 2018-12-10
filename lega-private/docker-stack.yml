@@ -36,6 +36,22 @@ services:
 #    entrypoint: ["/bin/bash", "/usr/bin/ega-entrypoint.sh"]
     command: ["rabbitmq-server"]
 
+  mediator-server:
+    image: uiobmi/mediator.server:latest
+    container_name: mediator-server
+    hostname: mediator-server
+    ports:
+    - "8080:8080"
+#    - "6006:6006"
+    networks:
+      - lega-public
+      - lega-private
+    environment:
+    - BROKER_HOST=mq
+#    - BROKER_PORT=5672
+    - KEYS=completed
+
+
   db:
     image: postgres:10
     hostname: db
