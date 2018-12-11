@@ -57,12 +57,15 @@ pipeline {
   
   post('Remove VM') { 
     always {
-        sh 'docker service logs lega-public_ingest'
-        sh 'docker service logs lega-private_db'
-        sh 'docker service logs lega-private_s3'
-        sh 'docker service logs lega-public_ingest'
-        sh 'docker service logs lega-private_verify'
-        sh 'docker service logs lega-public_mq'
+        sh '''
+          eval "$(docker-machine env ${GIT_COMMIT})"
+          docker service logs lega-public_ingest
+          docker service logs lega-private_db
+          docker service logs lega-private_s3
+          docker service logs lega-public_ingest
+          docker service logs lega-private_verify
+          docker service logs lega-public_mq
+        '''
       }
     cleanup { 
       sh 'docker-machine rm -y ${GIT_COMMIT}'
