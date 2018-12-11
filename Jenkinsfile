@@ -56,7 +56,7 @@ pipeline {
   }
   
   post('Remove VM') { 
-    failure {
+    always {
         sh '''
           eval "$(docker-machine env ${GIT_COMMIT})"
           echo '---=== lega-public_inbox Logs ===---'
