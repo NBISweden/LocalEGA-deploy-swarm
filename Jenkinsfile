@@ -59,11 +59,15 @@ pipeline {
     always {
         sh '''
           eval "$(docker-machine env ${GIT_COMMIT})"
+          echo '---=== lega-public_ingest Logs ===---'
           docker service logs lega-public_ingest
+          echo '---=== lega-private_db Logs ===---'
           docker service logs lega-private_db
+          echo '---=== lega-private_s3 Logs ===---'
           docker service logs lega-private_s3
-          docker service logs lega-public_ingest
+          echo '---=== lega-private_verify Logs ===---'
           docker service logs lega-private_verify
+          echo '---=== lega-public_mq ===---'
           docker service logs lega-public_mq
         '''
       }
