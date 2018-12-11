@@ -56,7 +56,7 @@ pipeline {
   }
   
   post('Remove VM') { 
-    always {
+    failure {
         sh '''
           eval "$(docker-machine env ${GIT_COMMIT})"
           echo '---=== lega-public_ingest Logs ===---'
@@ -69,6 +69,8 @@ pipeline {
           docker service logs lega-private_verify
           echo '---=== lega-public_mq ===---'
           docker service logs lega-public_mq
+          echo '---=== lega-private_mq Logs ===---'
+          docker service logs lega-private_mq
         '''
       }
     cleanup { 
