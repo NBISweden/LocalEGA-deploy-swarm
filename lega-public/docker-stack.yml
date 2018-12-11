@@ -36,18 +36,18 @@ services:
     entrypoint: ["/bin/bash", "/usr/bin/ega-entrypoint.sh"]
     command: ["rabbitmq-server"]
 
-  mediator-client:
-    image: uiobmi/mediator.client:latest
-    container_name: mediator-client
-    hostname: mediator-client
-    ports:
-    - "5005:5005"
-    networks:
-      - lega-public
-      - lega-private
-    environment:
-    - BROKER_HOST=lega-public_mq
-#    - BROKER_PORT=5672
+#  mediator-client:
+#    image: uiobmi/mediator.client:latest
+#    container_name: mediator-client
+#    hostname: mediator-client
+#    ports:
+#    - "5005:5005"
+#    networks:
+#      - lega-public
+#      - lega-private
+#    environment:
+#    - BROKER_HOST=lega-public_mq
+##    - BROKER_PORT=5672
 
   inbox:
     image: nbisweden/ega-mina-inbox:latest
@@ -109,7 +109,7 @@ services:
     environment:
       - S3_ACCESS_KEY
       - S3_SECRET_KEY
-#      - VAULT_URL=http://lega-private_s3:9000
+#      - VAULT_URL=http://lega-private_s3:9000/lega
     volumes:
        - inbox:/ega/inbox
     configs:

@@ -10,46 +10,46 @@ networks:
 
 services:
 
-  mq:
-    image: rabbitmq:3.6.14-management
-    hostname: mq
-    networks:
-      - lega-public
-      - lega-private
-    ports:
-    - "15671:15672"
-    - "5671:5672"
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        window: 120s
-    environment:
-      - CEGA_CONNECTION
-    configs:
-      - source: lega-private.defs.json
-        target: /etc/rabbitmq/defs.json
-      - source: lega-private.rabbitmq.config
-        target: /etc/rabbitmq/rabbitmq.config
-#      - source: lega-private.entrypoint.sh
-#        target: /usr/bin/ega-entrypoint.sh
-#    entrypoint: ["/bin/bash", "/usr/bin/ega-entrypoint.sh"]
-    command: ["rabbitmq-server"]
+#  mq:
+#    image: rabbitmq:3.6.14-management
+#    hostname: mq
+#    networks:
+#      - lega-public
+#      - lega-private
+#    ports:
+#    - "15671:15672"
+#    - "5671:5672"
+#    deploy:
+#      restart_policy:
+#        condition: on-failure
+#        delay: 5s
+#        window: 120s
+#    environment:
+#      - CEGA_CONNECTION
+#    configs:
+#      - source: lega-private.defs.json
+#        target: /etc/rabbitmq/defs.json
+#      - source: lega-private.rabbitmq.config
+#        target: /etc/rabbitmq/rabbitmq.config
+##      - source: lega-private.entrypoint.sh
+##        target: /usr/bin/ega-entrypoint.sh
+##    entrypoint: ["/bin/bash", "/usr/bin/ega-entrypoint.sh"]
+#    command: ["rabbitmq-server"]
 
-  mediator-server:
-    image: uiobmi/mediator.server:latest
-    container_name: mediator-server
-    hostname: mediator-server
-    ports:
-    - "8080:8080"
-#    - "6006:6006"
-    networks:
-      - lega-public
-      - lega-private
-    environment:
-    - BROKER_HOST=mq
-#    - BROKER_PORT=5672
-    - KEYS=completed
+#  mediator-server:
+#    image: uiobmi/mediator.server:latest
+#    container_name: mediator-server
+#    hostname: mediator-server
+#    ports:
+#    - "8080:8080"
+##    - "6006:6006"
+#    networks:
+#      - lega-public
+#      - lega-private
+#    environment:
+#    - BROKER_HOST=mq
+##    - BROKER_PORT=5672
+#    - KEYS=completed
 
 
   db:
