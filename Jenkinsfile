@@ -53,6 +53,16 @@ pipeline {
         '''
       }
     }
+    stage('Logs') {
+      steps {
+        sh 'docker service logs lega-public_ingest'
+        sh 'docker service logs lega-private_db'
+        sh 'docker service logs lega-private_s3'
+        sh 'docker service logs lega-public_ingest'
+        sh 'docker service logs lega-private_verify'
+        sh 'docker service logs lega-public_mq'
+      }
+    }
   }
   
   post('Remove VM') { 
