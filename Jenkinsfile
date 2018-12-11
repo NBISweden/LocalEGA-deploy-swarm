@@ -53,8 +53,10 @@ pipeline {
         '''
       }
     }
-    stage('Logs') {
-      steps {
+  }
+  
+  post('Remove VM') { 
+    always {
         sh 'docker service logs lega-public_ingest'
         sh 'docker service logs lega-private_db'
         sh 'docker service logs lega-private_s3'
@@ -62,10 +64,6 @@ pipeline {
         sh 'docker service logs lega-private_verify'
         sh 'docker service logs lega-public_mq'
       }
-    }
-  }
-  
-  post('Remove VM') { 
     cleanup { 
       sh 'docker-machine rm -y ${GIT_COMMIT}'
     }
