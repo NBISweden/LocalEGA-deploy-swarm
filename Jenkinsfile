@@ -59,18 +59,22 @@ pipeline {
     failure {
         sh '''
           eval "$(docker-machine env ${GIT_COMMIT})"
-          echo '---=== lega-public_ingest Logs ===---'
-          docker service logs lega-public_ingest
-          echo '---=== lega-private_db Logs ===---'
-          docker service logs lega-private_db
-          echo '---=== lega-private_s3 Logs ===---'
-          docker service logs lega-private_s3
-          echo '---=== lega-private_verify Logs ===---'
-          docker service logs lega-private_verify
-          echo '---=== lega-public_mq ===---'
+          echo '---=== lega-public_inbox Logs ===---'
+          docker service logs lega-public_inbox
+          echo '---=== cega_cega-mq Logs ===---'
+          docker service logs cega_cega-mq
+          echo '---=== lega-public_mq Logs ===---'
           docker service logs lega-public_mq
           echo '---=== lega-private_mq Logs ===---'
           docker service logs lega-private_mq
+          echo '---=== lega-public_ingest Logs ===---'
+          docker service logs lega-public_ingest
+          echo '---=== lega-private_s3 Logs ===---'
+          docker service logs lega-private_s3
+          echo '---=== lega-private_db Logs ===---'
+          docker service logs lega-private_db
+          echo '---=== lega-private_verify Logs ===---'
+          docker service logs lega-private_verify
         '''
       }
     cleanup { 
