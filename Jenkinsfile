@@ -2,6 +2,10 @@ pipeline {
   
   agent any
   
+  triggers {
+    cron('0 0 * ? * * *')
+  }
+  
   environment {
     OS_USERNAME=credentials('OS_USERNAME')
     OS_PASSWORD=credentials('OS_PASSWORD')
