@@ -4,6 +4,7 @@ pipeline {
   
   triggers {
     cron('0 0 * * *')
+    upstream(upstreamProjects: 'LocalEGA Build Trigger')
   }
   
   environment {
