@@ -2,6 +2,11 @@ pipeline {
   
   agent any
   
+  triggers {
+    cron('0 0 * * *')
+    upstream(upstreamProjects: 'LocalEGA Build Trigger')
+  }
+  
   environment {
     OS_USERNAME=credentials('OS_USERNAME')
     OS_PASSWORD=credentials('OS_PASSWORD')
