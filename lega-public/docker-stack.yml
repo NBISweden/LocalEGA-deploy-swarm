@@ -35,22 +35,6 @@ services:
     entrypoint: ["/bin/bash", "/usr/bin/ega-entrypoint.sh"]
     command: ["rabbitmq-server"]
 
-  mediator-client:
-    image: uiobmi/mediator.client:latest
-    networks:
-    - lega-public
-    - lega-private
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        window: 120s
-    depends_on:
-    - mq
-    environment:
-    - BROKER_HOST=mq
-    - MEDIATOR_SERVER=lega-private_mediator-server:8080
-
   inbox:
     image: nbisweden/ega-mina-inbox:latest
     networks:
@@ -116,6 +100,22 @@ services:
     - source: conf.ini
       target: /etc/ega/conf.ini
     entrypoint: ["gosu", "lega", "ega-ingest"]
+
+  mediator-client:
+    image: uiobmi/mediator.client:latest
+    networks:
+    - lega-public
+    - lega-private
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        window: 120s
+    depends_on:
+    - mq
+    environment:
+    - BROKER_HOST=mq
+    - MEDIATOR_SERVER=lega-private_mediator-server:8080
 
 volumes:
   inbox:

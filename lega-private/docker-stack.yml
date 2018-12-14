@@ -29,23 +29,6 @@ services:
       target: /etc/rabbitmq/rabbitmq.config
     command: ["rabbitmq-server"]
 
-  mediator-server:
-    image: uiobmi/mediator.server:latest
-    ports:
-    - "8080:8080"
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        window: 120s
-    networks:
-    - lega-public
-    - lega-private
-    depends_on:
-    - private-mq
-    environment:
-    - BROKER_HOST=private-mq
-
   db:
     image: postgres:10
     networks:
@@ -201,6 +184,23 @@ services:
 #    volumes:
 #    - /var/run/docker.sock:/var/run/docker.sock
 #    - portainer:/data
+
+  mediator-server:
+    image: uiobmi/mediator.server:latest
+    ports:
+    - "8080:8080"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        window: 120s
+    networks:
+    - lega-public
+    - lega-private
+    depends_on:
+    - private-mq
+    environment:
+    - BROKER_HOST=private-mq
 
 volumes:
   s3:
