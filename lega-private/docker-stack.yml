@@ -169,6 +169,29 @@ services:
       target: /etc/ega/conf.ini
     entrypoint: ["gosu", "lega", "ega-id-mapper"]
 
+  ingest:
+    image: nbisweden/ega-base:latest
+    networks:
+    - lega-public
+    - lega-private
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        window: 120s
+    depends_on:
+    - lega-public_mq
+    environment:
+    - S3_ACCESS_KEY
+    - S3_SECRET_KEY
+    volumes:
+    - inbox:/ega/inbox
+    configs:
+    - source: conf.ini
+      target: /etc/ega/conf.ini
+    entrypoint: ["gosu", "lega", "ega-ingest"]
 
 #  portainer:
 #    image: portainer/portainer:latest
@@ -221,6 +244,7 @@ services:
 volumes:
   s3:
   db:
+  inbox:
 #  portainer:
 
 configs:

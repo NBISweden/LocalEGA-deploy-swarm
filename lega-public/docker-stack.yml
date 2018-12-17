@@ -57,31 +57,6 @@ services:
     volumes:
     - inbox:/ega/inbox
 
-
-  ingest:
-    image: nbisweden/ega-base:latest
-    networks:
-    - lega-public
-    - lega-private
-    deploy:
-      placement:
-        constraints: [node.role == manager]
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        window: 120s
-    depends_on:
-    - mq
-    environment:
-    - S3_ACCESS_KEY
-    - S3_SECRET_KEY
-    volumes:
-    - inbox:/ega/inbox
-    configs:
-    - source: conf.ini
-      target: /etc/ega/conf.ini
-    entrypoint: ["gosu", "lega", "ega-ingest"]
-
   mediator-client:
     image: uiobmi/mediator.client:latest
     networks:
@@ -99,7 +74,6 @@ services:
     - MEDIATOR_SERVER=lega-private_mediator-server:8080
 
 volumes:
-  inbox:
 
 configs:
   lega-public.defs.json:
