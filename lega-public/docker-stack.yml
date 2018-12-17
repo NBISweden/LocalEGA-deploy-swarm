@@ -73,8 +73,6 @@ services:
     - BROKER_HOST=mq
     - MEDIATOR_SERVER=lega-private_mediator-server:8080
 
-volumes:
-
 configs:
   lega-public.defs.json:
     external: true
