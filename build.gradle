@@ -7,6 +7,11 @@ plugins {
     id 'com.gradle.build-scan' version '2.0.2'
 }
 
+buildScan {
+    termsOfServiceUrl = 'https://gradle.com/terms-of-service'
+    termsOfServiceAgree = 'yes'
+}
+
 task purge() {
     setGroup "swarm"
 
@@ -40,7 +45,12 @@ task rm() {
     doLast {
         exec {
             executable "docker"
-            args "stack", "rm", "lega-public", "lega-private"
+            args "stack", "rm", "lega-private"
+        }
+        sleep 10000
+        exec {
+            executable "docker"
+            args "stack", "rm", "lega-public"
         }
         sleep 10000
         exec {
@@ -50,9 +60,17 @@ task rm() {
     }
 }
 
-task ls() {
+task clean_all() {
     setGroup "swarm"
 
+    dependsOn rm
+    dependsOn purge
+    dependsOn clean
+}
+
+task ls() {
+    setGroup "swarm"
+    
     doLast {
         exec {
             executable "docker"

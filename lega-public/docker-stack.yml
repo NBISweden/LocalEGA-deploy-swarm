@@ -12,38 +12,36 @@ services:
 
   mq:
     image: rabbitmq:3.6.14-management
-    hostname: mq
     networks:
-      - lega-public
-      - lega-private
-      - cega
+    - lega-public
+    - lega-private
+    - cega
     ports:
-      - "15672:15672"
+    - "15672:15672"
     deploy:
       restart_policy:
         condition: on-failure
         delay: 5s
         window: 120s
     environment:
-      - CEGA_CONNECTION
+    - CEGA_CONNECTION
     configs:
-      - source: lega-public.defs.json
-        target: /etc/rabbitmq/defs.json
-      - source: lega-public.rabbitmq.config
-        target: /etc/rabbitmq/rabbitmq.config
-      - source: lega-public.entrypoint.sh
-        target: /usr/bin/ega-entrypoint.sh
+    - source: lega-public.defs.json
+      target: /etc/rabbitmq/defs.json
+    - source: lega-public.rabbitmq.config
+      target: /etc/rabbitmq/rabbitmq.config
+    - source: lega-public.entrypoint.sh
+      target: /usr/bin/ega-entrypoint.sh
     entrypoint: ["/bin/bash", "/usr/bin/ega-entrypoint.sh"]
     command: ["rabbitmq-server"]
 
   inbox:
     image: nbisweden/ega-mina-inbox:latest
-    hostname: ega-inbox
     networks:
-      - lega-public
-      - cega
+    - lega-public
+    - cega
     ports:
-      - "2222:2222"
+    - "2222:2222"
     deploy:
       placement:
         constraints: [node.role == manager]
@@ -52,36 +50,35 @@ services:
         delay: 5s
         window: 120s
     depends_on:
-      - mq
+    - mq
     environment:
-      - CEGA_ENDPOINT
-      - CEGA_ENDPOINT_CREDS
+    - CEGA_ENDPOINT
+    - CEGA_ENDPOINT_CREDS
     volumes:
-      - inbox:/ega/inbox
+    - inbox:/ega/inbox
 
   id-mapper:
     image: nbisweden/ega-base:latest
     networks:
-      - lega-public
-      - lega-private
+    - lega-public
+    - lega-private
     deploy:
       restart_policy:
         condition: on-failure
         delay: 5s
         window: 120s
     depends_on:
-      - lega-private_db
-      - mq
+    - mq
     configs:
-      - source: conf.ini
-        target: /etc/ega/conf.ini
+    - source: conf.ini
+      target: /etc/ega/conf.ini
     entrypoint: ["gosu", "lega", "ega-id-mapper"]
 
   ingest:
     image: nbisweden/ega-base:latest
     networks:
-      - lega-public
-      - lega-private
+    - lega-public
+    - lega-private
     deploy:
       placement:
         constraints: [node.role == manager]
@@ -90,34 +87,35 @@ services:
         delay: 5s
         window: 120s
     depends_on:
-      - lega-private_db
-      - mq
-      - lega-private_s3
+    - mq
     environment:
-      - S3_ACCESS_KEY
-      - S3_SECRET_KEY
+    - S3_ACCESS_KEY
+    - S3_SECRET_KEY
     volumes:
-       - inbox:/ega/inbox
+    - inbox:/ega/inbox
     configs:
-      - source: conf.ini
-        target: /etc/ega/conf.ini
+    - source: conf.ini
+      target: /etc/ega/conf.ini
     entrypoint: ["gosu", "lega", "ega-ingest"]
 
-  portainer:
-    image: portainer/portainer:latest
-    ports:
-        - "30000:9000"
-    command: --no-auth
+  mediator-client:
+    image: uiobmi/mediator.client:latest
+    networks:
+    - lega-public
+    - lega-private
     deploy:
-      placement:
-        constraints: [node.role == manager]
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - portainer:/data
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        window: 120s
+    depends_on:
+    - mq
+    environment:
+    - BROKER_HOST=mq
+    - MEDIATOR_SERVER=lega-private_mediator-server:8080
 
 volumes:
   inbox:
-  portainer:
 
 configs:
   lega-public.defs.json:

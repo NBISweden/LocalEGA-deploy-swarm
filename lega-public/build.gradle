@@ -4,19 +4,19 @@ import se.nbis.lega.deployment.lega.*
 import java.util.stream.Collectors
 
 task removeVolumes(type: RemoveVolumesTask) {
-    setGroup "lega-public"
+    setGroup Groups.LEGA_PUBLIC.getName()
 
     setVolumes Arrays.stream(Volume.values()).map { v -> v.getName() }.collect(Collectors.toSet())
 }
 
 task removeNetworks(type: RemoveNetworksTask) {
-    setGroup "lega-public"
+    setGroup Groups.LEGA_PUBLIC.getName()
 
     setNetworks Arrays.stream(Network.values()).map { v -> v.getName() }.collect(Collectors.toSet())
 }
 
 task clearConfiguration(type: ClearConfigurationTask) {
-    setGroup "lega-public"
+    setGroup Groups.LEGA_PUBLIC.getName()
 
     setConfigs Arrays.stream(LegaPublicConfig.values()).map { c -> c.getName() }.collect(Collectors.toSet())
 }
@@ -30,21 +30,21 @@ task createIngestConfiguration(type: CreateIngestConfigurationTask)
 task createConfIni(type: CreateLegaPublicConfIniConfigurationTask)
 
 task createConfiguration {
-    setGroup "lega-public"
+    setGroup Groups.LEGA_PUBLIC.getName()
 
     dependsOn clearConfiguration, createConfIni
 }
 
 task deployStack(type: DeployStackTask) {
-    setGroup "lega-public"
+    setGroup Groups.LEGA_PUBLIC.getName()
 
     setComposeFile file("docker-stack.yml").absolutePath
-    setStackName "lega-public"
+    setStackName Groups.LEGA_PUBLIC.getName()
     setEnvironment getTraceAsMap()
 }
 
 task removeStack(type: RemoveStackTask) {
-    setGroup "lega-public"
+    setGroup Groups.LEGA_PUBLIC.getName()
 
-    setStackName "lega-public"
+    setStackName Groups.LEGA_PUBLIC.getName()
 }

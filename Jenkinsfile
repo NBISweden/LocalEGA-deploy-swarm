@@ -2,6 +2,11 @@ pipeline {
   
   agent any
   
+  triggers {
+    cron('0 0 * * *')
+    upstream(upstreamProjects: 'LocalEGA Build Trigger')
+  }
+  
   environment {
     OS_USERNAME=credentials('OS_USERNAME')
     OS_PASSWORD=credentials('OS_PASSWORD')
@@ -40,7 +45,7 @@ pipeline {
         sh '''
           eval "$(docker-machine env ${GIT_COMMIT})"
           gradle deploy
-          sleep 70
+          sleep 120
           gradle ls
         '''
       }
@@ -56,6 +61,27 @@ pipeline {
   }
   
   post('Remove VM') { 
+    always {
+        sh '''
+          eval "$(docker-machine env ${GIT_COMMIT})"
+          echo '---=== lega-public_inbox Logs ===---'
+          docker service logs lega-public_inbox
+          echo '---=== cega_cega-mq Logs ===---'
+          docker service logs cega_cega-mq
+          echo '---=== lega-public_mq Logs ===---'
+          docker service logs lega-public_mq
+          echo '---=== lega-private_private-mq Logs ===---'
+          docker service logs lega-private_private-mq
+          echo '---=== lega-public_ingest Logs ===---'
+          docker service logs lega-public_ingest
+          echo '---=== lega-private_s3 Logs ===---'
+          docker service logs lega-private_s3
+          echo '---=== lega-private_db Logs ===---'
+          docker service logs lega-private_db
+          echo '---=== lega-private_verify Logs ===---'
+          docker service logs lega-private_verify
+        '''
+      }
     cleanup { 
       sh 'docker-machine rm -y ${GIT_COMMIT}'
     }

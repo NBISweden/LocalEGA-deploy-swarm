@@ -4,11 +4,12 @@ import se.nbis.lega.deployment.RemoveStackTask
 import se.nbis.lega.deployment.cega.Config
 import se.nbis.lega.deployment.cega.CreateMQConfigurationTask
 import se.nbis.lega.deployment.cega.CreateUsersConfigurationTask
+import se.nbis.lega.deployment.Groups
 
 import java.util.stream.Collectors
 
 task clearConfiguration(type: ClearConfigurationTask) {
-    setGroup "cega"
+    setGroup Groups.CEGA.getName()
 
     setConfigs Arrays.stream(Config.values()).map { c -> c.getName() }.collect(Collectors.toSet())
 }
@@ -18,21 +19,21 @@ task createUsersConfiguration(type: CreateUsersConfigurationTask)
 task createMQConfiguration(type: CreateMQConfigurationTask)
 
 task createConfiguration {
-    setGroup "cega"
+    setGroup Groups.CEGA.getName()
 
     dependsOn clearConfiguration, createUsersConfiguration, createMQConfiguration
 }
 
 task deployStack(type: DeployStackTask) {
-    setGroup "cega"
+    setGroup Groups.CEGA.getName()
 
     setComposeFile file("docker-stack.yml").absolutePath
-    setStackName "cega"
+    setStackName Groups.CEGA.getName()
     setEnvironment "LEGA_INSTANCES": "lega", "CEGA_REST_lega_PASSWORD": readTrace("CEGA_REST_PASSWORD")
 }
 
 task removeStack(type: RemoveStackTask) {
-    setGroup "cega"
+    setGroup Groups.CEGA.getName()
 
-    setStackName "cega"
+    setStackName Groups.CEGA.getName()
 }
