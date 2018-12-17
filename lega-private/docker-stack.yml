@@ -245,6 +245,7 @@ volumes:
   s3:
   db:
   inbox:
+    external: true
 #  portainer:
 
 configs:

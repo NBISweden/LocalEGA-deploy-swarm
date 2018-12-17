@@ -12,7 +12,7 @@ public class CreateLegaPrivateConfIniConfigurationTask extends LegaPrivateTask {
     public CreateLegaPrivateConfIniConfigurationTask() {
         super();
         this.dependsOn("clearConfiguration", "createDBConfiguration", "createKeysConfiguration",
-                        "createRESConfiguration", "createMinioConfiguration");
+                        "createRESConfiguration", "createMinioConfiguration", "createIngestConfiguration");
     }
 
     @TaskAction
