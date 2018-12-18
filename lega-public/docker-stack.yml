@@ -75,6 +75,7 @@ services:
 
 volumes:
   inbox:
+    external: true
 
 configs:
   lega-public.defs.json:

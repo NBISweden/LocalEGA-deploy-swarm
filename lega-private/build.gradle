@@ -21,23 +21,19 @@ task clearConfiguration(type: ClearConfigurationTask) {
     setConfigs Arrays.stream(LegaPrivateConfig.values()).map { c -> c.getName() }.collect(Collectors.toSet())
 }
 
-task createMinioConfiguration(type: CreateMinioConfigurationTask)
-
-task createDBConfiguration(type: CreateDBConfigurationTask){
-    setGroup Groups.LEGA_PRIVATE.getName()
-
-    dependsOn createMinioConfiguration
-}
+task createDBConfiguration(type: CreateDBConfigurationTask)
 
 task createKeysConfiguration(type: CreateKeysConfigurationTask)
 
-task createConfIni(type: CreateLegaPrivateConfIniConfigurationTask)
+task createMinioConfiguration(type: CreateMinioConfigurationTask)
 
-task createIngestConfiguration(type: CreateIngestConfigurationTask)
+task createConfIni(type: CreateLegaPrivateConfIniConfigurationTask)
 
 task createKeysIni(type: CreateKeysIniConfigurationTask)
 
 task createRESConfiguration(type: CreateRESConfigurationTask)
+
+task createIngestConfiguration(type: CreateIngestConfigurationTask)
 
 task createConfiguration {
     setGroup Groups.LEGA_PRIVATE.getName()
