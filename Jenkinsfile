@@ -72,8 +72,8 @@ pipeline {
           docker service logs lega-public_mq
           echo '---=== lega-private_private-mq Logs ===---'
           docker service logs lega-private_private-mq
-          echo '---=== lega-public_ingest Logs ===---'
-          docker service logs lega-public_ingest
+          echo '---=== lega-private_ingest Logs ===---'
+          docker service logs lega-private_ingest
           echo '---=== lega-private_s3 Logs ===---'
           docker service logs lega-private_s3
           echo '---=== lega-private_db Logs ===---'

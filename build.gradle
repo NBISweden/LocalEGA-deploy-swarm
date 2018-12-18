@@ -36,7 +36,9 @@ task bootstrap() {
 task deploy() {
     setGroup "swarm"
 
-    dependsOn ":cega:deployStack", ":lega-public:deployStack", ":lega-private:deployStack"
+    dependsOn ":cega:deployStack"
+    dependsOn ":lega-public:deployStack"
+    dependsOn ":lega-private:deployStack"
 }
 
 task rm() {
