@@ -7,6 +7,12 @@ import se.nbis.lega.deployment.LegaPrivateTask;
 
 public class CreateIngestConfigurationTask extends LegaPrivateTask {
 
+    public CreateIngestConfigurationTask() {
+        super();
+        this.dependsOn("clearConfiguration", "createDBConfiguration", "createKeysConfiguration",
+                        "createRESConfiguration", "createMinioConfiguration");
+    }
+
     @TaskAction
     public void run() throws IOException {
         File traceFile = getProject().file(LEGA_PRIVATE_TMP_TRACE);
