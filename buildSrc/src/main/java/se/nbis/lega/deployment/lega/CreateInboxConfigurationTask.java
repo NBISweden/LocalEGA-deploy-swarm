@@ -6,12 +6,18 @@ import se.nbis.lega.deployment.LegaPublicTask;
 
 public class CreateInboxConfigurationTask extends LegaPublicTask {
 
+    private static final String CEGA_REST_PASSWORD = "CEGA_REST_PASSWORD";
+    private static final String CEGA_ENDPOINT = "CEGA_ENDPOINT";
+    private static final String CEGA_ENDPOINT_CREDS = "CEGA_ENDPOINT_CREDS";
+
     @TaskAction
     public void run() throws IOException {
-        String cegaRESTPassword = readTrace(getProject().getParent().file(CEGA_TMP_TRACE), "CEGA_REST_PASSWORD");
+        String cegaRESTPassword = readTrace(getProject().getParent().file(CEGA_TMP_TRACE), CEGA_REST_PASSWORD);
         if (cegaRESTPassword != null) {
-            writeTrace("CEGA_ENDPOINT", "http://cega-users/lega/v1/legas/users/%s?idType=username");
-            writeTrace("CEGA_ENDPOINT_CREDS", "lega:" + cegaRESTPassword);
+            String cegaUsersHost = "cega-users";
+            writeTrace(CEGA_ENDPOINT,
+                            String.format("http://%s/lega/v1/legas/users/%%s?idType=username", cegaUsersHost));
+            writeTrace(CEGA_ENDPOINT_CREDS, "lega:" + cegaRESTPassword);
         }
     }
 
