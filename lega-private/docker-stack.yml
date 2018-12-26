@@ -193,18 +193,6 @@ services:
       target: /etc/ega/conf.ini
     entrypoint: ["gosu", "lega", "ega-ingest"]
 
-#  portainer:
-#    image: portainer/portainer:latest
-#    ports:
-#    - "40000:9000"
-#    command: --no-auth
-#    deploy:
-#      placement:
-#        constraints: [node.role == manager]
-#    volumes:
-#    - /var/run/docker.sock:/var/run/docker.sock
-#    - portainer:/data
-
   private-mq:
     image: rabbitmq:3.6.14-management
     networks:
@@ -241,12 +229,24 @@ services:
     environment:
     - BROKER_HOST=private-mq
 
+  portainer:
+    image: portainer/portainer:latest
+    ports:
+    - "40000:9000"
+    command: --no-auth
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - portainer:/data
+
 volumes:
   s3:
   db:
   inbox:
     external: true
-#  portainer:
+  portainer:
 
 configs:
   lega-private.defs.json:
