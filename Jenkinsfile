@@ -44,8 +44,8 @@ pipeline {
       steps {
         sh '''
           eval "$(docker-machine env ${GIT_COMMIT})"
-          gradle deployPublic
           gradle deployPrivate
+          gradle deployPublic
           sleep 120
           gradle ls
         '''
