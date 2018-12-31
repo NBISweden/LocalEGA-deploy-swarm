@@ -162,8 +162,8 @@ services:
         condition: on-failure
         delay: 5s
         window: 120s
-    depends_on:
-    - lega-public_mq
+#    depends_on:
+#    - lega-public_mq
     configs:
     - source: conf.ini
       target: /etc/ega/conf.ini
@@ -181,8 +181,8 @@ services:
         condition: on-failure
         delay: 5s
         window: 120s
-    depends_on:
-    - lega-public_mq
+#    depends_on:
+#    - lega-public_mq
     environment:
     - S3_ACCESS_KEY
     - S3_SECRET_KEY
