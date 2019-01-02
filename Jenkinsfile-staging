@@ -13,9 +13,7 @@ node {
       sshCommand remote: remote, command: "ls -lrt"
       sshCommand remote: remote, command: "for i in {1..5}; do echo -n \"Loop \$i \"; date ; sleep 1; done"
       sshCommand remote: remote, command: "echo $env.BRANCH_NAME"
-      sshCommand remote: remote, command: "echo $GIT_BRANCH"
-      sshCommand remote: remote, command: "echo $GIT_URL"
-      sshCommand remote: remote, command: "echo $GIT_COMMIT"
+      sshCommand remote: remote, command: "git checkout --track https://github.com/NBISweden/LocalEGA-deploy-swarm$env.BRANCH_NAME.git"
     }
   }
 }
