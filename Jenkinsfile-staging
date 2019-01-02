@@ -1,0 +1,33 @@
+pipeline {
+  
+  agent any
+  
+  node {
+  def remote = [:]
+  remote.name = 'test'
+  remote.host = '158.37.63.36'
+  remote.user = 'ubuntu'
+  remote.password = 'password'
+  remote.allowAnyHosts = true
+    stage('Remote SSH') {
+      sshCommand remote: remote, command: "ls -lrt"
+      sshCommand remote: remote, command: "for i in {1..5}; do echo -n \"Loop \$i \"; date ; sleep 1; done"
+    }
+  }
+
+  environment {
+    OS_USERNAME=credentials('OS_USERNAME')
+    OS_PASSWORD=credentials('OS_PASSWORD')
+    OS_TENANT_ID=credentials('OS_TENANT_ID')
+    OS_DOMAIN_NAME=credentials('OS_DOMAIN_NAME')
+    OS_AUTH_URL=credentials('OS_AUTH_URL')
+    OS_IDENTITY_API_VERSION=credentials('OS_IDENTITY_API_VERSION')
+    OS_REGION_NAME=credentials('OS_REGION_NAME')
+    OS_NETWORK_NAME=credentials('OS_NETWORK_NAME')
+    OS_SECURITY_GROUPS=credentials('OS_SECURITY_GROUPS')
+    OS_SSH_USER=credentials('OS_SSH_USER')
+    OS_FLAVOR_NAME=credentials('OS_FLAVOR_NAME')
+    OS_IMAGE_ID=credentials('OS_IMAGE_ID')
+  }
+  
+}
