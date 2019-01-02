@@ -1,15 +1,18 @@
   
-  node {
+node {
   def remote = [:]
   remote.name = 'test'
   remote.host = '158.37.63.36'
   remote.user = 'ubuntu'
   remote.password = 'password'
   remote.allowAnyHosts = true
+    withCredentials([sshUserPrivateKey(credentialsId: '214dcd62-2e2f-4e9d-8cdd-bbc97c3172c7', keyFileVariable: 'identity', passphraseVariable: '', usernameVariable: 'userName')]) {
+        remote.user = userName
+        remote.identityFile = identity
     stage('Remote SSH') {
       sshCommand remote: remote, command: "ls -lrt"
       sshCommand remote: remote, command: "for i in {1..5}; do echo -n \"Loop \$i \"; date ; sleep 1; done"
     }
   }
-
+}
 
