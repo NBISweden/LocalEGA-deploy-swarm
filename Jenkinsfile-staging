@@ -14,7 +14,7 @@ node {
       sshCommand remote: remote, command: "echo $env.BRANCH_NAME"
       sshCommand remote: remote, command: "mkdir repo"
       sshCommand remote: remote, command: "cd repo"
-      sshCommand remote: remote, command: "git clone --single-branch --branch $env.BRANCH_NAME https://github.com/NBISweden/LocalEGA-deploy-swarm.git"
+      sshCommand remote: remote, command: "git clone --single-branch --branch $env.BRANCH_NAME https://github.com/NBISweden/LocalEGA-deploy-swarm.git repo"
     }
   }
 }
