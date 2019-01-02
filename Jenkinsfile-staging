@@ -9,15 +9,8 @@ node {
         remote.user = userName
         remote.identityFile = identity
       stage('Remote SSH clone') {
-        if(!fileExists("repo"))
-        {
-          sshCommand remote: remote, command: "gradle clean all"
-          sshCommand remote: remote, command: "rm -rf repo"
-        }
-        sshCommand remote: remote, command: "mkdir repo"
-        sshCommand remote: remote, command: "git clone --single-branch --branch $env.BRANCH_NAME https://github.com/NBISweden/LocalEGA-deploy-swarm.git repo"
-        sshCommand remote: remote, command: "gradle bootstrap"
-        sshCommand remote: remote, command: "gradle deployPrivate"
+        sshScript remote: remote, script: "dep.sh"
+
       }
   }
 }
