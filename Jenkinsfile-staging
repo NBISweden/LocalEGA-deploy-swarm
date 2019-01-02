@@ -11,7 +11,7 @@ node {
         remote.user = userName
         remote.identityFile = identity
       stage('Remote SSH clone') {
-        sshCommand remote: remote, command: "sudo usermod -a -G docker $USER"
+        sshCommand remote: remote, command: "sudo usermod -a -G docker $remote.user"
         sshCommand remote: remote, command: "$GRADLE clean_all"
         sshCommand remote: remote, command: "rm -rf repo"
         sshCommand remote: remote, command: "mkdir repo"
