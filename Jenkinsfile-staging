@@ -8,20 +8,17 @@ node {
     withCredentials([sshUserPrivateKey(credentialsId: '214dcd62-2e2f-4e9d-8cdd-bbc97c3172c7', keyFileVariable: 'identity', passphraseVariable: '', usernameVariable: 'userName')]) {
         remote.user = userName
         remote.identityFile = identity
-    stages{
       stage('Remote SSH clone') {
         if(!fileExists("repo"))
         {
+          sshCommand remote: remote, command: "gradle clean all"
           sshCommand remote: remote, command: "rm -rf repo"
         }
         sshCommand remote: remote, command: "mkdir repo"
         sshCommand remote: remote, command: "git clone --single-branch --branch $env.BRANCH_NAME https://github.com/NBISweden/LocalEGA-deploy-swarm.git repo"
-      }
-      stage('Remote SSH gradle') {
         sshCommand remote: remote, command: "gradle bootstrap"
         sshCommand remote: remote, command: "gradle deployPrivate"
       }
-    }
   }
 }
 
