@@ -1,6 +1,7 @@
 node {
   def remote = [:]
   env.GRADLE_HOME = '/home/ubuntu/.sdkman/candidates/gradle/current'
+  env.GRADLE = '$GRADLE_HOME/bin/gradle -p repo'
   remote.name = 'test'
   remote.host = '158.37.63.36'
   remote.user = 'ubuntu'
@@ -10,10 +11,12 @@ node {
         remote.user = userName
         remote.identityFile = identity
       stage('Remote SSH clone') {
+        sshCommand remote: remote, command: "$GRADLE clean_all"
         sshCommand remote: remote, command: "rm -rf repo"
         sshCommand remote: remote, command: "mkdir repo"
         sshCommand remote: remote, command: "git clone --single-branch --branch $env.BRANCH_NAME https://github.com/NBISweden/LocalEGA-deploy-swarm.git repo"
-        sshCommand remote: remote, command: "$GRADLE_HOME/bin/gradle -p repo bottstrap"
+        sshCommand remote: remote, command: "$GRADLE bottstrap"
+        sshCommand remote: remote, command: "$GRADLE deployPrivate"
         //writeFile file: 'dep.sh', text: 'gradle -v\r\ngradle clean all\r\nrm -rf repo\r\nmkdir repo\r\ngit clone --single-branch --branch $env.BRANCH_NAME https://github.com/NBISweden/LocalEGA-deploy-swarm.git repo\r\ngradle bootstrap\r\ngradle deployPrivate'
        // sshScript remote: remote, script: "dep.sh"
       } 
