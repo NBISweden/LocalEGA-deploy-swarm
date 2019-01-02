@@ -11,9 +11,10 @@ node {
         remote.identityFile = identity
     stage('Remote SSH') {
       sshCommand remote: remote, command: "ls -lrt"
-      sshCommand remote: remote, command: "for i in {1..5}; do echo -n \"Loop \$i \"; date ; sleep 1; done"
       sshCommand remote: remote, command: "echo $env.BRANCH_NAME"
-      sshCommand remote: remote, command: "git checkout --track https://github.com/NBISweden/LocalEGA-deploy-swarm$env.BRANCH_NAME.git"
+      sshCommand remote: remote, command: "mkdir repo"
+      sshCommand remote: remote, command: "cd repo"
+      sshCommand remote: remote, command: "git clone --single-branch --branch $env.BRANCH_NAME https://github.com/NBISweden/LocalEGA-deploy-swarm.git"
     }
   }
 }
