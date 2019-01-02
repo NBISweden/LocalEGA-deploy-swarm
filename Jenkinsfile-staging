@@ -1,7 +1,7 @@
 node {
   def remote = [:]
   env.GRADLE_HOME = '/home/ubuntu/.sdkman/candidates/gradle/current'
-  env.GRADLE = '$GRADLE_HOME/bin/gradle -p repo'
+  env.GRADLE = '$env.GRADLE_HOME/bin/gradle -p repo'
   remote.name = 'test'
   remote.host = '158.37.63.36'
   remote.user = 'ubuntu'
