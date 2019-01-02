@@ -13,9 +13,9 @@ node {
       sshCommand remote: remote, command: "ls -lrt"
       sshCommand remote: remote, command: "for i in {1..5}; do echo -n \"Loop \$i \"; date ; sleep 1; done"
       sshCommand remote: remote, command: "echo $env.BRANCH_NAME"
-      sshCommand remote: remote, command: "echo $env.GIT_BRANCH"
-      sshCommand remote: remote, command: "echo $env.GIT_URL"
-      sshCommand remote: remote, command: "echo $env.GIT_COMMIT"
+      sshCommand remote: remote, command: "echo $GIT_BRANCH"
+      sshCommand remote: remote, command: "echo $GIT_URL"
+      sshCommand remote: remote, command: "echo $GIT_COMMIT"
     }
   }
 }
