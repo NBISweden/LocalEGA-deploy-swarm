@@ -12,7 +12,7 @@ node {
         sshCommand remote: remote, command: "rm -rf repo"
         sshCommand remote: remote, command: "mkdir repo"
         sshCommand remote: remote, command: "git clone --single-branch --branch $env.BRANCH_NAME https://github.com/NBISweden/LocalEGA-deploy-swarm.git repo"
-        sshCommand remote: remote, command: "'$env.GRADLE_HOME'/bin/gradle -v"
+        sshCommand remote: remote, command: "/home/ubuntu/.sdkman/candidates/gradle/current/bin/gradle -v"
         //writeFile file: 'dep.sh', text: 'gradle -v\r\ngradle clean all\r\nrm -rf repo\r\nmkdir repo\r\ngit clone --single-branch --branch $env.BRANCH_NAME https://github.com/NBISweden/LocalEGA-deploy-swarm.git repo\r\ngradle bootstrap\r\ngradle deployPrivate'
        // sshScript remote: remote, script: "dep.sh"
       }
