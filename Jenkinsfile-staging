@@ -1,70 +1,71 @@
 node {
-  def remote = [:]
+  def tsd = [:]
   env.GRADLE_HOME = '/home/ubuntu/.sdkman/candidates/gradle/current'
   env.GRADLE = '/home/ubuntu/.sdkman/candidates/gradle/current/bin/gradle -p LocalEGA-deploy-swarm'
-  remote.name = 'private'
-  remote.host = '158.37.63.36'
-  remote.user = 'ubuntu'
-  remote.password = 'password'
-  remote.allowAnyHosts = true
+  tsd.name = 'private'
+  tsd.host = '158.37.63.36'
+  tsd.user = 'ubuntu'
+  tsd.password = 'password'
+  tsd.allowAnyHosts = true
+  
+  cega-lega = [:]
+  cega-lega.name = 'public'
+  cega-lega.host = '158.37.63.170'
+  cega-lega.user = 'ubuntu'
+  cega-lega.password = 'password'
+  cega-lega.allowAnyHosts = true
     withCredentials([sshUserPrivateKey(credentialsId: '214dcd62-2e2f-4e9d-8cdd-bbc97c3172c7', keyFileVariable: 'identity', passphraseVariable: '', usernameVariable: 'userName')]) {
-        remote.user = userName
-        remote.identityFile = identity
+        tsd.user = userName
+        tsd.identityFile = identity
       stage('Private clean') {
-        sshCommand remote: remote, command: "$GRADLE clean_all"
-        sshCommand remote: remote, command: "rm -rf LocalEGA-deploy-swarm"
+        sshCommand remote: tsd, command: "$GRADLE clean_all"
+        sshCommand remote: tsd, command: "rm -rf LocalEGA-deploy-swarm"
       } 
       stage('Private bootstrap') {
-        sshCommand remote: remote, command: "git clone --single-branch --branch $env.BRANCH_NAME https://github.com/NBISweden/LocalEGA-deploy-swarm.git"
-        sshCommand remote: remote, command: "$GRADLE bootstrapPrivate"
+        sshCommand remote: tsd, command: "git clone --single-branch --branch $env.BRANCH_NAME https://github.com/NBISweden/LocalEGA-deploy-swarm.git"
+        sshCommand remote: tsd, command: "$GRADLE bootstrapPrivate"
       } 
       stage('Private deploy') {
-        sshCommand remote: remote, command: "$GRADLE deployPrivate"
+        sshCommand remote: tsd, command: "$GRADLE deployPrivate"
       } 
       stage('Private post deploy') {
-        sshCommand remote: remote, command: "$GRADLE ls"
-        sshCommand remote: remote, command: "docker service logs lega-private_mediator-server"
-        sshCommand remote: remote, command: "docker service logs lega-private_ingest"
+        sshCommand remote: tsd, command: "$GRADLE ls"
+        sshCommand remote: tsd, command: "docker service logs lega-private_mediator-server"
+        sshCommand remote: tsd, command: "docker service logs lega-private_ingest"
       } 
   }
 //}
 //node {
-//  def remote = [:]
 //  env.GRADLE_HOME = '/home/ubuntu/.sdkman/candidates/gradle/current'
 //  env.GRADLE = '/home/ubuntu/.sdkman/candidates/gradle/current/bin/gradle -p LocalEGA-deploy-swarm'  
-  remote.name = 'public'
-  remote.host = '158.37.63.170'
-  remote.user = 'ubuntu'
-  remote.password = 'password'
-  remote.allowAnyHosts = true
       stage('Public clean') {
     withCredentials([sshUserPrivateKey(credentialsId: 'a5a36700-13f7-4efb-a14b-549b7a3499bb', keyFileVariable: 'identity', passphraseVariable: '', usernameVariable: 'userName')]) {
-        remote.user = userName
-        remote.identityFile = identity
-        sshCommand remote: remote, command: "$GRADLE clean_all"
-        sshCommand remote: remote, command: "rm -rf LocalEGA-deploy-swarm"
+        cega-lega.user = userName
+        cega-lega.identityFile = identity
+        sshCommand remote: cega-lega, command: "$GRADLE clean_all"
+        sshCommand remote: cega-lega, command: "rm -rf LocalEGA-deploy-swarm"
         }
       } 
       stage('Public bootstrap') {
           withCredentials([sshUserPrivateKey(credentialsId: 'a5a36700-13f7-4efb-a14b-549b7a3499bb', keyFileVariable: 'identity', passphraseVariable: '', usernameVariable: 'userName')]) {
-        remote.user = userName
-        remote.identityFile = identity
-        sshCommand remote: remote, command: "git clone --single-branch --branch $env.BRANCH_NAME https://github.com/NBISweden/LocalEGA-deploy-swarm.git"
-        sshCommand remote: remote, command: "$GRADLE bootstrapPublic"
+        cega-lega.user = userName
+        cega-lega.identityFile = identity
+        sshCommand remote: cega-lega, command: "git clone --single-branch --branch $env.BRANCH_NAME https://github.com/NBISweden/LocalEGA-deploy-swarm.git"
+        sshCommand remote: cega-lega, command: "$GRADLE bootstrapPublic"
       } }
       stage('Public deploy ') {
           withCredentials([sshUserPrivateKey(credentialsId: 'a5a36700-13f7-4efb-a14b-549b7a3499bb', keyFileVariable: 'identity', passphraseVariable: '', usernameVariable: 'userName')]) {
-        remote.user = userName
-        remote.identityFile = identity
-        sshCommand remote: remote, command: "$GRADLE deployPublic"
+        cega-lega.user = userName
+        cega-lega.identityFile = identity
+        sshCommand remote: cega-lega, command: "$GRADLE deployPublic"
       } }
       stage('Public post deploy') {
           withCredentials([sshUserPrivateKey(credentialsId: 'a5a36700-13f7-4efb-a14b-549b7a3499bb', keyFileVariable: 'identity', passphraseVariable: '', usernameVariable: 'userName')]) {
-        remote.user = userName
-        remote.identityFile = identity
-        sshCommand remote: remote, command: "$GRADLE ls"
-        sshCommand remote: remote, command: "docker service logs lega-public_mediator-client"
-        sshCommand remote: remote, command: "docker service logs lega-public_mq"
+        cega-lega.user = userName
+        cega-lega.identityFile = identity
+        sshCommand remote: cega-lega, command: "$GRADLE ls"
+        sshCommand remote: cega-lega, command: "docker service logs lega-public_mediator-client"
+        sshCommand remote: cega-lega, command: "docker service logs lega-public_mq"
       } 
   }
 }
