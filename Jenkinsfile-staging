@@ -37,7 +37,7 @@ node {
   remote.user = 'ubuntu'
   remote.password = 'password'
   remote.allowAnyHosts = true
-    withCredentials([sshUserPrivateKey(credentialsId: '214dcd62-2e2f-4e9d-8cdd-bbc97c3172c7', keyFileVariable: 'identity', passphraseVariable: '', usernameVariable: 'userName')]) {
+    withCredentials([sshUserPrivateKey(credentialsId: 'a5a36700-13f7-4efb-a14b-549b7a3499bb', keyFileVariable: 'identity', passphraseVariable: '', usernameVariable: 'userName')]) {
         remote.user = userName
         remote.identityFile = identity
       stage('Public clean') {
