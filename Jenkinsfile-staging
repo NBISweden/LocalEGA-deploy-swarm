@@ -10,16 +10,16 @@ node {
     withCredentials([sshUserPrivateKey(credentialsId: '214dcd62-2e2f-4e9d-8cdd-bbc97c3172c7', keyFileVariable: 'identity', passphraseVariable: '', usernameVariable: 'userName')]) {
         remote.user = userName
         remote.identityFile = identity
-      stage('Remote SSH clone') {
-        sshCommand remote: remote, command: "sudo usermod -a -G docker $remote.user"
+      stage('Remote SSH clean') {
         sshCommand remote: remote, command: "$GRADLE clean_all"
-        sshCommand remote: remote, command: "rm -rf repo"
-        sshCommand remote: remote, command: "mkdir repo"
-        sshCommand remote: remote, command: "git clone --single-branch --branch $env.BRANCH_NAME https://github.com/NBISweden/LocalEGA-deploy-swarm.git repo"
+        sshCommand remote: remote, command: "rm -rf LocalEGA-deploy-swarm"
+      } 
+      stage('Remote SSH bootstrap') {
+        sshCommand remote: remote, command: "git clone --single-branch --branch $env.BRANCH_NAME https://github.com/NBISweden/LocalEGA-deploy-swarm.git"
         sshCommand remote: remote, command: "$GRADLE bootstrap"
+      } 
+      stage('Remote SSH deploy private') {
         sshCommand remote: remote, command: "$GRADLE deployPrivate"
-        //writeFile file: 'dep.sh', text: 'gradle -v\r\ngradle clean all\r\nrm -rf repo\r\nmkdir repo\r\ngit clone --single-branch --branch $env.BRANCH_NAME https://github.com/NBISweden/LocalEGA-deploy-swarm.git repo\r\ngradle bootstrap\r\ngradle deployPrivate'
-       // sshScript remote: remote, script: "dep.sh"
       } 
   }
 }
