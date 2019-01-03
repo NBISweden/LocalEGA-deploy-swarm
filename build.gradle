@@ -36,6 +36,21 @@ task bootstrap() {
     dependsOn ":createNetworks"
 }
 
+task bootstrapPublic() {
+    setGroup "swarm"
+    
+    dependsOn ":cega:createConfiguration"
+    dependsOn ":lega-public:createConfiguration"
+    dependsOn ":createNetworks"
+}
+
+task bootstrapPrivate() {
+    setGroup "swarm"
+
+    dependsOn ":lega-private:createConfiguration"
+    dependsOn ":createNetworks"
+}
+
 task deploy() {
     setGroup "swarm"
 

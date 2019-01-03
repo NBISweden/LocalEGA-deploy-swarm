@@ -16,7 +16,7 @@ node {
       } 
       stage('Remote SSH bootstrap') {
         sshCommand remote: remote, command: "git clone --single-branch --branch $env.BRANCH_NAME https://github.com/NBISweden/LocalEGA-deploy-swarm.git"
-        sshCommand remote: remote, command: "$GRADLE bootstrap"
+        sshCommand remote: remote, command: "$GRADLE bootstrapPrivate"
       } 
       stage('Remote SSH deploy private') {
         sshCommand remote: remote, command: "$GRADLE deployPrivate"
@@ -27,7 +27,11 @@ node {
         sshCommand remote: remote, command: "docker service logs lega-private_ingest"
       } 
   }
-  remote.name = 'public'
+}
+node {
+  def remote = [:]
+  env.GRADLE_HOME = '/home/ubuntu/.sdkman/candidates/gradle/current'
+  env.GRADLE = '/home/ubuntu/.sdkman/candidates/gradle/current/bin/gradle -p LocalEGA-deploy-swarm'  remote.name = 'public'
   remote.host = '158.37.63.170'
   remote.user = 'ubuntu'
   remote.password = 'password'
@@ -41,7 +45,7 @@ node {
       } 
       stage('Remote SSH bootstrap') {
         sshCommand remote: remote, command: "git clone --single-branch --branch $env.BRANCH_NAME https://github.com/NBISweden/LocalEGA-deploy-swarm.git"
-        sshCommand remote: remote, command: "$GRADLE bootstrap"
+        sshCommand remote: remote, command: "$GRADLE bootstrapPublic"
       } 
       stage('Remote SSH deploy private') {
         sshCommand remote: remote, command: "$GRADLE deployPublic"
