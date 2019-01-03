@@ -71,7 +71,7 @@ services:
     - mq
     environment:
     - BROKER_HOST=mq
-    - MEDIATOR_SERVER=localhost:8080
+    - MEDIATOR_SERVER=158.37.63.36:8080
 
 volumes:
   inbox:

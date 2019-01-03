@@ -56,7 +56,7 @@ node {
     }
     stage('Public bootstrap') {
       sshCommand remote: cega_lega, command: "git clone --single-branch --branch $env.BRANCH_NAME https://github.com/NBISweden/LocalEGA-deploy-swarm.git"
-      sshCommand remote: cega_lega, command: "$GRADLE bootstrapPublic"
+      sshCommand remote: cega_lega, command: "$GRADLE bootstrap"
     } 
     stage('Public deploy ') {
       sshCommand remote: cega_lega, command: "$GRADLE deployPublic"
