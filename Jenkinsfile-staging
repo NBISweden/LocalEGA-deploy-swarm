@@ -24,7 +24,7 @@ node {
     } 
     stage('Private bootstrap') {
       sshCommand remote: tsd, command: "git clone --single-branch --branch $env.BRANCH_NAME https://github.com/NBISweden/LocalEGA-deploy-swarm.git"
-      sshCommand remote: tsd, command: "$GRADLE bootstrapPrivate"
+      sshCommand remote: tsd, command: "$GRADLE bootstrap"
     } 
     stage('Private deploy') {
       sshCommand remote: tsd, command: "$GRADLE deployPrivate"
