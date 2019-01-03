@@ -19,7 +19,7 @@ node {
       tsd.user = userName
       tsd.identityFile = identity
     stage('Private clean') {
-      sshCommand remote: tsd, failOnError: false, command: "if [ -d LocalEGA-deploy-swarm ]; then\r\n\t$GRADLE clean_all\r\n\trm -rf LocalEGA-deploy-swarm \r\n fi"
+      sshCommand remote: tsd, failOnError: false, command: "if [ -d LocalEGA-deploy-swarm ]; then\r\n\t$GRADLE clean_all\r\n\trm -rf LocalEGA-deploy-swarm; \r\n fi"
       //sshCommand remote: tsd, failOnError: false, command: "rm -rf LocalEGA-deploy-swarm"
     } 
     stage('Private bootstrap') {
@@ -43,7 +43,7 @@ node {
       cega_lega.user = userName
       cega_lega.identityFile = identity
     stage('Public clean') {
-        sshCommand remote: cega_lega, failOnError: false, command: "if [ -d LocalEGA-deploy-swarm ]; then\r\n\t$GRADLE clean_all\r\n\trm -rf LocalEGA-deploy-swarm \r\n fi"
+        sshCommand remote: cega_lega, failOnError: false, command: "if [ -d LocalEGA-deploy-swarm ]; then\r\n\t$GRADLE clean_all\r\n\trm -rf LocalEGA-deploy-swarm; \r\n fi"
         //sshCommand remote: cega_lega, failOnError: false, command: "rm -rf LocalEGA-deploy-swarm"
     }
     stage('Public bootstrap') {
