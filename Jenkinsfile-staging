@@ -1,7 +1,7 @@
 node {
   def remote = [:]
   env.GRADLE_HOME = '/home/ubuntu/.sdkman/candidates/gradle/current'
-  env.GRADLE = '/home/ubuntu/.sdkman/candidates/gradle/current/bin/gradle -p repo'
+  env.GRADLE = '/home/ubuntu/.sdkman/candidates/gradle/current/bin/gradle -p LocalEGA-deploy-swarm'
   remote.name = 'test'
   remote.host = '158.37.63.36'
   remote.user = 'ubuntu'
@@ -20,6 +20,11 @@ node {
       } 
       stage('Remote SSH deploy private') {
         sshCommand remote: remote, command: "$GRADLE deployPrivate"
+      } 
+      stage('Remote SSH post deploy private') {
+        sshCommand remote: remote, command: "$GRADLE ls"
+        sshCommand remote: remote, command: "docker service logs lega-private_mediator-server"
+        sshCommand remote: remote, command: "docker service logs lega-private_ingest"
       } 
   }
 }
