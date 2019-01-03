@@ -14,49 +14,63 @@ node {
   cega_lega.user = 'ubuntu'
   cega_lega.password = 'password'
   cega_lega.allowAnyHosts = true
-    withCredentials([sshUserPrivateKey(credentialsId: 'tsdkey', keyFileVariable: 'identity', passphraseVariable: '', usernameVariable: 'userName')]) {
-        tsd.user = userName
-        tsd.identityFile = identity
-      stage('Private clean') {
-        sshCommand remote: tsd, command: "$GRADLE clean_all"
-        sshCommand remote: tsd, command: "rm -rf LocalEGA-deploy-swarm"
-      } 
-      stage('Private bootstrap') {
-        sshCommand remote: tsd, command: "git clone --single-branch --branch $env.BRANCH_NAME https://github.com/NBISweden/LocalEGA-deploy-swarm.git"
-        sshCommand remote: tsd, command: "$GRADLE bootstrapPrivate"
-      } 
-      stage('Private deploy') {
-        sshCommand remote: tsd, command: "$GRADLE deployPrivate"
-      } 
-      stage('Private post deploy') {
-        sshCommand remote: tsd, command: "$GRADLE ls"
-        sshCommand remote: tsd, command: "docker service logs lega-private_mediator-server"
-        sshCommand remote: tsd, command: "docker service logs lega-private_ingest"
-      } 
+  
+  withCredentials([sshUserPrivateKey(credentialsId: 'tsdkey', keyFileVariable: 'identity', passphraseVariable: '', usernameVariable: 'userName')]) {
+      tsd.user = userName
+      tsd.identityFile = identity
+    stage('Private clean') {
+      if (fileExists('LocalEGA-deploy-swarm')) {
+      sshCommand remote: tsd, command: "$GRADLE clean_all"
+      sshCommand remote: tsd, command: "rm -rf LocalEGA-deploy-swarm"
+      } else {
+          echo 'Nothing to clean'
+      }
+    } 
+    stage('Private bootstrap') {
+      sshCommand remote: tsd, command: "git clone --single-branch --branch $env.BRANCH_NAME https://github.com/NBISweden/LocalEGA-deploy-swarm.git"
+      sshCommand remote: tsd, command: "$GRADLE bootstrapPrivate"
+    } 
+    stage('Private deploy') {
+      sshCommand remote: tsd, command: "$GRADLE deployPrivate"
+    } 
+    stage('Private post deploy') {
+      sshCommand remote: tsd, command: "$GRADLE ls"
+      sshCommand remote: tsd, command: "docker service logs lega-private_mediator-server"
+      sshCommand remote: tsd, command: "docker service logs lega-private_ingest"
+      sshCommand remote: tsd, command: "docker service logs lega-private_private-mq"
+      sshCommand remote: tsd, command: "docker service logs lega-private_s3"
+      sshCommand remote: tsd, command: "docker service logs lega-private_db"
+      sshCommand remote: tsd, command: "docker service logs lega-private_verify"
+    } 
   }
-//}
-//node {
-//  env.GRADLE_HOME = '/home/ubuntu/.sdkman/candidates/gradle/current'
-//  env.GRADLE = '/home/ubuntu/.sdkman/candidates/gradle/current/bin/gradle -p LocalEGA-deploy-swarm'  
-    withCredentials([sshUserPrivateKey(credentialsId: 'publicKey', keyFileVariable: 'identity', passphraseVariable: '', usernameVariable: 'userName')]) {
-        cega_lega.user = userName
-        cega_lega.identityFile = identity
-      stage('Public clean') {
+  withCredentials([sshUserPrivateKey(credentialsId: 'publicKey', keyFileVariable: 'identity', passphraseVariable: '', usernameVariable: 'userName')]) {
+      cega_lega.user = userName
+      cega_lega.identityFile = identity
+    stage('Public clean') {
+      if (fileExists('LocalEGA-deploy-swarm')) {
         sshCommand remote: cega_lega, command: "$GRADLE clean_all"
         sshCommand remote: cega_lega, command: "rm -rf LocalEGA-deploy-swarm"
-        }
-      stage('Public bootstrap') {
-        sshCommand remote: cega_lega, command: "git clone --single-branch --branch $env.BRANCH_NAME https://github.com/NBISweden/LocalEGA-deploy-swarm.git"
-        sshCommand remote: cega_lega, command: "$GRADLE bootstrapPublic"
-      } 
-      stage('Public deploy ') {
-        sshCommand remote: cega_lega, command: "$GRADLE deployPublic"
-      } 
-      stage('Public post deploy') {
-        sshCommand remote: cega_lega, command: "$GRADLE ls"
-        sshCommand remote: cega_lega, command: "docker service logs lega-public_mediator-client"
-        sshCommand remote: cega_lega, command: "docker service logs lega-public_mq"
-      } 
+      } else {
+          echo 'Nothing to clean'
+      }
     }
+    stage('Public bootstrap') {
+      sshCommand remote: cega_lega, command: "git clone --single-branch --branch $env.BRANCH_NAME https://github.com/NBISweden/LocalEGA-deploy-swarm.git"
+      sshCommand remote: cega_lega, command: "$GRADLE bootstrapPublic"
+    } 
+    stage('Public deploy ') {
+      sshCommand remote: cega_lega, command: "$GRADLE deployPublic"
+    } 
+    stage('Public post deploy') {
+      sshCommand remote: cega_lega, command: "$GRADLE ls"
+      sshCommand remote: cega_lega, command: "docker service logs lega-public_mediator-client"
+      sshCommand remote: cega_lega, command: "docker service logs lega-public_mq"
+      sshCommand remote: cega_lega, command: "docker service logs lega-public_inbox"
+      sshCommand remote: cega_lega, command: "docker service logs cega_cega-mq"
+    } 
+    stage('Public ingest') {
+      sshCommand remote: cega_lega, command: "$GRADLE ingest"
+    } 
+  }
 }
 
