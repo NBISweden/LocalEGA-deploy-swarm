@@ -1,7 +1,7 @@
 node {
   def remote = [:]
   env.GRADLE_HOME = '/home/ubuntu/.sdkman/candidates/gradle/current'
-  env.GRADLE = '/home/ubuntu/.sdkman/candidates/gradle/current/bin/gradle -p LocalEGA-deploy-swarm'
+  env.GRADLE = 'gradle -p LocalEGA-deploy-swarm'
   remote.name = 'test'
   remote.host = '158.37.63.36'
   remote.user = 'ubuntu'
