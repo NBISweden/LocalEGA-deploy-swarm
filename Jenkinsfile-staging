@@ -27,11 +27,11 @@ node {
         sshCommand remote: remote, command: "docker service logs lega-private_ingest"
       } 
   }
-}
-node {
-  def remote = [:]
-  env.GRADLE_HOME = '/home/ubuntu/.sdkman/candidates/gradle/current'
-  env.GRADLE = '/home/ubuntu/.sdkman/candidates/gradle/current/bin/gradle -p LocalEGA-deploy-swarm'  remote.name = 'public'
+//}
+//node {
+//  def remote = [:]
+//  env.GRADLE_HOME = '/home/ubuntu/.sdkman/candidates/gradle/current'
+//  env.GRADLE = '/home/ubuntu/.sdkman/candidates/gradle/current/bin/gradle -p LocalEGA-deploy-swarm'  remote.name = 'public'
   remote.host = '158.37.63.170'
   remote.user = 'ubuntu'
   remote.password = 'password'
