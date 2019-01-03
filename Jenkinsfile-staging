@@ -37,21 +37,31 @@ node {
   remote.user = 'ubuntu'
   remote.password = 'password'
   remote.allowAnyHosts = true
+      stage('Public clean') {
     withCredentials([sshUserPrivateKey(credentialsId: 'a5a36700-13f7-4efb-a14b-549b7a3499bb', keyFileVariable: 'identity', passphraseVariable: '', usernameVariable: 'userName')]) {
         remote.user = userName
         remote.identityFile = identity
-      stage('Public clean') {
         sshCommand remote: remote, command: "$GRADLE clean_all"
         sshCommand remote: remote, command: "rm -rf LocalEGA-deploy-swarm"
+        }
       } 
       stage('Public bootstrap') {
+          withCredentials([sshUserPrivateKey(credentialsId: 'a5a36700-13f7-4efb-a14b-549b7a3499bb', keyFileVariable: 'identity', passphraseVariable: '', usernameVariable: 'userName')]) {
+        remote.user = userName
+        remote.identityFile = identity
         sshCommand remote: remote, command: "git clone --single-branch --branch $env.BRANCH_NAME https://github.com/NBISweden/LocalEGA-deploy-swarm.git"
         sshCommand remote: remote, command: "$GRADLE bootstrapPublic"
-      } 
+      } }
       stage('Public deploy ') {
+          withCredentials([sshUserPrivateKey(credentialsId: 'a5a36700-13f7-4efb-a14b-549b7a3499bb', keyFileVariable: 'identity', passphraseVariable: '', usernameVariable: 'userName')]) {
+        remote.user = userName
+        remote.identityFile = identity
         sshCommand remote: remote, command: "$GRADLE deployPublic"
-      } 
+      } }
       stage('Public post deploy') {
+          withCredentials([sshUserPrivateKey(credentialsId: 'a5a36700-13f7-4efb-a14b-549b7a3499bb', keyFileVariable: 'identity', passphraseVariable: '', usernameVariable: 'userName')]) {
+        remote.user = userName
+        remote.identityFile = identity
         sshCommand remote: remote, command: "$GRADLE ls"
         sshCommand remote: remote, command: "docker service logs lega-public_mediator-client"
         sshCommand remote: remote, command: "docker service logs lega-public_mq"
