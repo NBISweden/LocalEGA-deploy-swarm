@@ -26,12 +26,10 @@ pipeline {
     stage('Create VM') {
       steps {
         sh '''
-        docker-machine create \
-        --driver generic \
+        docker-machine create --driver generic \
         --generic-ip-address=158.37.63.36 \
         --generic-ssh-user=ubuntu \
-        --generic-ssh-key tsd.pem\
-        vm
+        --generic-ssh-key=tsd.pem vm
           eval "$(docker-machine env ${GIT_COMMIT})"
           docker swarm init
         '''
