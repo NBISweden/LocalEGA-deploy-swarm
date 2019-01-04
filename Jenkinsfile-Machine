@@ -119,8 +119,16 @@ pipeline {
         '''
       }
     cleanup { 
-      sh 'docker-machine rm -y private-${GIT_COMMIT}'
-      sh 'docker-machine rm -y public-${GIT_COMMIT}'
+      sh '''
+       eval "$(docker-machine env public-${GIT_COMMIT})"
+       docker-machine rm -y private-${GIT_COMMIT}
+       docker swarm leave
+        '''
+      sh '''
+        eval "$(docker-machine env private-${GIT_COMMIT})"
+        docker-machine rm -y public-${GIT_COMMIT}
+        docker swarm leave
+        '''
     }
   }
   
