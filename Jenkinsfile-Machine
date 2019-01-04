@@ -48,7 +48,7 @@ pipeline {
         sh '''
           eval "$(docker-machine env private-${GIT_COMMIT})"
           gradle deployPrivate
-          sleep 120
+          sleep 30
           gradle ls
         '''
       }
@@ -78,7 +78,7 @@ pipeline {
         sh '''
           eval "$(docker-machine env public-${GIT_COMMIT})"
           gradle deployPublic
-          sleep 120
+          sleep 60
           gradle ls
         '''
       }
@@ -105,7 +105,7 @@ pipeline {
           docker service logs lega-public_mq
         '''
         sh '''
-          eval "$(docker-machine env private_${GIT_COMMIT})"
+          eval "$(docker-machine env private-${GIT_COMMIT})"
           echo '---=== lega-private_private-mq Logs ===---'
           docker service logs lega-private_private-mq
           echo '---=== lega-private_ingest Logs ===---'
