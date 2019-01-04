@@ -29,7 +29,7 @@ pipeline {
         docker-machine create --driver generic \
         --generic-ip-address=158.37.63.36 \
         --generic-ssh-user=ubuntu \
-        --generic-ssh-key=tsd.pem vm
+        --generic-ssh-key=tsd.pem ${GIT_COMMIT}
           eval "$(docker-machine env ${GIT_COMMIT})"
           docker swarm init
         '''
