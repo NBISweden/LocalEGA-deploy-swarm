@@ -20,6 +20,8 @@ services:
 
   cega-users:
     image: nbisweden/ega-base:latest
+    ports:
+      - "80:80"
     deploy:
       restart_policy:
         condition: on-failure

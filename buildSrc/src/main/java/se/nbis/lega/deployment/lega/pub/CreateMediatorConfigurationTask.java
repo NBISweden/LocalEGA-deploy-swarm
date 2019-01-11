@@ -8,7 +8,7 @@ import java.io.IOException;
 public class CreateMediatorConfigurationTask extends LegaPublicTask {
 
     @TaskAction public void run() throws IOException {
-        writeTrace("MEDIATOR_SERVER", getHost() + "8080");
+        writeTrace("MEDIATOR_SERVER", getHost() + ":8080");
     }
 
 }
