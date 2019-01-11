@@ -10,7 +10,6 @@ import java.util.UUID;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.tasks.TaskAction;
-import se.nbis.lega.deployment.CegaTask;
 
 public class CreateMQConfigurationTask extends CegaTask {
 

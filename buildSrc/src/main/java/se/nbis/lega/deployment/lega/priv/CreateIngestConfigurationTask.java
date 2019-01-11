@@ -1,9 +1,9 @@
-package se.nbis.lega.deployment.lega;
+package se.nbis.lega.deployment.lega.priv;
 
 import java.io.File;
 import java.io.IOException;
 import org.gradle.api.tasks.TaskAction;
-import se.nbis.lega.deployment.LegaPrivateTask;
+import se.nbis.lega.deployment.lega.priv.LegaPrivateTask;
 
 public class CreateIngestConfigurationTask extends LegaPrivateTask {
 

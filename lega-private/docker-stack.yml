@@ -1,179 +1,165 @@
 version: '3.3'
 
-networks:
-  lega-private:
-    external: true
-#  lega-public:
-#    external: true
-#  cega:
-#    external: true
-
 services:
+
+  mq:
+    image: rabbitmq:3.6.14-management
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        window: 120s
+    configs:
+      - source: lega-private.defs.json
+        target: /etc/rabbitmq/defs.json
+      - source: lega-private.rabbitmq.config
+        target: /etc/rabbitmq/rabbitmq.config
+    command: ["rabbitmq-server"]
 
   db:
     image: postgres:10
-    networks:
-    - lega-private
-#    - lega-public
     deploy:
       restart_policy:
         condition: on-failure
         delay: 5s
         window: 120s
     environment:
-    - PGDATA=/ega/data
-    - DB_LEGA_IN_PASSWORD
-    - DB_LEGA_OUT_PASSWORD
-    - SSL_SUBJ=/C=NO/ST=Norway/L=Oslo/O=UiO/OU=IFI/CN=LocalEGA/emailAddress=ega@nbis.se
+      - PGDATA=/ega/data
+      - DB_LEGA_IN_PASSWORD
+      - DB_LEGA_OUT_PASSWORD
+      - SSL_SUBJ=/C=NO/ST=Norway/L=Oslo/O=UiO/OU=IFI/CN=LocalEGA/emailAddress=ega@nbis.se
     volumes:
-    - db:/ega/data
+      - db:/ega/data
     configs:
-    - source: postgresql.conf
-      target: /etc/ega/pg.conf
-    - source: main.sql
-      target: /docker-entrypoint-initdb.d/main.sql
-    - source: grants.sql
-      target: /docker-entrypoint-initdb.d/grants.sql
-    - source: download.sql
-      target: /docker-entrypoint-initdb.d/download.sql
-    - source: ebi.sql
-      target: /docker-entrypoint-initdb.d/ebi.sql
-    - source: qc.sql
-      target: /docker-entrypoint-initdb.d/qc.sql
-    - source: db.entrypoint.sh
-      target: /usr/bin/ega-entrypoint.sh
-      uid: '999'
-      gid: '999'
-      mode: 0555
+      - source: postgresql.conf
+        target: /etc/ega/pg.conf
+      - source: main.sql
+        target: /docker-entrypoint-initdb.d/main.sql
+      - source: grants.sql
+        target: /docker-entrypoint-initdb.d/grants.sql
+      - source: download.sql
+        target: /docker-entrypoint-initdb.d/download.sql
+      - source: ebi.sql
+        target: /docker-entrypoint-initdb.d/ebi.sql
+      - source: qc.sql
+        target: /docker-entrypoint-initdb.d/qc.sql
+      - source: db.entrypoint.sh
+        target: /usr/bin/ega-entrypoint.sh
+        uid: '999'
+        gid: '999'
+        mode: 0555
     entrypoint: ["/bin/bash", "/usr/bin/ega-entrypoint.sh"]
+
+  s3:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        window: 120s
+    environment:
+      - MINIO_ACCESS_KEY
+      - MINIO_SECRET_KEY
+    volumes:
+      - s3:/data
+    command: server /data
 
   keys:
     image: cscfi/ega-keyserver:latest
-    networks:
-    - lega-private
-#    - lega-public
-#    - cega
     deploy:
       restart_policy:
         condition: on-failure
         delay: 5s
         window: 120s
     environment:
-    - SPRING_PROFILES_ACTIVE=no-oss
-    - EGA_KEY_PATH=/etc/ega/pgp/ega.sec,/etc/ega/pgp/ega2.sec
-    - EGA_KEYPASS_PATH=/etc/ega/pgp/ega.sec.pass,/etc/ega/pgp/ega2.sec.pass
-    - EGA_SHAREDPASS_PATH=/etc/ega/pgp/ega.shared.pass
-    - EGA_PUBLICKEY_URL=
-    - EGA_LEGACY_PATH=
+      - SPRING_PROFILES_ACTIVE=no-oss
+      - EGA_KEY_PATH=/etc/ega/pgp/ega.sec,/etc/ega/pgp/ega2.sec
+      - EGA_KEYPASS_PATH=/etc/ega/pgp/ega.sec.pass,/etc/ega/pgp/ega2.sec.pass
+      - EGA_SHAREDPASS_PATH=/etc/ega/pgp/ega.shared.pass
+      - EGA_PUBLICKEY_URL=
+      - EGA_LEGACY_PATH=
     configs:
-    - source: ega.sec
-      target: /etc/ega/pgp/ega.sec
-    - source: ega2.sec
-      target: /etc/ega/pgp/ega2.sec
-    - source: ega.sec.pass
-      target: /etc/ega/pgp/ega.sec.pass
-    - source: ega2.sec.pass
-      target: /etc/ega/pgp/ega2.sec.pass
-    - source: ega.shared.pass
-      target: /etc/ega/pgp/ega.shared.pass
+      - source: ega.sec
+        target: /etc/ega/pgp/ega.sec
+      - source: ega2.sec
+        target: /etc/ega/pgp/ega2.sec
+      - source: ega.sec.pass
+        target: /etc/ega/pgp/ega.sec.pass
+      - source: ega2.sec.pass
+        target: /etc/ega/pgp/ega2.sec.pass
+      - source: ega.shared.pass
+        target: /etc/ega/pgp/ega.shared.pass
 
   verify:
     image: nbisweden/ega-base:latest
-    networks:
-    - lega-private
-#    - lega-public
     deploy:
       restart_policy:
         condition: on-failure
         delay: 5s
         window: 120s
     depends_on:
-    - db
-    - keys
-    - s3
+      - db
+      - keys
+      - s3
+      - mq
     environment:
-    - LEGA_PASSWORD
-    - S3_ACCESS_KEY
-    - S3_SECRET_KEY
+      - LEGA_PASSWORD
+      - S3_ACCESS_KEY
+      - S3_SECRET_KEY
     configs:
-    - source: conf.ini
-      target: /etc/ega/conf.ini
+      - source: conf.ini
+        target: /etc/ega/conf.ini
     entrypoint: ["gosu", "lega", "ega-verify"]
 
   res:
     image: cscfi/ega-res:latest
-    networks:
-    - lega-private
-#    - lega-public
     ports:
-    - "8081:8080"
+      - "8081:8080"
     deploy:
       restart_policy:
         condition: on-failure
         delay: 5s
         window: 120s
     depends_on:
-    - s3
-    - keys
+      - s3
+      - keys
     environment:
-    - SPRING_PROFILES_ACTIVE=no-oss,LocalEGA
-    - EGA_EGA_EXTERNAL_URL=
-    - EGA_EGA_CRAM_FASTA_A=
-    - EGA_EGA_CRAM_FASTA_B=
-    - EGA_EBI_FIRE_URL=
-    - EGA_EBI_FIRE_ARCHIVE=
-    - EGA_EBI_FIRE_KEY=
-    - SERVICE_ARCHIVE_CLASS=
-    - EGA_SHAREDPASS_PATH=/etc/ega/pgp/ega.shared.pass
-    - EGA_EBI_AWS_ENDPOINT_URL=http://s3:9000
-    - EGA_EBI_AWS_ACCESS_KEY=
-    - EGA_EBI_AWS_ACCESS_SECRET=
-    - EGA_EBI_AWS_ENDPOINT_REGION=
+      - SPRING_PROFILES_ACTIVE=no-oss,LocalEGA
+      - EGA_EGA_EXTERNAL_URL=
+      - EGA_EGA_CRAM_FASTA_A=
+      - EGA_EGA_CRAM_FASTA_B=
+      - EGA_EBI_FIRE_URL=
+      - EGA_EBI_FIRE_ARCHIVE=
+      - EGA_EBI_FIRE_KEY=
+      - SERVICE_ARCHIVE_CLASS=
+      - EGA_SHAREDPASS_PATH=/etc/ega/pgp/ega.shared.pass
+      - EGA_EBI_AWS_ENDPOINT_URL=http://s3:9000
+      - EGA_EBI_AWS_ACCESS_KEY=
+      - EGA_EBI_AWS_ACCESS_SECRET=
+      - EGA_EBI_AWS_ENDPOINT_REGION=
     configs:
-    - source: ega.shared.pass
-      target: /etc/ega/pgp/ega.shared.pass
-
-  s3:
-    image: minio/minio:latest
-    networks:
-    - lega-private
-#    - lega-public
-    ports:
-    - "9000:9000"
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        window: 120s
-    environment:
-    - MINIO_ACCESS_KEY
-    - MINIO_SECRET_KEY
-    volumes:
-    - s3:/data
-    command: server /data
+      - source: ega.shared.pass
+        target: /etc/ega/pgp/ega.shared.pass
 
   id-mapper:
     image: nbisweden/ega-base:latest
-    networks:
-    - lega-private
-#    - lega-public
     deploy:
       restart_policy:
         condition: on-failure
         delay: 5s
         window: 120s
     depends_on:
-    - lega-public_mq
+      - mq
+      - db
     configs:
-    - source: conf.ini
-      target: /etc/ega/conf.ini
+      - source: conf.ini
+        target: /etc/ega/conf.ini
     entrypoint: ["gosu", "lega", "ega-id-mapper"]
 
   ingest:
     image: nbisweden/ega-base:latest
-    networks:
-    - lega-private
-#    - lega-public
     deploy:
       placement:
         constraints: [node.role == manager]
@@ -182,71 +168,38 @@ services:
         delay: 5s
         window: 120s
     depends_on:
-    - lega-public_mq
+      - mq
+      - db
+      - s3
     environment:
-    - S3_ACCESS_KEY
-    - S3_SECRET_KEY
+      - S3_ACCESS_KEY
+      - S3_SECRET_KEY
     volumes:
-    - inbox:/ega/inbox
+      - inbox:/ega/inbox
     configs:
-    - source: conf.ini
-      target: /etc/ega/conf.ini
+      - source: conf.ini
+        target: /etc/ega/conf.ini
     entrypoint: ["gosu", "lega", "ega-ingest"]
-
-#  portainer:
-#    image: portainer/portainer:latest
-#    ports:
-#    - "40000:9000"
-#    command: --no-auth
-#    deploy:
-#      placement:
-#        constraints: [node.role == manager]
-#    volumes:
-#    - /var/run/docker.sock:/var/run/docker.sock
-#    - portainer:/data
-
-  private-mq:
-    image: rabbitmq:3.6.14-management
-    networks:
-    - lega-private
-#    - lega-public
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        window: 120s
-    environment:
-    - CEGA_CONNECTION
-    configs:
-    - source: lega-private.defs.json
-      target: /etc/rabbitmq/defs.json
-    - source: lega-private.rabbitmq.config
-      target: /etc/rabbitmq/rabbitmq.config
-    command: ["rabbitmq-server"]
 
   mediator-server:
     image: uiobmi/mediator.server:latest
     ports:
-    - "8080:8080"
+      - "8080:8080"
     deploy:
       restart_policy:
         condition: on-failure
         delay: 5s
         window: 120s
-    networks:
-    - lega-private
-#    - lega-public
     depends_on:
-    - private-mq
+      - mq
     environment:
-    - BROKER_HOST=private-mq
+      - BROKER_HOST=mq
 
 volumes:
   s3:
   db:
   inbox:
     external: true
-#  portainer:
 
 configs:
   lega-private.defs.json:

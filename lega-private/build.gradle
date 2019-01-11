@@ -1,5 +1,6 @@
 import se.nbis.lega.deployment.*
-import se.nbis.lega.deployment.lega.*
+import se.nbis.lega.deployment.lega.Volume
+import se.nbis.lega.deployment.lega.priv.*
 
 import java.util.stream.Collectors
 
@@ -9,17 +10,13 @@ task removeVolumes(type: RemoveVolumesTask) {
     setVolumes Arrays.stream(Volume.values()).map { v -> v.getName() }.collect(Collectors.toSet())
 }
 
-task removeNetworks(type: RemoveNetworksTask) {
-    setGroup Groups.LEGA_PRIVATE.getName()
-
-    setNetworks Arrays.stream(Network.values()).map { v -> v.getName() }.collect(Collectors.toSet())
-}
-
 task clearConfiguration(type: ClearConfigurationTask) {
     setGroup Groups.LEGA_PRIVATE.getName()
 
-    setConfigs Arrays.stream(LegaPrivateConfig.values()).map { c -> c.getName() }.collect(Collectors.toSet())
+    setConfigs Arrays.stream(Config.values()).map { c -> c.getName() }.collect(Collectors.toSet())
 }
+
+task createMQConfiguration(type: CreateMQConfigurationTask)
 
 task createDBConfiguration(type: CreateDBConfigurationTask)
 
@@ -27,7 +24,7 @@ task createKeysConfiguration(type: CreateKeysConfigurationTask)
 
 task createMinioConfiguration(type: CreateMinioConfigurationTask)
 
-task createConfIni(type: CreateLegaPrivateConfIniConfigurationTask)
+task createConfIni(type: CreateConfIniConfigurationTask)
 
 task createKeysIni(type: CreateKeysIniConfigurationTask)
 
@@ -38,8 +35,9 @@ task createIngestConfiguration(type: CreateIngestConfigurationTask)
 task createConfiguration {
     setGroup Groups.LEGA_PRIVATE.getName()
 
-    dependsOn clearConfiguration, createConfIni, createKeysIni
+    dependsOn "clearConfiguration", "createConfIni", "createKeysIni"
 }
+
 task deployStack(type: DeployStackTask) {
     setGroup Groups.LEGA_PRIVATE.getName()
 

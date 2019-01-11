@@ -1,4 +1,4 @@
-package se.nbis.lega.deployment.lega;
+package se.nbis.lega.deployment.lega.priv;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +20,8 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.tasks.TaskAction;
-import se.nbis.lega.deployment.LegaPrivateTask;
+import se.nbis.lega.deployment.lega.priv.LegaPrivateTask;
+import se.nbis.lega.deployment.lega.priv.Config;
 
 public class CreateKeysIniConfigurationTask extends LegaPrivateTask {
 
@@ -40,7 +41,7 @@ public class CreateKeysIniConfigurationTask extends LegaPrivateTask {
 
         encryptAES(getProject().file(".tmp/keys.ini"), getProject().file(".tmp/keys.ini.enc"), keysPassphrase);
 
-        createConfig(LegaPrivateConfig.KEYS_INI_ENC.getName(), getProject().file(".tmp/keys.ini.enc"));
+        createConfig(Config.KEYS_INI_ENC.getName(), getProject().file(".tmp/keys.ini.enc"));
     }
 
     private void generateKeysIni() throws IOException {

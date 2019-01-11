@@ -32,7 +32,6 @@ import io.minio.errors.InvalidBucketNameException;
 import io.minio.errors.InvalidEndpointException;
 import io.minio.errors.InvalidPortException;
 import io.minio.errors.NoResponseException;
-import se.nbis.lega.deployment.TestTask;
 
 public class IngestFileTask extends TestTask {
 

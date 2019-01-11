@@ -1,16 +1,9 @@
 version: '3.3'
 
-networks:
-
-  cega:
-    external: true
-
 services:
 
   cega-mq:
     image: rabbitmq:3.6.14-management
-    networks:
-      - cega
     ports:
       - "15670:15672"
       - "5672:5672"
@@ -27,8 +20,6 @@ services:
 
   cega-users:
     image: nbisweden/ega-base:latest
-    networks:
-      - cega
     deploy:
       restart_policy:
         condition: on-failure

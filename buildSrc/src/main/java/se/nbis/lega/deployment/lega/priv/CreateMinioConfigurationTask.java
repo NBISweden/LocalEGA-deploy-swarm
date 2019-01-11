@@ -1,9 +1,9 @@
-package se.nbis.lega.deployment.lega;
+package se.nbis.lega.deployment.lega.priv;
 
 import java.io.IOException;
 import java.util.UUID;
 import org.gradle.api.tasks.TaskAction;
-import se.nbis.lega.deployment.LegaPrivateTask;
+import se.nbis.lega.deployment.lega.priv.LegaPrivateTask;
 
 public class CreateMinioConfigurationTask extends LegaPrivateTask {
 
