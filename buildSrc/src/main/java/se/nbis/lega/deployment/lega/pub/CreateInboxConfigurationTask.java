@@ -12,9 +12,12 @@ public class CreateInboxConfigurationTask extends LegaPublicTask {
         String cegaRESTPassword =
             readTrace(getProject().getParent().file(CEGA_TMP_TRACE), "CEGA_REST_PASSWORD");
         if (cegaRESTPassword != null) {
-            writeTrace("CEGA_ENDPOINT", String
-                .format("http://%s/lega/v1/legas/users/%%s?idType=username",
-                    getMachineIPAddress(Machine.CEGA.getName())));
+            String host = getProperty("cegaIP");
+            if (host == null) {
+                host = getMachineIPAddress(Machine.CEGA.getName());
+            }
+            writeTrace("CEGA_ENDPOINT",
+                String.format("http://%s/lega/v1/legas/users/%%s?idType=username", host));
             writeTrace("CEGA_ENDPOINT_CREDS", "lega:" + cegaRESTPassword);
         }
     }

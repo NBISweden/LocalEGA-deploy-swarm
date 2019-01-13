@@ -9,7 +9,11 @@ public class CreateMediatorConfigurationTask extends LegaPublicTask {
 
     @TaskAction
     public void run() throws IOException {
-        writeTrace("MEDIATOR_SERVER", getMachineIPAddress(Machine.LEGA.getName()) + ":8080");
+        String host = getProperty("legaIP");
+        if (host == null) {
+            host = getMachineIPAddress(Machine.LEGA.getName());
+        }
+        writeTrace("MEDIATOR_SERVER", host + ":8080");
     }
 
 }

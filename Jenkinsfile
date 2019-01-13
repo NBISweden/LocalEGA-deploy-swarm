@@ -56,7 +56,7 @@ pipeline {
                       sh '''
                         eval "$(docker-machine env LEGA-${GIT_COMMIT})"
                         gradle :lega-private:createConfiguration
-                        gradle :lega-public:createConfiguration
+                        gradle :lega-public:createConfiguration -PcegaIP=${docker-machine ip CEGA-${GIT_COMMIT}} -PlegaIP=${docker-machine ip LEGA-${GIT_COMMIT}}
                       '''
             }
           )
