@@ -5,13 +5,20 @@ services:
   cega-mq:
     image: rabbitmq:3.6.14-management
     ports:
-      - "15670:15672"
-      - "5672:5672"
+      - "5670:5670"
+      - "15670:15670"
+      - "25670:25670"
+      - "33670:33670"
+      - "33671:33671"
     deploy:
       restart_policy:
         condition: on-failure
         delay: 5s
         window: 120s
+    environment:
+      - RABBITMQ_DIST_PORT=25670
+      - RABBITMQ_CTL_DIST_PORT_MIN=33670
+      - RABBITMQ_CTL_DIST_PORT_MAX=33671
     configs:
       - source: cega.defs.json
         target: /etc/rabbitmq/defs.json

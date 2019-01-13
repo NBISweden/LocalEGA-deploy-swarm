@@ -80,7 +80,7 @@ public class IngestFileTask extends TestTask {
         String mqConnectionString;
         String username;
         if (mqPassword != null) {
-            mqConnectionString = String.format("amqp://lega:%s@%s:5672/lega", mqPassword, host);
+            mqConnectionString = String.format("amqp://lega:%s@%s:5670/lega", mqPassword, host);
             username = "john";
         } else {
             mqConnectionString = System.getenv(CEGA_CONNECTION);

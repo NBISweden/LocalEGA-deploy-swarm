@@ -15,7 +15,7 @@ public class CreateMQConfigurationTask extends LegaPublicTask {
             readTrace(getProject().getParent().file(CEGA_TMP_TRACE), "CEGA_MQ_PASSWORD");
         if (cegaMQPassword != null) {
             writeTrace(CEGA_CONNECTION,
-                String.format("amqp://lega:%s@%s:5672/lega", cegaMQPassword, getHost()));
+                String.format("amqp://lega:%s@%s:5670/lega", cegaMQPassword, getHost()));
         }
     }
 
