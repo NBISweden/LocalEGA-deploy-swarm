@@ -5,20 +5,16 @@ services:
   mq:
     image: rabbitmq:3.6.14-management
     ports:
+      - "4369:4369"
       - "5672:5672"
       - "15672:15672"
-      - "25672:25672"
-      - "33672:33672"
-      - "33673:33673"
+      - "35672-35682:35672-35682"
     deploy:
       restart_policy:
         condition: on-failure
         delay: 5s
         window: 120s
     environment:
-      - RABBITMQ_DIST_PORT=25672
-      - RABBITMQ_CTL_DIST_PORT_MIN=33672
-      - RABBITMQ_CTL_DIST_PORT_MAX=33673
       - CEGA_CONNECTION
     configs:
       - source: lega-public.defs.json
@@ -72,22 +68,4 @@ configs:
   lega-public.rabbitmq.config:
     external: true
   lega-public.entrypoint.sh:
-    external: true
-  conf.ini:
-    external: true
-  keys.ini.enc:
-    external: true
-  ssl.cert:
-    external: true
-  ssl.key:
-    external: true
-  ega.sec:
-    external: true
-  ega2.sec:
-    external: true
-  ega.sec.pass:
-    external: true
-  ega2.sec.pass:
-    external: true
-  ega.shared.pass:
     external: true

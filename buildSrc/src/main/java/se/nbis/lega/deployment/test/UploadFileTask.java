@@ -6,6 +6,7 @@ import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
 import net.schmizz.sshj.userauth.UserAuthException;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.TaskAction;
+import se.nbis.lega.deployment.cluster.Machine;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,7 +20,10 @@ public class UploadFileTask extends TestTask {
 
     @TaskAction
     public void run() throws IOException {
-        String host = getHost();
+        String host = getProperty("legaIP");
+        if (host == null) {
+            host = getMachineIPAddress(Machine.LEGA.getName());
+        }
         System.out.println("Connecting to " + host);
         SSHClient ssh;
         try {
