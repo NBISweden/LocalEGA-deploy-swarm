@@ -94,32 +94,6 @@ pipeline {
     }
   }
   
-  post('Remove VM') { 
-    always {
-        sh '''
-          eval "$(docker-machine env CEGA-${GIT_COMMIT})"
-          echo '---=== cega_cega-mq Logs ===---'
-          docker service logs cega_cega-mq
-          eval "$(docker-machine env LEGA-${GIT_COMMIT})"
-          echo '---=== lega-public_inbox Logs ===---'
-          docker service logs lega-public_inbox
-          echo '---=== lega-public_mq Logs ===---'
-          docker service logs lega-public_mq
-          echo '---=== lega-private_private-mq Logs ===---'
-          docker service logs lega-private_private-mq
-          echo '---=== lega-private_ingest Logs ===---'
-          docker service logs lega-private_ingest
-          echo '---=== lega-private_s3 Logs ===---'
-          docker service logs lega-private_s3
-          echo '---=== lega-private_db Logs ===---'
-          docker service logs lega-private_db
-          echo '---=== lega-private_verify Logs ===---'
-          docker service logs lega-private_verify
-        '''
-      }
-    cleanup { 
-      sh 'docker-machine rm -y CEGA-${GIT_COMMIT} LEGA-${GIT_COMMIT}'
-    }
-  }
+
   
 }

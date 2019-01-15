@@ -3,7 +3,9 @@ version: '3.3'
 services:
 
   cega-mq:
-    image: rabbitmq:3.6.14-management
+    image: rabbitmq:3.7.8-management
+    networks:
+      - host
     ports:
       - "4369:4369"
       - "5672:5672"
@@ -22,6 +24,8 @@ services:
 
   cega-users:
     image: nbisweden/ega-base:latest
+    networks:
+      - host
     ports:
       - "80:80"
     deploy:
@@ -55,4 +59,8 @@ configs:
   john.yml:
     external: true
   jane.yml:
+    external: true
+
+networks:
+  host:
     external: true
