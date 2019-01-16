@@ -4,7 +4,6 @@ public enum Config {
 
     DEFS_JSON("cega.defs.json"),
     RABBITMQ_CONFIG("cega.rabbitmq.config"),
-    EUREKA_PY("eureka.py"),
     SERVER_PY("server.py"),
     USERS_HTML("users.html"),
     JOHN_YML("john.yml"),
