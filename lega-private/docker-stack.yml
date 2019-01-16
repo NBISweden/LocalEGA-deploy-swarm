@@ -4,8 +4,6 @@ services:
 
   mq:
     image: rabbitmq:3.7.8-management
-    networks:
-      - host
     deploy:
       restart_policy:
         condition: on-failure
@@ -20,8 +18,6 @@ services:
 
   db:
     image: postgres:10
-    networks:
-      - host
     deploy:
       restart_policy:
         condition: on-failure
@@ -56,8 +52,6 @@ services:
 
   s3:
     image: minio/minio:latest
-    networks:
-      - host
     ports:
       - "9000:9000"
     deploy:
@@ -74,8 +68,6 @@ services:
 
   keys:
     image: cscfi/ega-keyserver:latest
-    networks:
-      - host
     deploy:
       restart_policy:
         condition: on-failure
@@ -102,8 +94,6 @@ services:
 
   verify:
     image: nbisweden/ega-base:latest
-    networks:
-      - host
     deploy:
       restart_policy:
         condition: on-failure
@@ -125,8 +115,6 @@ services:
 
   res:
     image: cscfi/ega-res:latest
-    networks:
-      - host
     ports:
       - "8081:8080"
     deploy:
@@ -157,8 +145,6 @@ services:
 
   id-mapper:
     image: nbisweden/ega-base:latest
-    networks:
-      - host
     deploy:
       restart_policy:
         condition: on-failure
@@ -174,8 +160,6 @@ services:
 
   ingest:
     image: nbisweden/ega-base:latest
-    networks:
-      - host
     deploy:
       placement:
         constraints: [node.role == manager]
@@ -199,8 +183,6 @@ services:
 
   mediator-server:
     image: uiobmi/mediator.server:latest
-    networks:
-      - host
     ports:
       - "8080:8080"
     deploy:
@@ -249,8 +231,4 @@ configs:
   ega2.sec.pass:
     external: true
   ega.shared.pass:
-    external: true
-
-networks:
-  host:
     external: true

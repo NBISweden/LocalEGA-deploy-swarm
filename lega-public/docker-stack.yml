@@ -4,8 +4,6 @@ services:
 
   mq:
     image: rabbitmq:3.7.8-management
-    networks:
-      - host
     ports:
       - "4369:4369"
       - "5672:5672"
@@ -30,8 +28,6 @@ services:
 
   inbox:
     image: nbisweden/ega-mina-inbox:latest
-    networks:
-      - host
     ports:
       - "2222:2222"
     deploy:
@@ -51,8 +47,6 @@ services:
 
   mediator-client:
     image: uiobmi/mediator.client:latest
-    networks:
-      - host
     deploy:
       restart_policy:
         condition: on-failure
@@ -62,6 +56,7 @@ services:
       - mq
     environment:
       - BROKER_HOST=mq
+      - QUEUES=files,stableIDs
       - MEDIATOR_SERVER
 
 volumes:
@@ -74,8 +69,4 @@ configs:
   lega-public.rabbitmq.config:
     external: true
   lega-public.entrypoint.sh:
-    external: true
-
-networks:
-  host:
     external: true
