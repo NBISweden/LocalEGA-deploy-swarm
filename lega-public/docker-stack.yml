@@ -42,8 +42,8 @@ services:
     environment:
       - CEGA_ENDPOINT
       - CEGA_ENDPOINT_CREDS
-    volumes:
-      - inbox:/ega/inbox
+      - S3_ACCESS_KEY
+      - S3_SECRET_KEY
 
   mediator-client:
     image: uiobmi/mediator.client:latest
@@ -58,10 +58,6 @@ services:
       - BROKER_HOST=mq
       - QUEUES=files,stableIDs
       - MEDIATOR_SERVER
-
-volumes:
-  inbox:
-    external: true
 
 configs:
   lega-public.defs.json:

@@ -118,14 +118,14 @@ public class IngestFileTask extends TestTask {
         InsufficientDataException, NoSuchAlgorithmException, NoResponseException, InternalException,
         InvalidKeyException, InvalidBucketNameException, ErrorResponseException {
         File traceFile = getProject().file(LEGA_PRIVATE_TMP_TRACE);
-        String accessKey = readTrace(traceFile, S3_ACCESS_KEY);
-        String secretKey = readTrace(traceFile, S3_SECRET_KEY);
+        String accessKey = readTrace(traceFile, VAULT_S3_ACCESS_KEY);
+        String secretKey = readTrace(traceFile, VAULT_S3_SECRET_KEY);
         MinioClient minioClient =
             new MinioClient(String.format("http://%s:9000", host), accessKey, secretKey);
-        if (!minioClient.bucketExists(LEGA)) {
+        if (!minioClient.bucketExists(VAULT_S3_BUCKET_NAME)) {
             return 0;
         }
-        int size = IterableUtils.size(minioClient.listObjects(LEGA));
+        int size = IterableUtils.size(minioClient.listObjects(VAULT_S3_BUCKET_NAME));
         return size;
     }
 

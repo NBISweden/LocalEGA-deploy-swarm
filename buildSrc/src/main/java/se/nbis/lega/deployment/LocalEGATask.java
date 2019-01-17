@@ -22,11 +22,23 @@ public abstract class LocalEGATask extends DefaultTask {
     public static final String TMP_TRACE = ".tmp/.trace";
     public static final String CEGA_TMP_TRACE = "cega/.tmp/.trace";
     public static final String LEGA_PRIVATE_TMP_TRACE = "lega-private/.tmp/.trace";
-    public static final String S3_SECRET_KEY = "S3_SECRET_KEY";
-    public static final String S3_ACCESS_KEY = "S3_ACCESS_KEY";
+
+    public static final String VAULT_S3_ACCESS_KEY = "VAULT_S3_ACCESS_KEY";
+    public static final String VAULT_S3_SECRET_KEY = "VAULT_S3_SECRET_KEY";
     public static final String CEGA_MQ_PASSWORD = "CEGA_MQ_PASSWORD";
+    public static final String CEGA_REST_PASSWORD = "CEGA_REST_PASSWORD";
     public static final String CEGA_CONNECTION = "CEGA_CONNECTION";
-    public static final String LEGA = "lega";
+    public static final String MEDIATOR_SERVER = "MEDIATOR_SERVER";
+    public static final String CEGA_ENDPOINT = "CEGA_ENDPOINT";
+    public static final String CEGA_ENDPOINT_CREDS = "CEGA_ENDPOINT_CREDS";
+    public static final String KEYS_PASSWORD = "KEYS_PASSWORD";
+    public static final String LEGA_PASSWORD = "LEGA_PASSWORD";
+    public static final String PGP_PASSPHRASE = "PGP_PASSPHRASE";
+    public static final String DB_LEGA_IN_PASSWORD = "DB_LEGA_IN_PASSWORD";
+    public static final String DB_LEGA_OUT_PASSWORD = "DB_LEGA_OUT_PASSWORD";
+    public static final String EGA_USER_PASSWORD_JOHN = "EGA_USER_PASSWORD_JOHN";
+    public static final String EGA_USER_PASSWORD_JANE = "EGA_USER_PASSWORD_JANE";
+    public static final String VAULT_S3_BUCKET_NAME = "lega";
 
     static {
         Security.addProvider(new BouncyCastleProvider());

@@ -20,22 +20,23 @@ task createMQConfiguration(type: CreateMQConfigurationTask)
 
 task createDBConfiguration(type: CreateDBConfigurationTask)
 
+task createVaultS3Configuration(type: CreateVaultS3ConfigurationTask)
+
 task createKeysConfiguration(type: CreateKeysConfigurationTask)
 
-task createMinioConfiguration(type: CreateMinioConfigurationTask)
+task createKeysIniConfiguration(type: CreateKeysIniConfigurationTask) {
+    dependsOn "createKeysConfiguration"
+}
 
-task createConfIni(type: CreateConfIniConfigurationTask)
-
-task createKeysIni(type: CreateKeysIniConfigurationTask)
-
-task createRESConfiguration(type: CreateRESConfigurationTask)
-
-task createIngestConfiguration(type: CreateIngestConfigurationTask)
+task createConfIniConfiguration(type: CreateConfIniConfigurationTask) {
+    dependsOn "createDBConfiguration", "createVaultS3Configuration"
+}
 
 task createConfiguration {
     setGroup Groups.LEGA_PRIVATE.getName()
 
-    dependsOn "clearConfiguration", "createConfIni", "createKeysIni"
+    dependsOn "clearConfiguration", "createConfIniConfiguration", "createKeysIniConfiguration",
+            "createMQConfiguration"
 }
 
 task deployStack(type: DeployStackTask) {

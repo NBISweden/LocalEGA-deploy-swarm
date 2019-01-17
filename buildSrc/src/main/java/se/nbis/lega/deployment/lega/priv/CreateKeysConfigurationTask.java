@@ -1,5 +1,34 @@
 package se.nbis.lega.deployment.lega.priv;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.sshd.common.config.keys.KeyUtils;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.X500NameBuilder;
+import org.bouncycastle.asn1.x500.style.BCStyle;
+import org.bouncycastle.bcpg.ArmoredOutputStream;
+import org.bouncycastle.bcpg.HashAlgorithmTags;
+import org.bouncycastle.bcpg.sig.Features;
+import org.bouncycastle.bcpg.sig.KeyFlags;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.crypto.generators.RSAKeyPairGenerator;
+import org.bouncycastle.crypto.params.RSAKeyGenerationParameters;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openpgp.*;
+import org.bouncycastle.openpgp.operator.PBESecretKeyEncryptor;
+import org.bouncycastle.openpgp.operator.PGPDigestCalculator;
+import org.bouncycastle.openpgp.operator.bc.BcPBESecretKeyEncryptorBuilder;
+import org.bouncycastle.openpgp.operator.bc.BcPGPContentSignerBuilder;
+import org.bouncycastle.openpgp.operator.bc.BcPGPDigestCalculatorProvider;
+import org.bouncycastle.openpgp.operator.bc.BcPGPKeyPair;
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.gradle.api.tasks.TaskAction;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
@@ -18,43 +47,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import org.apache.commons.io.FileUtils;
-import org.apache.sshd.common.config.keys.KeyUtils;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x500.X500NameBuilder;
-import org.bouncycastle.asn1.x500.style.BCStyle;
-import org.bouncycastle.bcpg.ArmoredOutputStream;
-import org.bouncycastle.bcpg.HashAlgorithmTags;
-import org.bouncycastle.bcpg.sig.Features;
-import org.bouncycastle.bcpg.sig.KeyFlags;
-import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.cert.X509v3CertificateBuilder;
-import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
-import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
-import org.bouncycastle.crypto.generators.RSAKeyPairGenerator;
-import org.bouncycastle.crypto.params.RSAKeyGenerationParameters;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.openpgp.PGPEncryptedData;
-import org.bouncycastle.openpgp.PGPKeyPair;
-import org.bouncycastle.openpgp.PGPKeyRingGenerator;
-import org.bouncycastle.openpgp.PGPPublicKey;
-import org.bouncycastle.openpgp.PGPPublicKeyRing;
-import org.bouncycastle.openpgp.PGPSecretKeyRing;
-import org.bouncycastle.openpgp.PGPSignature;
-import org.bouncycastle.openpgp.PGPSignatureSubpacketGenerator;
-import org.bouncycastle.openpgp.operator.PBESecretKeyEncryptor;
-import org.bouncycastle.openpgp.operator.PGPDigestCalculator;
-import org.bouncycastle.openpgp.operator.bc.BcPBESecretKeyEncryptorBuilder;
-import org.bouncycastle.openpgp.operator.bc.BcPGPContentSignerBuilder;
-import org.bouncycastle.openpgp.operator.bc.BcPGPDigestCalculatorProvider;
-import org.bouncycastle.openpgp.operator.bc.BcPGPKeyPair;
-import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
-import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.gradle.api.tasks.TaskAction;
-import se.nbis.lega.deployment.lega.priv.LegaPrivateTask;
-import se.nbis.lega.deployment.lega.priv.Config;
 
 public class CreateKeysConfigurationTask extends LegaPrivateTask {
 
@@ -66,7 +58,7 @@ public class CreateKeysConfigurationTask extends LegaPrivateTask {
         createConfig(Config.SSL_CERT.getName(), getProject().file(".tmp/ssl/ssl.cert"));
         createConfig(Config.SSL_KEY.getName(), getProject().file(".tmp/ssl/ssl.key"));
         String pgpPassphrase = UUID.randomUUID().toString().replace("-", "");
-        writeTrace("PGP_PASSPHRASE", pgpPassphrase);
+        writeTrace(PGP_PASSPHRASE, pgpPassphrase);
         File egaSecPass = getProject().file(".tmp/pgp/ega.pass.sec");
         FileUtils.write(egaSecPass, pgpPassphrase, Charset.defaultCharset());
         createConfig(Config.EGA_SEC_PASS.getName(), egaSecPass);
@@ -78,28 +70,31 @@ public class CreateKeysConfigurationTask extends LegaPrivateTask {
         generatePGPKeyPair("ega2", pgpPassphrase);
         createConfig(Config.EGA2_SEC.getName(), getProject().file(".tmp/pgp/ega2.sec"));
         String masterPassphrase = UUID.randomUUID().toString().replace("-", "");
-        writeTrace("LEGA_PASSWORD", masterPassphrase);
+        writeTrace(LEGA_PASSWORD, masterPassphrase);
         File egaSharedSec = getProject().file(".tmp/pgp/ega.shared.sec");
         FileUtils.write(egaSharedSec, masterPassphrase, Charset.defaultCharset());
         createConfig(Config.EGA_SHARED_PASS.getName(), egaSharedSec);
     }
 
-    private void generateSSLCertificate() throws IOException, GeneralSecurityException, OperatorCreationException {
+    private void generateSSLCertificate()
+        throws IOException, GeneralSecurityException, OperatorCreationException {
         KeyPair keyPair = KeyUtils.generateKeyPair("ssh-rsa", 4096);
 
-        X500Name subject = new X500NameBuilder(BCStyle.INSTANCE).addRDN(BCStyle.C, "NO").addRDN(BCStyle.ST, "Norway")
-                        .addRDN(BCStyle.L, "Oslo").addRDN(BCStyle.O, "UiO").addRDN(BCStyle.OU, "IFI")
-                        .addRDN(BCStyle.CN, "LocalEGA").addRDN(BCStyle.EmailAddress, "ega@nbis.se").build();
+        X500Name subject = new X500NameBuilder(BCStyle.INSTANCE).addRDN(BCStyle.C, "NO")
+            .addRDN(BCStyle.ST, "Norway").addRDN(BCStyle.L, "Oslo").addRDN(BCStyle.O, "UiO")
+            .addRDN(BCStyle.OU, "IFI").addRDN(BCStyle.CN, "LocalEGA")
+            .addRDN(BCStyle.EmailAddress, "ega@nbis.se").build();
         SecureRandom random = new SecureRandom();
         byte[] id = new byte[20];
         random.nextBytes(id);
         BigInteger serial = new BigInteger(160, random);
         X509v3CertificateBuilder certificate = new JcaX509v3CertificateBuilder(subject, serial,
-                        Date.from(LocalDate.of(2018, 1, 1).atStartOfDay(ZoneOffset.UTC).toInstant()),
-                        Date.from(LocalDate.of(2020, 1, 1).atStartOfDay(ZoneOffset.UTC).toInstant()), subject,
-                        keyPair.getPublic());
+            Date.from(LocalDate.of(2018, 1, 1).atStartOfDay(ZoneOffset.UTC).toInstant()),
+            Date.from(LocalDate.of(2020, 1, 1).atStartOfDay(ZoneOffset.UTC).toInstant()), subject,
+            keyPair.getPublic());
 
-        ContentSigner signer = new JcaContentSignerBuilder("SHA256withRSA").build(keyPair.getPrivate());
+        ContentSigner signer =
+            new JcaContentSignerBuilder("SHA256withRSA").build(keyPair.getPrivate());
         X509CertificateHolder holder = certificate.build(signer);
 
         JcaX509CertificateConverter converter = new JcaX509CertificateConverter();
@@ -140,14 +135,17 @@ public class CreateKeysConfigurationTask extends LegaPrivateTask {
         Files.setPosixFilePermissions(secFile.toPath(), perms);
     }
 
-    private PGPKeyRingGenerator createPGPKeyRingGenerator(String userId, char[] passphrase) throws Exception {
+    private PGPKeyRingGenerator createPGPKeyRingGenerator(String userId, char[] passphrase)
+        throws Exception {
         RSAKeyPairGenerator keyPairGenerator = new RSAKeyPairGenerator();
 
         keyPairGenerator.init(
-                        new RSAKeyGenerationParameters(BigInteger.valueOf(0x10001), new SecureRandom(), 4096, 12));
+            new RSAKeyGenerationParameters(BigInteger.valueOf(0x10001), new SecureRandom(), 4096,
+                12));
 
         PGPKeyPair rsaKeyPair =
-                        new BcPGPKeyPair(PGPPublicKey.RSA_GENERAL, keyPairGenerator.generateKeyPair(), new Date());
+            new BcPGPKeyPair(PGPPublicKey.RSA_GENERAL, keyPairGenerator.generateKeyPair(),
+                new Date());
 
         PGPSignatureSubpacketGenerator signHashGenerator = new PGPSignatureSubpacketGenerator();
         signHashGenerator.setKeyFlags(false, KeyFlags.SIGN_DATA | KeyFlags.CERTIFY_OTHER);
@@ -156,18 +154,19 @@ public class CreateKeysConfigurationTask extends LegaPrivateTask {
         PGPSignatureSubpacketGenerator encryptHashGenerator = new PGPSignatureSubpacketGenerator();
         encryptHashGenerator.setKeyFlags(false, KeyFlags.ENCRYPT_COMMS | KeyFlags.ENCRYPT_STORAGE);
 
-        PGPDigestCalculator sha1DigestCalculator = new BcPGPDigestCalculatorProvider().get(HashAlgorithmTags.SHA1);
-        PGPDigestCalculator sha512DigestCalculator = new BcPGPDigestCalculatorProvider().get(HashAlgorithmTags.SHA512);
+        PGPDigestCalculator sha1DigestCalculator =
+            new BcPGPDigestCalculatorProvider().get(HashAlgorithmTags.SHA1);
+        PGPDigestCalculator sha512DigestCalculator =
+            new BcPGPDigestCalculatorProvider().get(HashAlgorithmTags.SHA512);
 
         PBESecretKeyEncryptor secretKeyEncryptor =
-                        (new BcPBESecretKeyEncryptorBuilder(PGPEncryptedData.AES_256, sha512DigestCalculator))
-                                        .build(passphrase);
+            (new BcPBESecretKeyEncryptorBuilder(PGPEncryptedData.AES_256, sha512DigestCalculator))
+                .build(passphrase);
 
-        return new PGPKeyRingGenerator(PGPSignature.NO_CERTIFICATION, rsaKeyPair, userId, sha1DigestCalculator,
-                        encryptHashGenerator.generate(), null,
-                        new BcPGPContentSignerBuilder(rsaKeyPair.getPublicKey().getAlgorithm(),
-                                        HashAlgorithmTags.SHA512),
-                        secretKeyEncryptor);
+        return new PGPKeyRingGenerator(PGPSignature.NO_CERTIFICATION, rsaKeyPair, userId,
+            sha1DigestCalculator, encryptHashGenerator.generate(), null,
+            new BcPGPContentSignerBuilder(rsaKeyPair.getPublicKey().getAlgorithm(),
+                HashAlgorithmTags.SHA512), secretKeyEncryptor);
     }
 
     private byte[] armorByteArray(byte[] data) throws IOException {

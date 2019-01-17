@@ -1,10 +1,9 @@
 package se.nbis.lega.deployment.lega.priv;
 
+import org.gradle.api.tasks.TaskAction;
+
 import java.io.IOException;
 import java.util.UUID;
-import org.gradle.api.tasks.TaskAction;
-import se.nbis.lega.deployment.lega.priv.LegaPrivateTask;
-import se.nbis.lega.deployment.lega.priv.Config;
 
 public class CreateDBConfigurationTask extends LegaPrivateTask {
 
@@ -17,8 +16,8 @@ public class CreateDBConfigurationTask extends LegaPrivateTask {
         createConfig(Config.EBI_SQL.getName(), getProject().file("db/ebi.sql"));
         createConfig(Config.QC_SQL.getName(), getProject().file("db/qc.sql"));
         createConfig(Config.DB_ENTRYPOINT_SH.getName(), getProject().file("db/entrypoint.sh"));
-        writeTrace("DB_LEGA_IN_PASSWORD", UUID.randomUUID().toString().replace("-", ""));
-        writeTrace("DB_LEGA_OUT_PASSWORD", UUID.randomUUID().toString().replace("-", ""));
+        writeTrace(DB_LEGA_IN_PASSWORD, UUID.randomUUID().toString().replace("-", ""));
+        writeTrace(DB_LEGA_OUT_PASSWORD, UUID.randomUUID().toString().replace("-", ""));
     }
 
 }
