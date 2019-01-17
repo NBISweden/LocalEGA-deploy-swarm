@@ -13,7 +13,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.sshd.common.config.keys.KeyUtils;
 import org.gradle.api.tasks.TaskAction;
 import net.schmizz.sshj.common.Buffer;
-import se.nbis.lega.deployment.CegaTask;
 
 public class CreateUsersConfigurationTask extends CegaTask {
 

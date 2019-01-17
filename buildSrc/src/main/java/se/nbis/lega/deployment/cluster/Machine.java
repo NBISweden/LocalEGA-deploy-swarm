@@ -1,12 +1,12 @@
-package se.nbis.lega.deployment.lega;
+package se.nbis.lega.deployment.cluster;
 
-public enum Network {
+public enum Machine {
 
-    CEGA("cega");
+    CEGA("cega"), LEGA("lega");
 
     private String name;
 
-    Network(String name) {
+    Machine(String name) {
         this.name = name;
     }
 

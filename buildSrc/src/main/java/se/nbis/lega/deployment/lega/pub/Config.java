@@ -1,6 +1,6 @@
-package se.nbis.lega.deployment.lega;
+package se.nbis.lega.deployment.lega.pub;
 
-public enum LegaPublicConfig {
+public enum Config {
 
     DEFS_JSON("lega-public.defs.json"),
     RABBITMQ_CONFIG("lega-public.rabbitmq.config"),
@@ -8,7 +8,7 @@ public enum LegaPublicConfig {
 
     private String name;
 
-    LegaPublicConfig(String name) {
+    Config(String name) {
         this.name = name;
     }
 

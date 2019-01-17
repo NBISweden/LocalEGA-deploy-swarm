@@ -1,4 +1,7 @@
-package se.nbis.lega.deployment;
+package se.nbis.lega.deployment.test;
+
+import se.nbis.lega.deployment.Groups;
+import se.nbis.lega.deployment.LocalEGATask;
 
 /**
  * Cega task

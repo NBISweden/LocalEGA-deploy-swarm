@@ -1,47 +1,35 @@
 version: '3.3'
 
-networks:
-  lega-public:
-    external: true
-  lega-private:
-    external: true
-  cega:
-    external: true
-
 services:
 
   mq:
-    image: rabbitmq:3.6.14-management
-    networks:
-    - lega-public
-    - lega-private
-    - cega
+    image: rabbitmq:3.7.8-management
     ports:
-    - "15672:15672"
+      - "4369:4369"
+      - "5672:5672"
+      - "15672:15672"
+      - "35672-35682:35672-35682"
     deploy:
       restart_policy:
         condition: on-failure
         delay: 5s
         window: 120s
     environment:
-    - CEGA_CONNECTION
+      - CEGA_CONNECTION
     configs:
-    - source: lega-public.defs.json
-      target: /etc/rabbitmq/defs.json
-    - source: lega-public.rabbitmq.config
-      target: /etc/rabbitmq/rabbitmq.config
-    - source: lega-public.entrypoint.sh
-      target: /usr/bin/ega-entrypoint.sh
+      - source: lega-public.defs.json
+        target: /etc/rabbitmq/defs.json
+      - source: lega-public.rabbitmq.config
+        target: /etc/rabbitmq/rabbitmq.config
+      - source: lega-public.entrypoint.sh
+        target: /usr/bin/ega-entrypoint.sh
     entrypoint: ["/bin/bash", "/usr/bin/ega-entrypoint.sh"]
     command: ["rabbitmq-server"]
 
   inbox:
     image: nbisweden/ega-mina-inbox:latest
-    networks:
-    - lega-public
-    - cega
     ports:
-    - "2222:2222"
+      - "2222:2222"
     deploy:
       placement:
         constraints: [node.role == manager]
@@ -50,28 +38,26 @@ services:
         delay: 5s
         window: 120s
     depends_on:
-    - mq
+      - mq
     environment:
-    - CEGA_ENDPOINT
-    - CEGA_ENDPOINT_CREDS
+      - CEGA_ENDPOINT
+      - CEGA_ENDPOINT_CREDS
     volumes:
-    - inbox:/ega/inbox
+      - inbox:/ega/inbox
 
   mediator-client:
     image: uiobmi/mediator.client:latest
-    networks:
-    - lega-public
-    - lega-private
     deploy:
       restart_policy:
         condition: on-failure
         delay: 5s
         window: 120s
     depends_on:
-    - mq
+      - mq
     environment:
-    - BROKER_HOST=mq
-    - MEDIATOR_SERVER=lega-private_mediator-server:8080
+      - BROKER_HOST=mq
+      - QUEUES=files,stableIDs
+      - MEDIATOR_SERVER
 
 volumes:
   inbox:
@@ -83,22 +69,4 @@ configs:
   lega-public.rabbitmq.config:
     external: true
   lega-public.entrypoint.sh:
-    external: true
-  conf.ini:
-    external: true
-  keys.ini.enc:
-    external: true
-  ssl.cert:
-    external: true
-  ssl.key:
-    external: true
-  ega.sec:
-    external: true
-  ega2.sec:
-    external: true
-  ega.sec.pass:
-    external: true
-  ega2.sec.pass:
-    external: true
-  ega.shared.pass:
     external: true

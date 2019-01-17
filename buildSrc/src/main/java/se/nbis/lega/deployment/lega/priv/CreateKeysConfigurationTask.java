@@ -1,4 +1,4 @@
-package se.nbis.lega.deployment.lega;
+package se.nbis.lega.deployment.lega.priv;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -53,7 +53,8 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.gradle.api.tasks.TaskAction;
-import se.nbis.lega.deployment.LegaPrivateTask;
+import se.nbis.lega.deployment.lega.priv.LegaPrivateTask;
+import se.nbis.lega.deployment.lega.priv.Config;
 
 public class CreateKeysConfigurationTask extends LegaPrivateTask {
 
@@ -62,25 +63,25 @@ public class CreateKeysConfigurationTask extends LegaPrivateTask {
         getProject().file(".tmp/ssl/").mkdirs();
         getProject().file(".tmp/pgp/").mkdirs();
         generateSSLCertificate();
-        createConfig(LegaPrivateConfig.SSL_CERT.getName(), getProject().file(".tmp/ssl/ssl.cert"));
-        createConfig(LegaPrivateConfig.SSL_KEY.getName(), getProject().file(".tmp/ssl/ssl.key"));
+        createConfig(Config.SSL_CERT.getName(), getProject().file(".tmp/ssl/ssl.cert"));
+        createConfig(Config.SSL_KEY.getName(), getProject().file(".tmp/ssl/ssl.key"));
         String pgpPassphrase = UUID.randomUUID().toString().replace("-", "");
         writeTrace("PGP_PASSPHRASE", pgpPassphrase);
         File egaSecPass = getProject().file(".tmp/pgp/ega.pass.sec");
         FileUtils.write(egaSecPass, pgpPassphrase, Charset.defaultCharset());
-        createConfig(LegaPrivateConfig.EGA_SEC_PASS.getName(), egaSecPass);
+        createConfig(Config.EGA_SEC_PASS.getName(), egaSecPass);
         File ega2SecPass = getProject().file(".tmp/pgp/ega2.pass.sec");
         FileUtils.write(ega2SecPass, pgpPassphrase, Charset.defaultCharset());
-        createConfig(LegaPrivateConfig.EGA2_SEC_PASS.getName(), ega2SecPass);
+        createConfig(Config.EGA2_SEC_PASS.getName(), ega2SecPass);
         generatePGPKeyPair("ega", pgpPassphrase);
-        createConfig(LegaPrivateConfig.EGA_SEC.getName(), getProject().file(".tmp/pgp/ega.sec"));
+        createConfig(Config.EGA_SEC.getName(), getProject().file(".tmp/pgp/ega.sec"));
         generatePGPKeyPair("ega2", pgpPassphrase);
-        createConfig(LegaPrivateConfig.EGA2_SEC.getName(), getProject().file(".tmp/pgp/ega2.sec"));
+        createConfig(Config.EGA2_SEC.getName(), getProject().file(".tmp/pgp/ega2.sec"));
         String masterPassphrase = UUID.randomUUID().toString().replace("-", "");
         writeTrace("LEGA_PASSWORD", masterPassphrase);
         File egaSharedSec = getProject().file(".tmp/pgp/ega.shared.sec");
         FileUtils.write(egaSharedSec, masterPassphrase, Charset.defaultCharset());
-        createConfig(LegaPrivateConfig.EGA_SHARED_PASS.getName(), egaSharedSec);
+        createConfig(Config.EGA_SHARED_PASS.getName(), egaSharedSec);
     }
 
     private void generateSSLCertificate() throws IOException, GeneralSecurityException, OperatorCreationException {

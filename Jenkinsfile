@@ -23,67 +23,80 @@ pipeline {
   }
   
   stages {
-    stage('Create VM') {
+    stage('Create VMs') {
       steps {
-        sh '''
-          docker-machine create --driver openstack ${GIT_COMMIT}
-          eval "$(docker-machine env ${GIT_COMMIT})"
-          docker swarm init
-        '''
+      parallel(
+            CEGA: {
+                      sh '''
+                        docker-machine create --driver openstack CEGA-${GIT_COMMIT}
+                        eval "$(docker-machine env CEGA-${GIT_COMMIT})"
+                        docker swarm init
+                      '''
+            },
+            LEGA: {
+                      sh '''
+                        docker-machine create --driver openstack LEGA-${GIT_COMMIT}
+                        eval "$(docker-machine env LEGA-${GIT_COMMIT})"
+                        docker swarm init
+                      '''
+            }
+          )
       }
     }
     stage('Bootstrap') {
       steps {
-        sh '''
-          eval "$(docker-machine env ${GIT_COMMIT})"
-          gradle bootstrap
-        '''
+      parallel(
+            CEGA: {
+                      sh '''
+                        eval "$(docker-machine env CEGA-${GIT_COMMIT})"
+                        gradle :cega:createConfiguration
+                      '''
+            },
+            LEGA: {
+                      sh '''
+                        eval "$(docker-machine env LEGA-${GIT_COMMIT})"
+                        gradle :lega-private:createConfiguration
+                        gradle :lega-public:createConfiguration -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT}) -PlegaIP=$(docker-machine ip LEGA-${GIT_COMMIT})
+                      '''
+            }
+          )
       }
     }
     stage('Deploy') {
       steps {
-        sh '''
-          eval "$(docker-machine env ${GIT_COMMIT})"
-          gradle deploy
-          sleep 120
-          gradle ls
-        '''
+      parallel(
+            CEGA: {
+                      sh '''
+                        eval "$(docker-machine env CEGA-${GIT_COMMIT})"
+                        gradle :cega:deployStack
+                        sleep 120
+                        gradle ls
+                      '''
+            },
+            LEGA: {
+                      sh '''
+                        eval "$(docker-machine env LEGA-${GIT_COMMIT})"
+                        gradle :lega-private:deployStack
+                        gradle :lega-public:deployStack
+                        sleep 120
+                        gradle ls
+                      '''
+            }
+          )
       }
     }
     stage('Test') {
       steps {
         sh '''
-          eval "$(docker-machine env ${GIT_COMMIT})"
-          gradle ingest
+          gradle ingest -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT}) -PlegaIP=$(docker-machine ip LEGA-${GIT_COMMIT})
         '''
       }
     }
   }
   
-  post('Remove VM') { 
-    always {
-        sh '''
-          eval "$(docker-machine env ${GIT_COMMIT})"
-          echo '---=== lega-public_inbox Logs ===---'
-          docker service logs lega-public_inbox
-          echo '---=== cega_cega-mq Logs ===---'
-          docker service logs cega_cega-mq
-          echo '---=== lega-public_mq Logs ===---'
-          docker service logs lega-public_mq
-          echo '---=== lega-private_private-mq Logs ===---'
-          docker service logs lega-private_private-mq
-          echo '---=== lega-private_ingest Logs ===---'
-          docker service logs lega-private_ingest
-          echo '---=== lega-private_s3 Logs ===---'
-          docker service logs lega-private_s3
-          echo '---=== lega-private_db Logs ===---'
-          docker service logs lega-private_db
-          echo '---=== lega-private_verify Logs ===---'
-          docker service logs lega-private_verify
-        '''
-      }
-    cleanup { 
-      sh 'docker-machine rm -y ${GIT_COMMIT}'
+  post('Remove VM') {
+    cleanup {
+      sh 'docker-machine rm -y CEGA-${GIT_COMMIT} LEGA-${GIT_COMMIT}'
     }
   }
   

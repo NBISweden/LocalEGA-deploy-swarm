@@ -1,22 +1,5 @@
 package se.nbis.lega.deployment;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.attribute.PosixFilePermission;
-import java.security.KeyPair;
-import java.security.Security;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
@@ -25,6 +8,14 @@ import org.apache.commons.io.FileUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.gradle.api.DefaultTask;
+
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.attribute.PosixFilePermission;
+import java.security.KeyPair;
+import java.security.Security;
+import java.util.*;
 
 public abstract class LocalEGATask extends DefaultTask {
 
@@ -51,11 +42,6 @@ public abstract class LocalEGATask extends DefaultTask {
         return readTrace(traceFile, key);
     }
 
-    protected String getHost() {
-        String host = System.getenv("DOCKER_HOST");
-        return host == null ? "localhost" : host.substring(6).split(":")[0];
-    }
-
     protected String getProperty(String key) {
         return (String) getProject().getProperties().getOrDefault(key, null);
     }
@@ -68,7 +54,9 @@ public abstract class LocalEGATask extends DefaultTask {
     public void writeTrace(File traceFile, String key, String value) throws IOException {
         String existingValue = readTrace(traceFile, key);
         if (existingValue == null) {
-            FileUtils.writeLines(traceFile, Collections.singleton(String.format("%s=%s", key, value)), true);
+            FileUtils
+                .writeLines(traceFile, Collections.singleton(String.format("%s=%s", key, value)),
+                    true);
         }
     }
 
@@ -110,10 +98,6 @@ public abstract class LocalEGATask extends DefaultTask {
         exec(true, "docker volume rm", name);
     }
 
-    protected void removeNetwork(String name) throws IOException {
-        exec(true, "docker network rm", name);
-    }
-
     protected void createConfig(String name, File file) throws IOException {
         exec("docker config create", name, file.getAbsolutePath());
     }
@@ -122,17 +106,18 @@ public abstract class LocalEGATask extends DefaultTask {
         return exec(false, null, command, arguments);
     }
 
-    protected List<String> exec(boolean ignoreExitCode, String command, String... arguments) throws IOException {
+    protected List<String> exec(boolean ignoreExitCode, String command, String... arguments)
+        throws IOException {
         return exec(ignoreExitCode, null, command, arguments);
     }
 
-    protected List<String> exec(Map<String, String> environment, String command, String... arguments)
-                    throws IOException {
+    protected List<String> exec(Map<String, String> environment, String command,
+        String... arguments) throws IOException {
         return exec(false, environment, command, arguments);
     }
 
-    protected List<String> exec(boolean ignoreExitCode, Map<String, String> environment, String command,
-                    String... arguments) throws IOException {
+    protected List<String> exec(boolean ignoreExitCode, Map<String, String> environment,
+        String command, String... arguments) throws IOException {
         Map<String, String> systemEnvironment = new HashMap<>(System.getenv());
         if (environment != null) {
             systemEnvironment.putAll(environment);
@@ -157,6 +142,10 @@ public abstract class LocalEGATask extends DefaultTask {
                 throw e;
             }
         }
+    }
+
+    protected String getMachineIPAddress(String name) throws IOException {
+        return exec("docker-machine ip", name).iterator().next();
     }
 
     protected void writePublicKey(KeyPair keyPair, File file) throws IOException {

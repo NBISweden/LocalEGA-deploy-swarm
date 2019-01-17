@@ -1,4 +1,7 @@
-package se.nbis.lega.deployment;
+package se.nbis.lega.deployment.lega.pub;
+
+import se.nbis.lega.deployment.Groups;
+import se.nbis.lega.deployment.LocalEGATask;
 
 /**
  * Lega public task
