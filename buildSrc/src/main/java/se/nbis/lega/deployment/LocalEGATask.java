@@ -49,6 +49,17 @@ public abstract class LocalEGATask extends DefaultTask {
         Security.addProvider(new BouncyCastleProvider());
     }
 
+    protected String machineName;
+
+    public void setMachineName(String machineName) {
+        String machineNameProperty = getProperty("machine");
+        if (machineNameProperty != null) {
+            this.machineName = machineNameProperty;
+        } else {
+            this.machineName = machineName;
+        }
+    }
+
     public Map<String, String> getTraceAsMap() throws IOException {
         File traceFile = getProject().file(TMP_TRACE);
         return readFileAsMap(traceFile);
@@ -108,15 +119,16 @@ public abstract class LocalEGATask extends DefaultTask {
     }
 
     protected void removeConfig(String name) throws IOException {
-        exec(true, "docker config rm", name);
+        exec(true, getMachineEnv(machineName), "docker config rm", name);
     }
 
     protected void removeVolume(String name) throws IOException {
-        exec(true, "docker volume rm", name);
+        exec(true, getMachineEnv(machineName), "docker volume rm", name);
     }
 
     protected void createConfig(String name, File file) throws IOException {
-        exec("docker config create", name, file.getAbsolutePath());
+        exec(true, getMachineEnv(machineName), "docker config create", name,
+            file.getAbsolutePath());
     }
 
     protected List<String> exec(String command, String... arguments) throws IOException {
@@ -148,11 +160,9 @@ public abstract class LocalEGATask extends DefaultTask {
         try {
             executor.execute(commandLine, systemEnvironment);
             String output = outputStream.toString();
-            System.out.println(output);
             return Arrays.asList(output.split(System.lineSeparator()));
         } catch (ExecuteException e) {
             String output = outputStream.toString();
-            System.out.println(output);
             if (ignoreExitCode) {
                 return Arrays.asList(output.split(System.lineSeparator()));
             } else {
@@ -163,6 +173,18 @@ public abstract class LocalEGATask extends DefaultTask {
 
     protected String getMachineIPAddress(String name) throws IOException {
         return exec("docker-machine ip", name).iterator().next();
+    }
+
+    protected Map<String, String> getMachineEnv(String name) throws IOException {
+        Map<String, String> env = new HashMap<>();
+        env.put("DOCKER_TLS_VERIFY", "1");
+        env.put("DOCKER_HOST", "tcp://" + getMachineIPAddress(name) + ":2376");
+        env.put("DOCKER_MACHINE_NAME", name);
+        List<String> exec = exec("docker-machine env", name);
+        String dockerCertPath = exec.get(2);
+        dockerCertPath = dockerCertPath.substring(25, dockerCertPath.length() - 1);
+        env.put("DOCKER_CERT_PATH", dockerCertPath);
+        return env;
     }
 
     protected void writePublicKey(KeyPair keyPair, File file) throws IOException {
