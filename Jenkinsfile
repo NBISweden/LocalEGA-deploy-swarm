@@ -33,10 +33,17 @@ pipeline {
                         docker swarm init
                       '''
             },
-            LEGA: {
+            LEGA-Public: {
                       sh '''
-                        docker-machine create --driver openstack LEGA-${GIT_COMMIT}
-                        eval "$(docker-machine env LEGA-${GIT_COMMIT})"
+                        docker-machine create --driver openstack LEGA-public-${GIT_COMMIT}
+                        eval "$(docker-machine env LEGA-public-${GIT_COMMIT})"
+                        docker swarm init
+                      '''
+            },
+            LEGA-Private: {
+                      sh '''
+                        docker-machine create --driver openstack LEGA-private-${GIT_COMMIT}
+                        eval "$(docker-machine env LEGA-private-${GIT_COMMIT})"
                         docker swarm init
                       '''
             }
@@ -54,9 +61,10 @@ pipeline {
             },
             LEGA: {
                       sh '''
-                        eval "$(docker-machine env LEGA-${GIT_COMMIT})"
+                        eval "$(docker-machine env LEGA-private-${GIT_COMMIT})"
                         gradle :lega-private:createConfiguration
-                        gradle :lega-public:createConfiguration -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT}) -PlegaIP=$(docker-machine ip LEGA-${GIT_COMMIT})
+                        eval "$(docker-machine env LEGA-public-${GIT_COMMIT})"
+                        gradle :lega-public:createConfiguration -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${GIT_COMMIT})
                       '''
             }
           )
@@ -73,11 +81,18 @@ pipeline {
                         gradle ls
                       '''
             },
-            LEGA: {
+            LEGA-Public: {
                       sh '''
-                        eval "$(docker-machine env LEGA-${GIT_COMMIT})"
-                        gradle :lega-private:deployStack
+                        eval "$(docker-machine env LEGA-public-${GIT_COMMIT})"
                         gradle :lega-public:deployStack
+                        sleep 120
+                        gradle ls
+                      '''
+            },
+            LEGA-Private: {
+                      sh '''
+                        eval "$(docker-machine env LEGA-private-${GIT_COMMIT})"
+                        gradle :lega-private:deployStack
                         sleep 120
                         gradle ls
                       '''
@@ -88,7 +103,7 @@ pipeline {
     stage('Test') {
       steps {
         sh '''
-          gradle ingest -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT}) -PlegaIP=$(docker-machine ip LEGA-${GIT_COMMIT})
+          gradle ingest -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT}) -PlegaPublicIP=$(docker-machine ip LEGA-public-${GIT_COMMIT}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${GIT_COMMIT})
         '''
       }
     }
@@ -96,7 +111,7 @@ pipeline {
   
   post('Remove VM') {
     cleanup {
-      sh 'docker-machine rm -y CEGA-${GIT_COMMIT} LEGA-${GIT_COMMIT}'
+      sh 'docker-machine rm -y CEGA-${GIT_COMMIT} LEGA-public-${GIT_COMMIT} LEGA-private-${GIT_COMMIT}'
     }
   }
   
