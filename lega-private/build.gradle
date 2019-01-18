@@ -20,6 +20,8 @@ task createMQConfiguration(type: CreateMQConfigurationTask)
 
 task createDBConfiguration(type: CreateDBConfigurationTask)
 
+task createInboxS3Configuration(type: CreateInboxS3ConfigurationTask)
+
 task createVaultS3Configuration(type: CreateVaultS3ConfigurationTask)
 
 task createKeysConfiguration(type: CreateKeysConfigurationTask)
@@ -35,7 +37,10 @@ task createConfIniConfiguration(type: CreateConfIniConfigurationTask) {
 task createConfiguration {
     setGroup Groups.LEGA_PRIVATE.getName()
 
-    dependsOn "clearConfiguration", "createConfIniConfiguration", "createKeysIniConfiguration",
+    dependsOn "clearConfiguration", 
+            "createInboxS3Configuration", 
+            "createConfIniConfiguration", 
+            "createKeysIniConfiguration",
             "createMQConfiguration"
 }
 

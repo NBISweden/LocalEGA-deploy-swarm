@@ -44,9 +44,9 @@ public class IngestFileTask extends TestTask {
         InsufficientDataException, InvalidEndpointException, InternalException,
         InterruptedException {
         System.out.println("Starting ingestion...");
-        String host = getProperty("legaIP");
+        String host = getProperty("legaPrivateIP");
         if (host == null) {
-            host = getMachineIPAddress(Machine.LEGA.getName());
+            host = getMachineIPAddress(Machine.LEGA_PRIVATE.getName());
         }
         int expectedAmount = getFilesAmount(host) + 1;
         ingest();

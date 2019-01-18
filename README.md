@@ -58,7 +58,7 @@ eval $(docker-machine env <CEGA_MACHINE_NAME>)
 gradle :cega:createConfiguration
 eval $(docker-machine env <LEGA_MACHINE_NAME>)
 gradle :lega-private:createConfiguration
-gradle :lega-public:createConfiguration -PcegaIP=$(docker-machine ip <CEGA_MACHINE_NAME>) -PlegaIP=$(docker-machine ip <LEGA_MACHINE_NAME>)
+gradle :lega-public:createConfiguration -PcegaIP=$(docker-machine ip <CEGA_MACHINE_NAME>) -PlegaPrivateIP=$(docker-machine ip <LEGA_PRIVATE_MACHINE_NAME>)
 ```
 
 During bootstrapping, two test users are generated: `john` and `jane`. Credentials, keys and other config information
@@ -97,7 +97,7 @@ successful deploying to check if ingestion works. It will automatically generate
 upload to the inbox of test-user `john`, ingest this file and check if it has successfully landed to the vault.
 
 Note that in case of non-standard machine names, additional parameters will be required:
-`gradle ingest -PcegaIP=$(docker-machine ip <CEGA_MACHINE_NAME>) -PlegaIP=$(docker-machine ip <LEGA_MACHINE_NAME>)`
+`gradle ingest -PcegaIP=$(docker-machine ip <CEGA_MACHINE_NAME>) -PlegaPublicIP=$(docker-machine ip <LEGA_PUBLIC_MACHINE_NAME>) -PlegaPrivateIP=$(docker-machine ip <LEGA_PRIVATE_MACHINE_NAME>)`
 
 ## Demo
 

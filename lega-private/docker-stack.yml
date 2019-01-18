@@ -53,18 +53,18 @@ services:
   inbox-s3:
     image: minio/minio:latest
     ports:
-      - "9000:9000"
+      - "9001:9000"
     deploy:
       restart_policy:
         condition: on-failure
         delay: 5s
         window: 120s
     environment:
-      - MINIO_ACCESS_KEY
-      - MINIO_SECRET_KEY
+      - MINIO_ACCESS_KEY=${INBOX_S3_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${INBOX_S3_SECRET_KEY}
     volumes:
-      - inbox_s3:/ega/inbox
-    command: server /ega/inbox
+      - inbox_s3:/data
+    command: server /data
 
   vault-s3:
     image: minio/minio:latest
@@ -122,8 +122,8 @@ services:
       - mq
     environment:
       - LEGA_PASSWORD
-      - S3_ACCESS_KEY
-      - S3_SECRET_KEY
+      - S3_ACCESS_KEY=${VAULT_S3_ACCESS_KEY}
+      - S3_SECRET_KEY=${VAULT_S3_SECRET_KEY}
     configs:
       - source: conf.ini
         target: /etc/ega/conf.ini
@@ -151,7 +151,7 @@ services:
       - EGA_EBI_FIRE_KEY=
       - SERVICE_ARCHIVE_CLASS=
       - EGA_SHAREDPASS_PATH=/etc/ega/pgp/ega.shared.pass
-      - EGA_EBI_AWS_ENDPOINT_URL=http://s3:9000
+      - EGA_EBI_AWS_ENDPOINT_URL=http://vault-s3:9000
       - EGA_EBI_AWS_ACCESS_KEY=${VAULT_S3_ACCESS_KEY}
       - EGA_EBI_AWS_ACCESS_SECRET=${VAULT_S3_SECRET_KEY}
       - EGA_EBI_AWS_ENDPOINT_REGION=
@@ -191,7 +191,7 @@ services:
       - S3_ACCESS_KEY=${VAULT_S3_ACCESS_KEY}
       - S3_SECRET_KEY=${VAULT_S3_SECRET_KEY}
     volumes:
-      - inbox:/ega/inbox
+      - inbox_s3:/ega/inbox
     configs:
       - source: conf.ini
         target: /etc/ega/conf.ini

@@ -23,6 +23,9 @@ public abstract class LocalEGATask extends DefaultTask {
     public static final String CEGA_TMP_TRACE = "cega/.tmp/.trace";
     public static final String LEGA_PRIVATE_TMP_TRACE = "lega-private/.tmp/.trace";
 
+    public static final String INBOX_S3_ACCESS_KEY = "INBOX_S3_ACCESS_KEY";
+    public static final String INBOX_S3_SECRET_KEY = "INBOX_S3_SECRET_KEY";
+    public static final String S3_ENDPOINT = "S3_ENDPOINT";
     public static final String VAULT_S3_ACCESS_KEY = "VAULT_S3_ACCESS_KEY";
     public static final String VAULT_S3_SECRET_KEY = "VAULT_S3_SECRET_KEY";
     public static final String CEGA_MQ_PASSWORD = "CEGA_MQ_PASSWORD";

@@ -26,7 +26,7 @@ public class CreateConfIniConfigurationTask extends LegaPrivateTask {
                 + "keyserver_endpoint = http://keys:8080/keys/retrieve/%%s/private/bin?idFormat=hex\n"
                 + System.lineSeparator() + "[inbox]\n" + "location = /ega/inbox/%%s\n"
                 + "mode = 2750\n" + System.lineSeparator() + "[vault]\n" + "driver = S3Storage\n"
-                + "url = http://s3:9000\n" + "access_key = %s\n" + "secret_key = %s\n"
+                + "url = http://vault-s3:9000\n" + "access_key = %s\n" + "secret_key = %s\n"
                 + "#region = lega\n" + System.lineSeparator() + System.lineSeparator()
                 + "[outgestion]\n" + "# Just for test\n"
                 + "keyserver_endpoint = http://keys:8080/keys/retrieve/%%s/private/bin?idFormat=hex\n"
