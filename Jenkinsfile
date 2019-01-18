@@ -26,21 +26,21 @@ pipeline {
     stage('Create VMs') {
       steps {
       parallel(
-            CEGA: {
+            "CEGA": {
                       sh '''
                         docker-machine create --driver openstack CEGA-${GIT_COMMIT}
                         eval "$(docker-machine env CEGA-${GIT_COMMIT})"
                         docker swarm init
                       '''
             },
-            LEGA-Public: {
+            "LEGA Public": {
                       sh '''
                         docker-machine create --driver openstack LEGA-public-${GIT_COMMIT}
                         eval "$(docker-machine env LEGA-public-${GIT_COMMIT})"
                         docker swarm init
                       '''
             },
-            LEGA-Private: {
+            "LEGA Private": {
                       sh '''
                         docker-machine create --driver openstack LEGA-private-${GIT_COMMIT}
                         eval "$(docker-machine env LEGA-private-${GIT_COMMIT})"
@@ -53,13 +53,13 @@ pipeline {
     stage('Bootstrap') {
       steps {
       parallel(
-            CEGA: {
+            "CEGA": {
                       sh '''
                         eval "$(docker-machine env CEGA-${GIT_COMMIT})"
                         gradle :cega:createConfiguration
                       '''
             },
-            LEGA: {
+            "LEGA": {
                       sh '''
                         eval "$(docker-machine env LEGA-private-${GIT_COMMIT})"
                         gradle :lega-private:createConfiguration
@@ -73,7 +73,7 @@ pipeline {
     stage('Deploy') {
       steps {
       parallel(
-            CEGA: {
+            "CEGA": {
                       sh '''
                         eval "$(docker-machine env CEGA-${GIT_COMMIT})"
                         gradle :cega:deployStack
@@ -81,7 +81,7 @@ pipeline {
                         gradle ls
                       '''
             },
-            LEGA-Public: {
+            "LEGA Public": {
                       sh '''
                         eval "$(docker-machine env LEGA-public-${GIT_COMMIT})"
                         gradle :lega-public:deployStack
@@ -89,7 +89,7 @@ pipeline {
                         gradle ls
                       '''
             },
-            LEGA-Private: {
+            "LEGA Private": {
                       sh '''
                         eval "$(docker-machine env LEGA-private-${GIT_COMMIT})"
                         gradle :lega-private:deployStack
