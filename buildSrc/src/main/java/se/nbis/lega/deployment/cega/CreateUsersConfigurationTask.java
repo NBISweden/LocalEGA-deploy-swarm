@@ -27,6 +27,10 @@ public class CreateUsersConfigurationTask extends CegaTask {
         String janePassword = generateUser("jane");
         createConfig(Config.JANE_YML.getName(), getProject().file(".tmp/users/jane.yml"));
         writeTrace(EGA_USER_PASSWORD_JANE, janePassword);
+        writeTrace(LEGA_INSTANCES, LEGA_INSTANCE_NAME);
+        String cegaRESTPassword = UUID.randomUUID().toString().replace("-", "");
+        writeTrace(CEGA_REST_PASSWORD, cegaRESTPassword);
+        writeTrace("CEGA_REST_" + LEGA_INSTANCE_NAME + "_PASSWORD", cegaRESTPassword);
     }
 
     private String generateUser(String username) throws GeneralSecurityException, IOException {

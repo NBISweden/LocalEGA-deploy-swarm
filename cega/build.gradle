@@ -29,7 +29,7 @@ task deployStack(type: DeployStackTask) {
 
     setComposeFile file("docker-stack.yml").absolutePath
     setStackName Groups.CEGA.getName()
-    setEnvironment "LEGA_INSTANCES": "lega", "CEGA_REST_lega_PASSWORD": readTrace("CEGA_REST_PASSWORD")
+    setEnvironment getTraceAsMap()
 }
 
 task removeStack(type: RemoveStackTask) {
