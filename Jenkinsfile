@@ -73,14 +73,14 @@ pipeline {
             },
             "LEGA Public": {
                       sh '''
-                        gradle :lega-public:deployStack -Pmachine=LEGA-public-${GIT_COMMIT} --stacktrace
+                        gradle :lega-public:deployStack -Pmachine=LEGA-public-${GIT_COMMIT}
                         sleep 120
                         gradle ls
                       '''
             },
             "LEGA Private": {
                       sh '''
-                        gradle :lega-private:deployStack -Pmachine=LEGA-private-${GIT_COMMIT} --stacktrace
+                        gradle :lega-private:deployStack -Pmachine=LEGA-private-${GIT_COMMIT}
                         sleep 120
                         gradle ls
                       '''

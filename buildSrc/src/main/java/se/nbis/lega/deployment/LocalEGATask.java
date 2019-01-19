@@ -166,6 +166,7 @@ public abstract class LocalEGATask extends DefaultTask {
             return Arrays.asList(output.split(System.lineSeparator()));
         } catch (ExecuteException e) {
             String output = outputStream.toString();
+            System.out.println(output);
             if (ignoreExitCode) {
                 return Arrays.asList(output.split(System.lineSeparator()));
             } else {
