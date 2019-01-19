@@ -28,23 +28,17 @@ pipeline {
       parallel(
             "CEGA": {
                       sh '''
-                        docker-machine create --driver openstack CEGA-${GIT_COMMIT}
-                        eval "$(docker-machine env CEGA-${GIT_COMMIT})"
-                        docker swarm init
+                        gradle :cluster:createCEGAMachine -Pmachine=CEGA-${GIT_COMMIT}
                       '''
             },
             "LEGA Public": {
                       sh '''
-                        docker-machine create --driver openstack LEGA-public-${GIT_COMMIT}
-                        eval "$(docker-machine env LEGA-public-${GIT_COMMIT})"
-                        docker swarm init
+                        gradle :cluster:createLEGAPublicMachine -Pmachine=LEGA-public-${GIT_COMMIT}
                       '''
             },
             "LEGA Private": {
                       sh '''
-                        docker-machine create --driver openstack LEGA-private-${GIT_COMMIT}
-                        eval "$(docker-machine env LEGA-private-${GIT_COMMIT})"
-                        docker swarm init
+                        gradle :cluster:createLEGAPrivateMachine -Pmachine=LEGA-private-${GIT_COMMIT}
                       '''
             }
           )
@@ -55,16 +49,13 @@ pipeline {
       parallel(
             "CEGA": {
                       sh '''
-                        eval "$(docker-machine env CEGA-${GIT_COMMIT})"
-                        gradle :cega:createConfiguration
+                        gradle :cega:createConfiguration -Pmachine=CEGA-${GIT_COMMIT}
                       '''
             },
             "LEGA": {
                       sh '''
-                        eval "$(docker-machine env LEGA-private-${GIT_COMMIT})"
-                        gradle :lega-private:createConfiguration
-                        eval "$(docker-machine env LEGA-public-${GIT_COMMIT})"
-                        gradle :lega-public:createConfiguration -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${GIT_COMMIT})
+                        gradle :lega-private:createConfiguration -Pmachine=LEGA-private-${GIT_COMMIT}
+                        gradle :lega-public:createConfiguration -Pmachine=LEGA-public-${GIT_COMMIT} -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${GIT_COMMIT})
                       '''
             }
           )
@@ -75,24 +66,21 @@ pipeline {
       parallel(
             "CEGA": {
                       sh '''
-                        eval "$(docker-machine env CEGA-${GIT_COMMIT})"
-                        gradle :cega:deployStack
+                        gradle :cega:deployStack -Pmachine=CEGA-${GIT_COMMIT}
                         sleep 120
                         gradle ls
                       '''
             },
             "LEGA Public": {
                       sh '''
-                        eval "$(docker-machine env LEGA-public-${GIT_COMMIT})"
-                        gradle :lega-public:deployStack
+                        gradle :lega-public:deployStack -Pmachine=LEGA-public-${GIT_COMMIT}
                         sleep 120
                         gradle ls
                       '''
             },
             "LEGA Private": {
                       sh '''
-                        eval "$(docker-machine env LEGA-private-${GIT_COMMIT})"
-                        gradle :lega-private:deployStack
+                        gradle :lega-private:deployStack -Pmachine=LEGA-private-${GIT_COMMIT}
                         sleep 120
                         gradle ls
                       '''

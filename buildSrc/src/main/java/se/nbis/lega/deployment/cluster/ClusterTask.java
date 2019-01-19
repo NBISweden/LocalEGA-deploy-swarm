@@ -5,15 +5,11 @@ import se.nbis.lega.deployment.LocalEGATask;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public abstract class ClusterTask extends LocalEGATask {
-
-    public static final List<String> DOCKER_ENV_VARS = Arrays
-        .asList("DOCKER_TLS_VERIFY", "DOCKER_HOST", "DOCKER_CERT_PATH", "DOCKER_MACHINE_NAME");
 
     public ClusterTask() {
         super();
@@ -33,26 +29,19 @@ public abstract class ClusterTask extends LocalEGATask {
         return result;
     }
 
-    protected Map<String, String> getMachineEnvironment(String name) throws IOException {
-        List<String> env = exec("docker-machine env", name);
-        Map<String, String> variables = new HashMap<>();
-        for (String variable : env) {
-            String[] split = variable.substring(7).split("=");
-            if (DOCKER_ENV_VARS.contains(split[0])) {
-                variables.put(split[0], split[1].replace("\"", ""));
-            }
-        }
-        return variables;
+    protected Map<String, String> createMachineVirtualBox(String name) throws IOException {
+        exec(true, "docker-machine create", "--driver", "virtualbox", name);
+        return getMachines(name).get(name);
     }
 
-    protected Map<String, String> createMachine(String name, String openStackConfig)
+    protected Map<String, String> createMachineOpenStack(String name, String openStackConfig)
         throws IOException {
-        if (openStackConfig == null) {
-            exec(true, "docker-machine create", "--driver", "virtualbox", name);
-        } else {
-            Map<String, String> env = readFileAsMap(new File(openStackConfig));
-            exec(true, env, "docker-machine create", "--driver", "openstack", name);
-        }
+        return createMachineOpenStack(name, readFileAsMap(new File(openStackConfig)));
+    }
+
+    protected Map<String, String> createMachineOpenStack(String name, Map<String, String> openStackEnvironment)
+        throws IOException {
+        exec(true, openStackEnvironment, "docker-machine create", "--driver", "openstack", name);
         return getMachines(name).get(name);
     }
 

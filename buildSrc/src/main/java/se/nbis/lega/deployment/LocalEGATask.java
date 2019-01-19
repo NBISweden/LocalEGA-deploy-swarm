@@ -23,6 +23,9 @@ public abstract class LocalEGATask extends DefaultTask {
     public static final String CEGA_TMP_TRACE = "cega/.tmp/.trace";
     public static final String LEGA_PRIVATE_TMP_TRACE = "lega-private/.tmp/.trace";
 
+    public static final List<String> DOCKER_ENV_VARS = Arrays
+        .asList("DOCKER_TLS_VERIFY", "DOCKER_HOST", "DOCKER_CERT_PATH", "DOCKER_MACHINE_NAME");
+
     public static final String LEGA_INSTANCES = "LEGA_INSTANCES";
     public static final String LEGA_INSTANCE_NAME = "lega";
     public static final String INBOX_S3_ACCESS_KEY = "INBOX_S3_ACCESS_KEY";
@@ -119,15 +122,15 @@ public abstract class LocalEGATask extends DefaultTask {
     }
 
     protected void removeConfig(String name) throws IOException {
-        exec(true, getMachineEnv(machineName), "docker config rm", name);
+        exec(true, getMachineEnvironment(machineName), "docker config rm", name);
     }
 
     protected void removeVolume(String name) throws IOException {
-        exec(true, getMachineEnv(machineName), "docker volume rm", name);
+        exec(true, getMachineEnvironment(machineName), "docker volume rm", name);
     }
 
     protected void createConfig(String name, File file) throws IOException {
-        exec(true, getMachineEnv(machineName), "docker config create", name,
+        exec(true, getMachineEnvironment(machineName), "docker config create", name,
             file.getAbsolutePath());
     }
 
@@ -175,16 +178,16 @@ public abstract class LocalEGATask extends DefaultTask {
         return exec("docker-machine ip", name).iterator().next();
     }
 
-    protected Map<String, String> getMachineEnv(String name) throws IOException {
-        Map<String, String> env = new HashMap<>();
-        env.put("DOCKER_TLS_VERIFY", "1");
-        env.put("DOCKER_HOST", "tcp://" + getMachineIPAddress(name) + ":2376");
-        env.put("DOCKER_MACHINE_NAME", name);
-        List<String> exec = exec("docker-machine env", name);
-        String dockerCertPath = exec.get(2);
-        dockerCertPath = dockerCertPath.substring(25, dockerCertPath.length() - 1);
-        env.put("DOCKER_CERT_PATH", dockerCertPath);
-        return env;
+    protected Map<String, String> getMachineEnvironment(String name) throws IOException {
+        List<String> env = exec("docker-machine env", name);
+        Map<String, String> variables = new HashMap<>();
+        for (String variable : env) {
+            String[] split = variable.substring(7).split("=");
+            if (DOCKER_ENV_VARS.contains(split[0])) {
+                variables.put(split[0], split[1].replace("\"", ""));
+            }
+        }
+        return variables;
     }
 
     protected void writePublicKey(KeyPair keyPair, File file) throws IOException {
