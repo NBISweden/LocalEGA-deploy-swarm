@@ -8,7 +8,7 @@ public class RemoveStackTask extends LocalEGATask {
 
     @TaskAction
     public void run() throws IOException {
-        exec(getMachineEnv(machineName), "docker stack rm", machineName);
+        exec(getMachineEnvironment(machineName), "docker stack rm", machineName);
     }
 
 }

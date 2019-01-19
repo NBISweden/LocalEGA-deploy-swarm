@@ -12,7 +12,7 @@ public class DeployStackTask extends LocalEGATask {
 
     @TaskAction
     public void run() throws IOException {
-        environment.putAll(getMachineEnv(machineName));
+        environment.putAll(getMachineEnvironment(machineName));
         exec(environment, "docker stack deploy", "--compose-file", composeFile, machineName);
     }
 
