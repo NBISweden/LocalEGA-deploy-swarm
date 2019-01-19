@@ -179,7 +179,6 @@ public abstract class LocalEGATask extends DefaultTask {
     }
 
     protected Map<String, String> getMachineEnvironment(String name) throws IOException {
-        System.out.println("name = " + name);
         List<String> env = exec("docker-machine env", name);
         Map<String, String> variables = new HashMap<>();
         for (String variable : env) {
