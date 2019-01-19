@@ -12,7 +12,7 @@ public abstract class CegaTask extends LocalEGATask {
     public CegaTask() {
         super();
         this.setGroup(Groups.CEGA.getName());
-        this.machineName = Machine.CEGA.getName();
+        this.setMachineName(Machine.CEGA.getName());
     }
 
 }

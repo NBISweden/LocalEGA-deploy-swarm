@@ -12,7 +12,7 @@ public abstract class LegaPrivateTask extends LocalEGATask {
     public LegaPrivateTask() {
         super();
         this.setGroup(Groups.LEGA_PRIVATE.getName());
-        this.machineName = Machine.LEGA_PRIVATE.getName();
+        this.setMachineName(Machine.LEGA_PRIVATE.getName());
     }
 
 }
