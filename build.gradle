@@ -36,36 +36,23 @@ task cleanAll() {
 task bootstrap() {
     setGroup "swarm"
 
-    dependsOn ":cega:createConfiguration", ":lega-public:createConfiguration", ":lega-private:createConfiguration"
+    dependsOn ":cega:createConfiguration", ":lega-private:createConfiguration", ":lega-public:createConfiguration"
 }
 
 task deploy() {
     setGroup "swarm"
 
     dependsOn ":cega:deployStack"
-    dependsOn ":lega-public:deployStack"
     dependsOn ":lega-private:deployStack"
+    dependsOn ":lega-public:deployStack"
 }
 
 task rm() {
     setGroup "swarm"
 
-    doLast {
-        exec {
-            executable "docker"
-            args "stack", "rm", "lega-private"
-        }
-        sleep 10000
-        exec {
-            executable "docker"
-            args "stack", "rm", "lega-public"
-        }
-        sleep 10000
-        exec {
-            executable "docker"
-            args "stack", "rm", "cega"
-        }
-    }
+    dependsOn ":cega:removeStack"
+    dependsOn ":lega-private:removeStack"
+    dependsOn ":lega-public:removeStack"
 }
 
 task ls() {
