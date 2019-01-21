@@ -20,6 +20,10 @@ pipeline {
     OS_SSH_USER=credentials('OS_SSH_USER')
     OS_FLAVOR_NAME=credentials('OS_FLAVOR_NAME')
     OS_IMAGE_ID=credentials('OS_IMAGE_ID')
+    GIT_COMMIT_SHORT = sh(
+                    script: "printf \$(git rev-parse --short ${GIT_COMMIT})",
+                    returnStdout: true
+            )
   }
   
   stages {
@@ -28,17 +32,17 @@ pipeline {
       parallel(
             "CEGA": {
                       sh '''
-                        gradle :cluster:createCEGAMachine -Pmachine=CEGA-${GIT_COMMIT}
+                        gradle :cluster:createCEGAMachine -Pmachine=CEGA-${GIT_COMMIT_SHORT}
                       '''
             },
             "LEGA Public": {
                       sh '''
-                        gradle :cluster:createLEGAPublicMachine -Pmachine=LEGA-public-${GIT_COMMIT}
+                        gradle :cluster:createLEGAPublicMachine -Pmachine=LEGA-public-${GIT_COMMIT_SHORT}
                       '''
             },
             "LEGA Private": {
                       sh '''
-                        gradle :cluster:createLEGAPrivateMachine -Pmachine=LEGA-private-${GIT_COMMIT}
+                        gradle :cluster:createLEGAPrivateMachine -Pmachine=LEGA-private-${GIT_COMMIT_SHORT}
                       '''
             }
           )
@@ -49,13 +53,13 @@ pipeline {
       parallel(
             "CEGA": {
                       sh '''
-                        gradle :cega:createConfiguration -Pmachine=CEGA-${GIT_COMMIT}
+                        gradle :cega:createConfiguration -Pmachine=CEGA-${GIT_COMMIT_SHORT}
                       '''
             },
             "LEGA": {
                       sh '''
-                        gradle :lega-private:createConfiguration -Pmachine=LEGA-private-${GIT_COMMIT}
-                        gradle :lega-public:createConfiguration -Pmachine=LEGA-public-${GIT_COMMIT} -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${GIT_COMMIT})
+                        gradle :lega-private:createConfiguration -Pmachine=LEGA-private-${GIT_COMMIT_SHORT}
+                        gradle :lega-public:createConfiguration -Pmachine=LEGA-public-${GIT_COMMIT_SHORT} -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT_SHORT}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${GIT_COMMIT_SHORT})
                       '''
             }
           )
@@ -66,21 +70,21 @@ pipeline {
       parallel(
             "CEGA": {
                       sh '''
-                        gradle :cega:deployStack -Pmachine=CEGA-${GIT_COMMIT}
+                        gradle :cega:deployStack -Pmachine=CEGA-${GIT_COMMIT_SHORT}
                         sleep 120
                         gradle ls
                       '''
             },
             "LEGA Public": {
                       sh '''
-                        gradle :lega-public:deployStack -Pmachine=LEGA-public-${GIT_COMMIT}
+                        gradle :lega-public:deployStack -Pmachine=LEGA-public-${GIT_COMMIT_SHORT}
                         sleep 120
                         gradle ls
                       '''
             },
             "LEGA Private": {
                       sh '''
-                        gradle :lega-private:deployStack -Pmachine=LEGA-private-${GIT_COMMIT}
+                        gradle :lega-private:deployStack -Pmachine=LEGA-private-${GIT_COMMIT_SHORT}
                         sleep 120
                         gradle ls
                       '''
@@ -91,7 +95,7 @@ pipeline {
     stage('Test') {
       steps {
         sh '''
-          gradle ingest -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT}) -PlegaPublicIP=$(docker-machine ip LEGA-public-${GIT_COMMIT}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${GIT_COMMIT})
+          gradle ingest -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT_SHORT}) -PlegaPublicIP=$(docker-machine ip LEGA-public-${GIT_COMMIT_SHORT}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${GIT_COMMIT_SHORT})
         '''
       }
     }
@@ -99,7 +103,7 @@ pipeline {
   
   post('Remove VM') {
     cleanup {
-      sh 'docker-machine rm -y CEGA-${GIT_COMMIT} LEGA-public-${GIT_COMMIT} LEGA-private-${GIT_COMMIT}'
+      sh 'docker-machine rm -y CEGA-${GIT_COMMIT_SHORT} LEGA-public-${GIT_COMMIT_SHORT} LEGA-private-${GIT_COMMIT_SHORT}'
     }
   }
   
