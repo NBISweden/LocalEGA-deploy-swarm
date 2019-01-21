@@ -22,14 +22,45 @@ public abstract class LocalEGATask extends DefaultTask {
     public static final String TMP_TRACE = ".tmp/.trace";
     public static final String CEGA_TMP_TRACE = "cega/.tmp/.trace";
     public static final String LEGA_PRIVATE_TMP_TRACE = "lega-private/.tmp/.trace";
-    public static final String S3_SECRET_KEY = "S3_SECRET_KEY";
-    public static final String S3_ACCESS_KEY = "S3_ACCESS_KEY";
+
+    public static final List<String> DOCKER_ENV_VARS = Arrays
+        .asList("DOCKER_TLS_VERIFY", "DOCKER_HOST", "DOCKER_CERT_PATH", "DOCKER_MACHINE_NAME");
+
+    public static final String LEGA_INSTANCES = "LEGA_INSTANCES";
+    public static final String LEGA_INSTANCE_NAME = "lega";
+    public static final String INBOX_S3_ACCESS_KEY = "INBOX_S3_ACCESS_KEY";
+    public static final String INBOX_S3_SECRET_KEY = "INBOX_S3_SECRET_KEY";
+    public static final String S3_ENDPOINT = "S3_ENDPOINT";
+    public static final String VAULT_S3_ACCESS_KEY = "VAULT_S3_ACCESS_KEY";
+    public static final String VAULT_S3_SECRET_KEY = "VAULT_S3_SECRET_KEY";
     public static final String CEGA_MQ_PASSWORD = "CEGA_MQ_PASSWORD";
+    public static final String CEGA_REST_PASSWORD = "CEGA_REST_PASSWORD";
     public static final String CEGA_CONNECTION = "CEGA_CONNECTION";
-    public static final String LEGA = "lega";
+    public static final String MEDIATOR_SERVER = "MEDIATOR_SERVER";
+    public static final String CEGA_ENDPOINT = "CEGA_ENDPOINT";
+    public static final String CEGA_ENDPOINT_CREDS = "CEGA_ENDPOINT_CREDS";
+    public static final String KEYS_PASSWORD = "KEYS_PASSWORD";
+    public static final String LEGA_PASSWORD = "LEGA_PASSWORD";
+    public static final String PGP_PASSPHRASE = "PGP_PASSPHRASE";
+    public static final String DB_LEGA_IN_PASSWORD = "DB_LEGA_IN_PASSWORD";
+    public static final String DB_LEGA_OUT_PASSWORD = "DB_LEGA_OUT_PASSWORD";
+    public static final String EGA_USER_PASSWORD_JOHN = "EGA_USER_PASSWORD_JOHN";
+    public static final String EGA_USER_PASSWORD_JANE = "EGA_USER_PASSWORD_JANE";
+    public static final String VAULT_S3_BUCKET_NAME = "lega";
 
     static {
         Security.addProvider(new BouncyCastleProvider());
+    }
+
+    protected String machineName;
+
+    public void setMachineName(String machineName) {
+        String machineNameProperty = getProperty("machine");
+        if (machineNameProperty != null) {
+            this.machineName = machineNameProperty;
+        } else {
+            this.machineName = machineName;
+        }
     }
 
     public Map<String, String> getTraceAsMap() throws IOException {
@@ -91,15 +122,16 @@ public abstract class LocalEGATask extends DefaultTask {
     }
 
     protected void removeConfig(String name) throws IOException {
-        exec(true, "docker config rm", name);
+        exec(true, getMachineEnvironment(machineName), "docker config rm", name);
     }
 
     protected void removeVolume(String name) throws IOException {
-        exec(true, "docker volume rm", name);
+        exec(true, getMachineEnvironment(machineName), "docker volume rm", name);
     }
 
     protected void createConfig(String name, File file) throws IOException {
-        exec("docker config create", name, file.getAbsolutePath());
+        exec(true, getMachineEnvironment(machineName), "docker config create", name,
+            file.getAbsolutePath());
     }
 
     protected List<String> exec(String command, String... arguments) throws IOException {
@@ -131,7 +163,6 @@ public abstract class LocalEGATask extends DefaultTask {
         try {
             executor.execute(commandLine, systemEnvironment);
             String output = outputStream.toString();
-            System.out.println(output);
             return Arrays.asList(output.split(System.lineSeparator()));
         } catch (ExecuteException e) {
             String output = outputStream.toString();
@@ -146,6 +177,18 @@ public abstract class LocalEGATask extends DefaultTask {
 
     protected String getMachineIPAddress(String name) throws IOException {
         return exec("docker-machine ip", name).iterator().next();
+    }
+
+    protected Map<String, String> getMachineEnvironment(String name) throws IOException {
+        List<String> env = exec("docker-machine env", name);
+        Map<String, String> variables = new HashMap<>();
+        for (String variable : env) {
+            String[] split = variable.substring(7).split("=");
+            if (DOCKER_ENV_VARS.contains(split[0])) {
+                variables.put(split[0], split[1].replace("\"", ""));
+            }
+        }
+        return variables;
     }
 
     protected void writePublicKey(KeyPair keyPair, File file) throws IOException {

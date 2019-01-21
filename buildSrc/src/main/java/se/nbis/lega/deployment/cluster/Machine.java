@@ -2,7 +2,7 @@ package se.nbis.lega.deployment.cluster;
 
 public enum Machine {
 
-    CEGA("cega"), LEGA("lega");
+    CEGA("cega"), LEGA_PUBLIC("lega-public"), LEGA_PRIVATE("lega-private");
 
     private String name;
 

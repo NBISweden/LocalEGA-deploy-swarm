@@ -40,25 +40,21 @@ Note that it may take a while to provision the cluster in OpenStack. To see how 
 
 ## Bootstrapping
 
-**NB**: before bootstrapping execute you need to `eval` to a proper machine. *This is required in order to
-run all subsequent commands against the Docker Swarm Manager and not against the local Docker daemon.*
-
-Here's an example of bootstrapping with local VMs (VirtualBox driver):
+Here's an example of bootstrapping with local VMs (VirtualBox driver) (NOTE that LEGA Private **should** be bootstrapped 
+prior to LEGA Public, because LEGA Public depends on some LEGA Private configs):
 ```
-eval $(docker-machine env cega)
 gradle :cega:createConfiguration
-eval $(docker-machine env lega)
 gradle :lega-private:createConfiguration
 gradle :lega-public:createConfiguration
 ```
 
+This can be replaced with a single command `gradle bootstrap`.
+
 If Docker Machine VM names are not default (i.e. not `cega` and `lega`) you will have to use additional parameters:
 ```
-eval $(docker-machine env <CEGA_MACHINE_NAME>)
-gradle :cega:createConfiguration
-eval $(docker-machine env <LEGA_MACHINE_NAME>)
-gradle :lega-private:createConfiguration
-gradle :lega-public:createConfiguration -PcegaIP=$(docker-machine ip <CEGA_MACHINE_NAME>) -PlegaIP=$(docker-machine ip <LEGA_MACHINE_NAME>)
+gradle :cega:createConfiguration -Pmachine=<CEGA_MACHINE_NAME>
+gradle :lega-private:createConfiguration -Pmachine=<LEGA_PRIVATE_MACHINE_NAME>
+gradle :lega-public:createConfiguration -Pmachine=<LEGA_PUBLIC_MACHINE_NAME> -PcegaIP=$(docker-machine ip <CEGA_MACHINE_NAME>) -PlegaPrivateIP=$(docker-machine ip <LEGA_PRIVATE_MACHINE_NAME>)
 ```
 
 During bootstrapping, two test users are generated: `john` and `jane`. Credentials, keys and other config information
@@ -68,22 +64,22 @@ can be found under `.tmp` folder of each subproject.
 
 After successful bootstrapping, deploying should be as simple as:
 ```
-eval $(docker-machine env cega)
 gradle :cega:deployStack
-eval $(docker-machine env lega)
 gradle :lega-private:deployStack
 gradle :lega-public:deployStack
 ```
+
+This can be replaced with a single command `gradle deploy`.
+
+You can also use `-Pmachine=<MACHINE_NAME>` option with any of those commands to specify machine name.
 
 To make sure that the system is deployed you can execute `gradle ls`.
 
 `gradle :cega:removeStack`, `gradle :lega-private:removeStack`, `lega-public :cega:removeStack` will remove deployed stacks 
 (yet preserving bootstrapped configuration). To clean configurations and remove stack you can use script like this:
 ```
-eval $(docker-machine env cega)
 gradle :cega:removeStack
 gradle :cega:clearConfiguration
-eval $(docker-machine env lega)
 gradle :lega-private:removeStack
 gradle :lega-private:clearConfiguration
 gradle :lega-public:removeStack
@@ -97,7 +93,7 @@ successful deploying to check if ingestion works. It will automatically generate
 upload to the inbox of test-user `john`, ingest this file and check if it has successfully landed to the vault.
 
 Note that in case of non-standard machine names, additional parameters will be required:
-`gradle ingest -PcegaIP=$(docker-machine ip <CEGA_MACHINE_NAME>) -PlegaIP=$(docker-machine ip <LEGA_MACHINE_NAME>)`
+`gradle ingest -PcegaIP=$(docker-machine ip <CEGA_MACHINE_NAME>) -PlegaPublicIP=$(docker-machine ip <LEGA_PUBLIC_MACHINE_NAME>) -PlegaPrivateIP=$(docker-machine ip <LEGA_PRIVATE_MACHINE_NAME>)`
 
 ## Demo
 

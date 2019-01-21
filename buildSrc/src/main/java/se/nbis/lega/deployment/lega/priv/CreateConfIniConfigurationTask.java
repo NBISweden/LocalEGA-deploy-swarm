@@ -9,22 +9,16 @@ import java.nio.charset.Charset;
 
 public class CreateConfIniConfigurationTask extends LegaPrivateTask {
 
-    public CreateConfIniConfigurationTask() {
-        super();
-        this.dependsOn("clearConfiguration", "createMQConfiguration", "createDBConfiguration",
-            "createKeysConfiguration", "createRESConfiguration", "createMinioConfiguration",
-            "createIngestConfiguration");
-    }
-
-    @TaskAction public void run() throws IOException {
+    @TaskAction
+    public void run() throws IOException {
         generateConfIni();
         createConfig(Config.CONF_INI.getName(), getProject().file(".tmp/conf.ini"));
     }
 
     private void generateConfIni() throws IOException {
-        String s3AccessKey = readTrace(S3_ACCESS_KEY);
-        String s3SecretKey = readTrace(S3_SECRET_KEY);
-        String postgresPassword = readTrace("DB_LEGA_IN_PASSWORD");
+        String s3AccessKey = readTrace(VAULT_S3_ACCESS_KEY);
+        String s3SecretKey = readTrace(VAULT_S3_SECRET_KEY);
+        String postgresPassword = readTrace(DB_LEGA_IN_PASSWORD);
         File confIni = getProject().file(".tmp/conf.ini");
         FileUtils.write(confIni, String.format(
             "[DEFAULT]\n" + "log = console\n" + System.lineSeparator() + "[keyserver]\n"
@@ -32,7 +26,7 @@ public class CreateConfIniConfigurationTask extends LegaPrivateTask {
                 + "keyserver_endpoint = http://keys:8080/keys/retrieve/%%s/private/bin?idFormat=hex\n"
                 + System.lineSeparator() + "[inbox]\n" + "location = /ega/inbox/%%s\n"
                 + "mode = 2750\n" + System.lineSeparator() + "[vault]\n" + "driver = S3Storage\n"
-                + "url = http://s3:9000\n" + "access_key = %s\n" + "secret_key = %s\n"
+                + "url = http://vault-s3:9000\n" + "access_key = %s\n" + "secret_key = %s\n"
                 + "#region = lega\n" + System.lineSeparator() + System.lineSeparator()
                 + "[outgestion]\n" + "# Just for test\n"
                 + "keyserver_endpoint = http://keys:8080/keys/retrieve/%%s/private/bin?idFormat=hex\n"

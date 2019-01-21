@@ -19,8 +19,7 @@ public class CreateMQConfigurationTask extends CegaTask {
         createConfig(Config.RABBITMQ_CONFIG.getName(), getProject().file("mq/rabbitmq.config"));
         String password = generateCEGAMQConfiguration();
         createConfig(Config.DEFS_JSON.getName(), getProject().file(".tmp/mq/defs.json"));
-        writeTrace("CEGA_MQ_PASSWORD", password);
-        writeTrace("CEGA_REST_PASSWORD", UUID.randomUUID().toString().replace("-", ""));
+        writeTrace(CEGA_MQ_PASSWORD, password);
     }
 
     public String generateCEGAMQConfiguration() throws IOException {

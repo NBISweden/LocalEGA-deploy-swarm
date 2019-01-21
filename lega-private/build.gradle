@@ -1,4 +1,5 @@
 import se.nbis.lega.deployment.*
+import se.nbis.lega.deployment.cluster.Machine
 import se.nbis.lega.deployment.lega.Volume
 import se.nbis.lega.deployment.lega.priv.*
 
@@ -7,12 +8,14 @@ import java.util.stream.Collectors
 task removeVolumes(type: RemoveVolumesTask) {
     setGroup Groups.LEGA_PRIVATE.getName()
 
+    setMachineName Machine.LEGA_PRIVATE.getName()
     setVolumes Arrays.stream(Volume.values()).map { v -> v.getName() }.collect(Collectors.toSet())
 }
 
 task clearConfiguration(type: ClearConfigurationTask) {
     setGroup Groups.LEGA_PRIVATE.getName()
 
+    setMachineName Machine.LEGA_PRIVATE.getName()
     setConfigs Arrays.stream(Config.values()).map { c -> c.getName() }.collect(Collectors.toSet())
 }
 
@@ -20,34 +23,40 @@ task createMQConfiguration(type: CreateMQConfigurationTask)
 
 task createDBConfiguration(type: CreateDBConfigurationTask)
 
+task createInboxS3Configuration(type: CreateInboxS3ConfigurationTask)
+
+task createVaultS3Configuration(type: CreateVaultS3ConfigurationTask)
+
 task createKeysConfiguration(type: CreateKeysConfigurationTask)
 
-task createMinioConfiguration(type: CreateMinioConfigurationTask)
+task createKeysIniConfiguration(type: CreateKeysIniConfigurationTask) {
+    dependsOn "createKeysConfiguration"
+}
 
-task createConfIni(type: CreateConfIniConfigurationTask)
-
-task createKeysIni(type: CreateKeysIniConfigurationTask)
-
-task createRESConfiguration(type: CreateRESConfigurationTask)
-
-task createIngestConfiguration(type: CreateIngestConfigurationTask)
+task createConfIniConfiguration(type: CreateConfIniConfigurationTask) {
+    dependsOn "createDBConfiguration", "createVaultS3Configuration"
+}
 
 task createConfiguration {
     setGroup Groups.LEGA_PRIVATE.getName()
 
-    dependsOn "clearConfiguration", "createConfIni", "createKeysIni"
+    dependsOn "clearConfiguration",
+            "createInboxS3Configuration",
+            "createConfIniConfiguration",
+            "createKeysIniConfiguration",
+            "createMQConfiguration"
 }
 
 task deployStack(type: DeployStackTask) {
     setGroup Groups.LEGA_PRIVATE.getName()
 
     setComposeFile file("docker-stack.yml").absolutePath
-    setStackName Groups.LEGA_PRIVATE.getName()
+    setMachineName Machine.LEGA_PRIVATE.getName()
     setEnvironment getTraceAsMap()
 }
 
 task removeStack(type: RemoveStackTask) {
     setGroup Groups.LEGA_PRIVATE.getName()
 
-    setStackName Groups.LEGA_PRIVATE.getName()
+    setMachineName Machine.LEGA_PRIVATE.getName()
 }

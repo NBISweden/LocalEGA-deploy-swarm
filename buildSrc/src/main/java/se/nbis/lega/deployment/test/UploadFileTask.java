@@ -20,9 +20,9 @@ public class UploadFileTask extends TestTask {
 
     @TaskAction
     public void run() throws IOException {
-        String host = getProperty("legaIP");
+        String host = getProperty("legaPublicIP");
         if (host == null) {
-            host = getMachineIPAddress(Machine.LEGA.getName());
+            host = getMachineIPAddress(Machine.LEGA_PUBLIC.getName());
         }
         System.out.println("Connecting to " + host);
         SSHClient ssh;

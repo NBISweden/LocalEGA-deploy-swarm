@@ -10,16 +10,22 @@ task createCEGAMachine(type: CreateMachineTask) {
     setMachineName Machine.CEGA.getName()
 }
 
-task createLEGAMachine(type: CreateMachineTask) {
+task createLEGAPublicMachine(type: CreateMachineTask) {
     setGroup Groups.CLUSTER.getName()
 
-    setMachineName Machine.LEGA.getName()
+    setMachineName Machine.LEGA_PUBLIC.getName()
+}
+
+task createLEGAPrivateMachine(type: CreateMachineTask) {
+    setGroup Groups.CLUSTER.getName()
+
+    setMachineName Machine.LEGA_PRIVATE.getName()
 }
 
 task provision() {
     setGroup Groups.CLUSTER.getName()
 
-    dependsOn ":cluster:createCEGAMachine", ":cluster:createLEGAMachine"
+    dependsOn ":cluster:createCEGAMachine", ":cluster:createLEGAPublicMachine", ":cluster:createLEGAPrivateMachine"
 }
 
 task removeCEGAMachine(type: RemoveMachineTask) {
@@ -28,16 +34,22 @@ task removeCEGAMachine(type: RemoveMachineTask) {
     setMachineName Machine.CEGA.getName()
 }
 
-task removeLEGAMachine(type: RemoveMachineTask) {
+task removeLEGAPublicMachine(type: RemoveMachineTask) {
     setGroup Groups.CLUSTER.getName()
 
-    setMachineName Machine.LEGA.getName()
+    setMachineName Machine.LEGA_PUBLIC.getName()
+}
+
+task removeLEGAPrivateMachine(type: RemoveMachineTask) {
+    setGroup Groups.CLUSTER.getName()
+
+    setMachineName Machine.LEGA_PRIVATE.getName()
 }
 
 task destroy() {
     setGroup Groups.CLUSTER.getName()
 
-    dependsOn ":cluster:removeCEGAMachine", ":cluster:removeLEGAMachine"
+    dependsOn ":cluster:removeCEGAMachine", ":cluster:removeLEGAPublicMachine", ":cluster:removeLEGAPrivateMachine"
 }
 
 task list(type: ListTask)
