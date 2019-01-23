@@ -20,71 +20,90 @@ pipeline {
     OS_SSH_USER=credentials('OS_SSH_USER')
     OS_FLAVOR_NAME=credentials('OS_FLAVOR_NAME')
     OS_IMAGE_ID=credentials('OS_IMAGE_ID')
+    GIT_COMMIT_SHORT = sh(
+                    script: "printf \$(git rev-parse --short ${GIT_COMMIT})",
+                    returnStdout: true
+            )
   }
   
   stages {
-    stage('Create VM') {
+    stage('Create VMs') {
       steps {
-        sh '''
-          docker-machine create --driver openstack ${GIT_COMMIT}
-          eval "$(docker-machine env ${GIT_COMMIT})"
-          docker swarm init
-        '''
+      parallel(
+            "CEGA": {
+                      sh '''
+                        gradle :cluster:createCEGAMachine -Pmachine=CEGA-${GIT_COMMIT_SHORT}
+                      '''
+            },
+            "LEGA Public": {
+                      sh '''
+                        gradle :cluster:createLEGAPublicMachine -Pmachine=LEGA-public-${GIT_COMMIT_SHORT}
+                      '''
+            },
+            "LEGA Private": {
+                      sh '''
+                        gradle :cluster:createLEGAPrivateMachine -Pmachine=LEGA-private-${GIT_COMMIT_SHORT}
+                      '''
+            }
+          )
       }
     }
     stage('Bootstrap') {
       steps {
-        sh '''
-          eval "$(docker-machine env ${GIT_COMMIT})"
-          gradle bootstrap
-        '''
+      parallel(
+            "CEGA": {
+                      sh '''
+                        gradle :cega:createConfiguration -Pmachine=CEGA-${GIT_COMMIT_SHORT}
+                      '''
+            },
+            "LEGA": {
+                      sh '''
+                        gradle :lega-private:createConfiguration -Pmachine=LEGA-private-${GIT_COMMIT_SHORT}
+                        gradle :lega-public:createConfiguration -Pmachine=LEGA-public-${GIT_COMMIT_SHORT} -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT_SHORT}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${GIT_COMMIT_SHORT})
+                      '''
+            }
+          )
       }
     }
     stage('Deploy') {
       steps {
-        sh '''
-          eval "$(docker-machine env ${GIT_COMMIT})"
-          gradle deployPublic
-          gradle deployPrivate
-          sleep 120
-          gradle ls
-        '''
+      parallel(
+            "CEGA": {
+                      sh '''
+                        gradle :cega:deployStack -Pmachine=CEGA-${GIT_COMMIT_SHORT}
+                        sleep 120
+                        gradle ls
+                      '''
+            },
+            "LEGA Public": {
+                      sh '''
+                        gradle :lega-public:deployStack -Pmachine=LEGA-public-${GIT_COMMIT_SHORT}
+                        sleep 120
+                        gradle ls
+                      '''
+            },
+            "LEGA Private": {
+                      sh '''
+                        gradle :lega-private:deployStack -Pmachine=LEGA-private-${GIT_COMMIT_SHORT}
+                        sleep 120
+                        gradle ls
+                      '''
+            }
+          )
       }
     }
     stage('Test') {
       steps {
         sh '''
-          eval "$(docker-machine env ${GIT_COMMIT})"
-          gradle ingest
+          gradle ingest -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT_SHORT}) -PlegaPublicIP=$(docker-machine ip LEGA-public-${GIT_COMMIT_SHORT}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${GIT_COMMIT_SHORT})
         '''
       }
     }
   }
   
-  post('Remove VM') { 
-    always {
-        sh '''
-          eval "$(docker-machine env ${GIT_COMMIT})"
-          echo '---=== lega-public_inbox Logs ===---'
-          docker service logs lega-public_inbox
-          echo '---=== cega_cega-mq Logs ===---'
-          docker service logs cega_cega-mq
-          echo '---=== lega-public_mq Logs ===---'
-          docker service logs lega-public_mq
-          echo '---=== lega-private_private-mq Logs ===---'
-          docker service logs lega-private_private-mq
-          echo '---=== lega-private_ingest Logs ===---'
-          docker service logs lega-private_ingest
-          echo '---=== lega-private_s3 Logs ===---'
-          docker service logs lega-private_s3
-          echo '---=== lega-private_db Logs ===---'
-          docker service logs lega-private_db
-          echo '---=== lega-private_verify Logs ===---'
-          docker service logs lega-private_verify
-        '''
-      }
-    cleanup { 
-      sh 'docker-machine rm -y ${GIT_COMMIT}'
+  post('Remove VM') {
+    cleanup {
+      sh 'docker-machine rm -y CEGA-${GIT_COMMIT_SHORT} LEGA-public-${GIT_COMMIT_SHORT} LEGA-private-${GIT_COMMIT_SHORT}'
     }
   }
   

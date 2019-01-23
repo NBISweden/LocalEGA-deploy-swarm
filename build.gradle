@@ -15,7 +15,7 @@ buildScan {
 task purge() {
     setGroup "swarm"
 
-    dependsOn ":lega-public:removeVolumes", ":lega-public:removeNetworks", ":lega-private:removeVolumes", ":lega-private:removeNetworks"
+    dependsOn ":lega-public:removeVolumes", ":lega-private:removeVolumes"
 }
 
 task clean() {
@@ -27,83 +27,37 @@ task clean() {
     }
 }
 
+task cleanAll() {
+    setGroup "swarm"
+
+    dependsOn "rm", "purge", "clean"
+}
+
 task bootstrap() {
     setGroup "swarm"
 
-    dependsOn ":cega:createConfiguration"
-    dependsOn ":lega-public:createConfiguration"
-    dependsOn ":lega-private:createConfiguration"
-    dependsOn ":createNetworks"
-}
-
-task bootstrapPublic() {
-    setGroup "swarm"
-    
-    dependsOn ":cega:createConfiguration"
-    dependsOn ":lega-public:createConfiguration"
-    dependsOn ":createNetworks"
-}
-
-task bootstrapPrivate() {
-    setGroup "swarm"
-
-    dependsOn ":lega-private:createConfiguration"
-    dependsOn ":createNetworks"
+    dependsOn ":cega:createConfiguration", ":lega-private:createConfiguration", ":lega-public:createConfiguration"
 }
 
 task deploy() {
     setGroup "swarm"
 
     dependsOn ":cega:deployStack"
-    dependsOn ":lega-public:deployStack"
     dependsOn ":lega-private:deployStack"
-}
-
-task deployPublic() {
-    setGroup "swarm"
-    
-    dependsOn ":cega:deployStack"
     dependsOn ":lega-public:deployStack"
-}
-
-task deployPrivate() {
-    setGroup "swarm"
-    
-    dependsOn ":lega-private:deployStack"
 }
 
 task rm() {
     setGroup "swarm"
 
-    doLast {
-        exec {
-            executable "docker"
-            args "stack", "rm", "lega-private"
-        }
-        sleep 10000
-        exec {
-            executable "docker"
-            args "stack", "rm", "lega-public"
-        }
-        sleep 10000
-        exec {
-            executable "docker"
-            args "stack", "rm", "cega"
-        }
-    }
-}
-
-task clean_all() {
-    setGroup "swarm"
-
-    dependsOn rm
-    dependsOn purge
-    dependsOn clean
+    dependsOn ":cega:removeStack"
+    dependsOn ":lega-private:removeStack"
+    dependsOn ":lega-public:removeStack"
 }
 
 task ls() {
     setGroup "swarm"
-    
+
     doLast {
         exec {
             executable "docker"
@@ -119,48 +73,3 @@ task encrypt(type: EncryptFileTask)
 task upload(type: UploadFileTask)
 
 task ingest(type: IngestFileTask)
-
-task createCEGANetwork() {
-    setGroup "swarm"
-
-    doLast {
-        exec {
-            ignoreExitValue = true
-            executable "docker"
-            args "network", "create", "-d", "overlay", "cega"
-        }
-    }
-}
-
-task createLEGAPublicNetwork() {
-    setGroup "swarm"
-
-    doLast {
-        exec {
-            ignoreExitValue = true
-            executable "docker"
-            args "network", "create", "-d", "overlay", "lega-public"
-        }
-    }
-}
-
-task createLEGAPrivateNetwork() {
-    setGroup "swarm"
-
-    doLast {
-        exec {
-            ignoreExitValue = true
-            executable "docker"
-            args "network", "create", "-d", "overlay", "lega-private"
-        }
-    }
-}
-
-
-task createNetworks() {
-    setGroup "swarm"
-    
-    dependsOn createCEGANetwork
-    dependsOn createLEGAPublicNetwork
-    dependsOn createLEGAPrivateNetwork
-}
