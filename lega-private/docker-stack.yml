@@ -139,7 +139,7 @@ services:
         delay: 5s
         window: 120s
     depends_on:
-      - s3
+      - vault-s3
       - keys
     environment:
       - SPRING_PROFILES_ACTIVE=no-oss,LocalEGA
@@ -175,7 +175,7 @@ services:
     entrypoint: ["gosu", "lega", "ega-id-mapper"]
 
   ingest:
-    image: nbisweden/ega-base:latest
+    image: nbisweden/ega-base:s3
     deploy:
       placement:
         constraints: [node.role == manager]
@@ -186,12 +186,11 @@ services:
     depends_on:
       - mq
       - db
-      - s3
+      - inbox-s3
+      - vault-s3
     environment:
       - S3_ACCESS_KEY=${VAULT_S3_ACCESS_KEY}
       - S3_SECRET_KEY=${VAULT_S3_SECRET_KEY}
-    volumes:
-      - inbox_s3:/ega/inbox
     configs:
       - source: conf.ini
         target: /etc/ega/conf.ini
