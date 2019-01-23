@@ -8,7 +8,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
-import se.nbis.lega.deployment.TestTask;
 
 public class GenerateFileTask extends TestTask {
 

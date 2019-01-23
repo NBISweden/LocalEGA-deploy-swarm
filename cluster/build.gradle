@@ -1,25 +1,55 @@
-import se.nbis.lega.deployment.cluster.*
+import se.nbis.lega.deployment.Groups
+import se.nbis.lega.deployment.cluster.CreateMachineTask
+import se.nbis.lega.deployment.cluster.ListTask
+import se.nbis.lega.deployment.cluster.Machine
+import se.nbis.lega.deployment.cluster.RemoveMachineTask
 
-task createManager(type: CreateManagerTask)
+task createCEGAMachine(type: CreateMachineTask) {
+    setGroup Groups.CLUSTER.getName()
 
-task createWorkers(type: CreateWorkersTask)
-
-task provision() {
-    setGroup "cluster"
-
-    dependsOn ":cluster:createManager", ":cluster:createWorkers"
+    setMachineName Machine.CEGA.getName()
 }
 
-task removeManager(type: RemoveManagerTask)
+task createLEGAPublicMachine(type: CreateMachineTask) {
+    setGroup Groups.CLUSTER.getName()
 
-task removeWorkers(type: RemoveWorkersTask)
+    setMachineName Machine.LEGA_PUBLIC.getName()
+}
+
+task createLEGAPrivateMachine(type: CreateMachineTask) {
+    setGroup Groups.CLUSTER.getName()
+
+    setMachineName Machine.LEGA_PRIVATE.getName()
+}
+
+task provision() {
+    setGroup Groups.CLUSTER.getName()
+
+    dependsOn ":cluster:createCEGAMachine", ":cluster:createLEGAPublicMachine", ":cluster:createLEGAPrivateMachine"
+}
+
+task removeCEGAMachine(type: RemoveMachineTask) {
+    setGroup Groups.CLUSTER.getName()
+
+    setMachineName Machine.CEGA.getName()
+}
+
+task removeLEGAPublicMachine(type: RemoveMachineTask) {
+    setGroup Groups.CLUSTER.getName()
+
+    setMachineName Machine.LEGA_PUBLIC.getName()
+}
+
+task removeLEGAPrivateMachine(type: RemoveMachineTask) {
+    setGroup Groups.CLUSTER.getName()
+
+    setMachineName Machine.LEGA_PRIVATE.getName()
+}
 
 task destroy() {
-    setGroup "cluster"
+    setGroup Groups.CLUSTER.getName()
 
-    dependsOn ":cluster:removeWorkers", ":cluster:removeManager"
+    dependsOn ":cluster:removeCEGAMachine", ":cluster:removeLEGAPublicMachine", ":cluster:removeLEGAPrivateMachine"
 }
 
 task list(type: ListTask)
-
-task env(type: EnvTask)

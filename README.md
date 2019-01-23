@@ -33,36 +33,58 @@ settings from [this list](https://docs.docker.com/machine/drivers/openstack/) (t
 `openstack.properties.sample` in the project folder). Then the command will look like this:
 `gradle provision -PopenStackConfig=/absolute/path/to/openstack.properties`. 
 
-By default one manager and one worker node are created. To increase the amount of workers, `workers` option can be 
-used, e.g.: `gradle provision -Pworkers=8 -PopenStackConfig=/absolute/path/to/openstack.properties`. 
-
 Note that it may take a while to provision the cluster in OpenStack. To see how many nodes are ready one can run
-`gradle list`. 
+`gradle list`. By default machine names are `cega` and `lega`.
 
 `gradle destroy` will remove all the virtual machines and destroy the cluster.
 
 ## Bootstrapping
 
-**NB**: before bootstrapping execute `gradle env` and the `eval`-command printed out. *This is required in order to
-run all subsequent commands against the Docker Swarm Manager and not against the local Docker daemon.*
+Here's an example of bootstrapping with local VMs (VirtualBox driver) (NOTE that LEGA Private **should** be bootstrapped 
+prior to LEGA Public, because LEGA Public depends on some LEGA Private configs):
+```
+gradle :cega:createConfiguration
+gradle :lega-private:createConfiguration
+gradle :lega-public:createConfiguration
+```
 
-The bootstrapping (generating of required configuration files, keys, credentials, etc.) is as simple as
-`gradle bootstrap`. You may also bootstrap `cega` or `lega` parts separately by calling `gradle createCEGAConfiguration`
-and `gradle :lega:createConfiguration` correspondingly, or you can even bootstrap different microservices separately, e.g.
-`gradle :cega:createConfiguration`. To clear the configuration execute `gradle clean` (or you can clean only the
-subprojects as well).
+This can be replaced with a single command `gradle bootstrap`.
+
+If Docker Machine VM names are not default (i.e. not `cega` and `lega`) you will have to use additional parameters:
+```
+gradle :cega:createConfiguration -Pmachine=<CEGA_MACHINE_NAME>
+gradle :lega-private:createConfiguration -Pmachine=<LEGA_PRIVATE_MACHINE_NAME>
+gradle :lega-public:createConfiguration -Pmachine=<LEGA_PUBLIC_MACHINE_NAME> -PcegaIP=$(docker-machine ip <CEGA_MACHINE_NAME>) -PlegaPrivateIP=$(docker-machine ip <LEGA_PRIVATE_MACHINE_NAME>)
+```
 
 During bootstrapping, two test users are generated: `john` and `jane`. Credentials, keys and other config information
 can be found under `.tmp` folder of each subproject.
 
 ## Deploying
 
-After successful bootstrapping, deploying should be as simple as `gradle deploy`. Again, you can deploy `cega` and
-`lega` parts separately. Updating of stacks can be done completely independently as well.
+After successful bootstrapping, deploying should be as simple as:
+```
+gradle :cega:deployStack
+gradle :lega-private:deployStack
+gradle :lega-public:deployStack
+```
 
-To make sure that the system is deploy you can execute `gradle ls`.
+This can be replaced with a single command `gradle deploy`.
 
-`gradle rm` will remove deployed stacks (yet preserving bootstrapped configuration).
+You can also use `-Pmachine=<MACHINE_NAME>` option with any of those commands to specify machine name.
+
+To make sure that the system is deployed you can execute `gradle ls`.
+
+`gradle :cega:removeStack`, `gradle :lega-private:removeStack`, `lega-public :cega:removeStack` will remove deployed stacks 
+(yet preserving bootstrapped configuration). To clean configurations and remove stack you can use script like this:
+```
+gradle :cega:removeStack
+gradle :cega:clearConfiguration
+gradle :lega-private:removeStack
+gradle :lega-private:clearConfiguration
+gradle :lega-public:removeStack
+gradle :lega-public:clearConfiguration
+```
 
 ## Testing
 
@@ -70,12 +92,8 @@ There's a built-in simple test to check that the basic scenario works fine. Try 
 successful deploying to check if ingestion works. It will automatically generate 10MBs file, encrypt it with `Crypt4GH`,
 upload to the inbox of test-user `john`, ingest this file and check if it has successfully landed to the vault.
 
-## Portainer
-
-For convenience, as an analogue for Kubernetes Dashboard, the [Portainer](https://portainer.io/) was added to this
-deployment. It's accessible at 30000 port. 
-
-![](https://habrastorage.org/webt/js/kv/6y/jskv6yxfauuw11qpiji4q3hjbw8.png)
+Note that in case of non-standard machine names, additional parameters will be required:
+`gradle ingest -PcegaIP=$(docker-machine ip <CEGA_MACHINE_NAME>) -PlegaPublicIP=$(docker-machine ip <LEGA_PUBLIC_MACHINE_NAME>) -PlegaPrivateIP=$(docker-machine ip <LEGA_PRIVATE_MACHINE_NAME>)`
 
 ## Demo
 

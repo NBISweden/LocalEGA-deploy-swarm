@@ -1,48 +1,49 @@
 import se.nbis.lega.deployment.*
+import se.nbis.lega.deployment.cluster.Machine
 import se.nbis.lega.deployment.lega.*
+import se.nbis.lega.deployment.lega.pub.Config
+import se.nbis.lega.deployment.lega.pub.CreateInboxConfigurationTask
+import se.nbis.lega.deployment.lega.pub.CreateMQConfigurationTask
+import se.nbis.lega.deployment.lega.pub.CreateMediatorConfigurationTask
 
 import java.util.stream.Collectors
 
 task removeVolumes(type: RemoveVolumesTask) {
     setGroup Groups.LEGA_PUBLIC.getName()
 
+    setMachineName Machine.LEGA_PUBLIC.getName()
     setVolumes Arrays.stream(Volume.values()).map { v -> v.getName() }.collect(Collectors.toSet())
-}
-
-task removeNetworks(type: RemoveNetworksTask) {
-    setGroup Groups.LEGA_PUBLIC.getName()
-
-    setNetworks Arrays.stream(Network.values()).map { v -> v.getName() }.collect(Collectors.toSet())
 }
 
 task clearConfiguration(type: ClearConfigurationTask) {
     setGroup Groups.LEGA_PUBLIC.getName()
 
-    setConfigs Arrays.stream(LegaPublicConfig.values()).map { c -> c.getName() }.collect(Collectors.toSet())
+    setMachineName Machine.LEGA_PUBLIC.getName()
+    setConfigs Arrays.stream(Config.values()).map { c -> c.getName() }.collect(Collectors.toSet())
 }
 
 task createMQConfiguration(type: CreateMQConfigurationTask)
 
 task createInboxConfiguration(type: CreateInboxConfigurationTask)
 
-task createConfIni(type: CreateLegaPublicConfIniConfigurationTask)
+task createMediatorConfiguration(type: CreateMediatorConfigurationTask)
 
 task createConfiguration {
     setGroup Groups.LEGA_PUBLIC.getName()
 
-    dependsOn clearConfiguration, createConfIni
+    dependsOn "clearConfiguration", "createMQConfiguration", "createInboxConfiguration", "createMediatorConfiguration"
 }
 
 task deployStack(type: DeployStackTask) {
     setGroup Groups.LEGA_PUBLIC.getName()
 
     setComposeFile file("docker-stack.yml").absolutePath
-    setStackName Groups.LEGA_PUBLIC.getName()
+    setMachineName Machine.LEGA_PUBLIC.getName()
     setEnvironment getTraceAsMap()
 }
 
 task removeStack(type: RemoveStackTask) {
     setGroup Groups.LEGA_PUBLIC.getName()
 
-    setStackName Groups.LEGA_PUBLIC.getName()
+    setMachineName Machine.LEGA_PUBLIC.getName()
 }

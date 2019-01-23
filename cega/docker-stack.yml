@@ -1,19 +1,14 @@
 version: '3.3'
 
-networks:
-
-  cega:
-    external: true
-
 services:
 
   cega-mq:
-    image: rabbitmq:3.6.14-management
-    networks:
-      - cega
+    image: rabbitmq:3.7.8-management
     ports:
-      - "15670:15672"
+      - "4369:4369"
       - "5672:5672"
+      - "15672:15672"
+      - "35672-35682:35672-35682"
     deploy:
       restart_policy:
         condition: on-failure
@@ -27,8 +22,8 @@ services:
 
   cega-users:
     image: nbisweden/ega-base:latest
-    networks:
-      - cega
+    ports:
+      - "80:80"
     deploy:
       restart_policy:
         condition: on-failure
@@ -52,8 +47,6 @@ configs:
   cega.defs.json:
     external: true
   cega.rabbitmq.config:
-    external: true
-  eureka.py:
     external: true
   server.py:
     external: true

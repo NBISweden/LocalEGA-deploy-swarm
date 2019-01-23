@@ -1,22 +1,5 @@
 package se.nbis.lega.deployment;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.attribute.PosixFilePermission;
-import java.security.KeyPair;
-import java.security.Security;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
@@ -26,19 +9,58 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.gradle.api.DefaultTask;
 
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.attribute.PosixFilePermission;
+import java.security.KeyPair;
+import java.security.Security;
+import java.util.*;
+
 public abstract class LocalEGATask extends DefaultTask {
 
     public static final String TMP_TRACE = ".tmp/.trace";
     public static final String CEGA_TMP_TRACE = "cega/.tmp/.trace";
     public static final String LEGA_PRIVATE_TMP_TRACE = "lega-private/.tmp/.trace";
-    public static final String S3_SECRET_KEY = "S3_SECRET_KEY";
-    public static final String S3_ACCESS_KEY = "S3_ACCESS_KEY";
+
+    public static final List<String> DOCKER_ENV_VARS = Arrays
+        .asList("DOCKER_TLS_VERIFY", "DOCKER_HOST", "DOCKER_CERT_PATH", "DOCKER_MACHINE_NAME");
+
+    public static final String LEGA_INSTANCES = "LEGA_INSTANCES";
+    public static final String LEGA_INSTANCE_NAME = "lega";
+    public static final String INBOX_S3_ACCESS_KEY = "INBOX_S3_ACCESS_KEY";
+    public static final String INBOX_S3_SECRET_KEY = "INBOX_S3_SECRET_KEY";
+    public static final String S3_ENDPOINT = "S3_ENDPOINT";
+    public static final String VAULT_S3_ACCESS_KEY = "VAULT_S3_ACCESS_KEY";
+    public static final String VAULT_S3_SECRET_KEY = "VAULT_S3_SECRET_KEY";
     public static final String CEGA_MQ_PASSWORD = "CEGA_MQ_PASSWORD";
+    public static final String CEGA_REST_PASSWORD = "CEGA_REST_PASSWORD";
     public static final String CEGA_CONNECTION = "CEGA_CONNECTION";
-    public static final String LEGA = "lega";
+    public static final String MEDIATOR_SERVER = "MEDIATOR_SERVER";
+    public static final String CEGA_ENDPOINT = "CEGA_ENDPOINT";
+    public static final String CEGA_ENDPOINT_CREDS = "CEGA_ENDPOINT_CREDS";
+    public static final String KEYS_PASSWORD = "KEYS_PASSWORD";
+    public static final String LEGA_PASSWORD = "LEGA_PASSWORD";
+    public static final String PGP_PASSPHRASE = "PGP_PASSPHRASE";
+    public static final String DB_LEGA_IN_PASSWORD = "DB_LEGA_IN_PASSWORD";
+    public static final String DB_LEGA_OUT_PASSWORD = "DB_LEGA_OUT_PASSWORD";
+    public static final String EGA_USER_PASSWORD_JOHN = "EGA_USER_PASSWORD_JOHN";
+    public static final String EGA_USER_PASSWORD_JANE = "EGA_USER_PASSWORD_JANE";
+    public static final String VAULT_S3_BUCKET_NAME = "lega";
 
     static {
         Security.addProvider(new BouncyCastleProvider());
+    }
+
+    protected String machineName;
+
+    public void setMachineName(String machineName) {
+        String machineNameProperty = getProperty("machine");
+        if (machineNameProperty != null) {
+            this.machineName = machineNameProperty;
+        } else {
+            this.machineName = machineName;
+        }
     }
 
     public Map<String, String> getTraceAsMap() throws IOException {
@@ -49,11 +71,6 @@ public abstract class LocalEGATask extends DefaultTask {
     public String readTrace(String key) throws IOException {
         File traceFile = getProject().file(TMP_TRACE);
         return readTrace(traceFile, key);
-    }
-
-    protected String getHost() {
-        String host = System.getenv("DOCKER_HOST");
-        return host == null ? "localhost" : host.substring(6).split(":")[0];
     }
 
     protected String getProperty(String key) {
@@ -68,7 +85,9 @@ public abstract class LocalEGATask extends DefaultTask {
     public void writeTrace(File traceFile, String key, String value) throws IOException {
         String existingValue = readTrace(traceFile, key);
         if (existingValue == null) {
-            FileUtils.writeLines(traceFile, Collections.singleton(String.format("%s=%s", key, value)), true);
+            FileUtils
+                .writeLines(traceFile, Collections.singleton(String.format("%s=%s", key, value)),
+                    true);
         }
     }
 
@@ -103,36 +122,34 @@ public abstract class LocalEGATask extends DefaultTask {
     }
 
     protected void removeConfig(String name) throws IOException {
-        exec(true, "docker config rm", name);
+        exec(true, getMachineEnvironment(machineName), "docker config rm", name);
     }
 
     protected void removeVolume(String name) throws IOException {
-        exec(true, "docker volume rm", name);
-    }
-
-    protected void removeNetwork(String name) throws IOException {
-        exec(true, "docker network rm", name);
+        exec(true, getMachineEnvironment(machineName), "docker volume rm", name);
     }
 
     protected void createConfig(String name, File file) throws IOException {
-        exec("docker config create", name, file.getAbsolutePath());
+        exec(true, getMachineEnvironment(machineName), "docker config create", name,
+            file.getAbsolutePath());
     }
 
     protected List<String> exec(String command, String... arguments) throws IOException {
         return exec(false, null, command, arguments);
     }
 
-    protected List<String> exec(boolean ignoreExitCode, String command, String... arguments) throws IOException {
+    protected List<String> exec(boolean ignoreExitCode, String command, String... arguments)
+        throws IOException {
         return exec(ignoreExitCode, null, command, arguments);
     }
 
-    protected List<String> exec(Map<String, String> environment, String command, String... arguments)
-                    throws IOException {
+    protected List<String> exec(Map<String, String> environment, String command,
+        String... arguments) throws IOException {
         return exec(false, environment, command, arguments);
     }
 
-    protected List<String> exec(boolean ignoreExitCode, Map<String, String> environment, String command,
-                    String... arguments) throws IOException {
+    protected List<String> exec(boolean ignoreExitCode, Map<String, String> environment,
+        String command, String... arguments) throws IOException {
         Map<String, String> systemEnvironment = new HashMap<>(System.getenv());
         if (environment != null) {
             systemEnvironment.putAll(environment);
@@ -146,7 +163,6 @@ public abstract class LocalEGATask extends DefaultTask {
         try {
             executor.execute(commandLine, systemEnvironment);
             String output = outputStream.toString();
-            System.out.println(output);
             return Arrays.asList(output.split(System.lineSeparator()));
         } catch (ExecuteException e) {
             String output = outputStream.toString();
@@ -157,6 +173,22 @@ public abstract class LocalEGATask extends DefaultTask {
                 throw e;
             }
         }
+    }
+
+    protected String getMachineIPAddress(String name) throws IOException {
+        return exec("docker-machine ip", name).iterator().next();
+    }
+
+    protected Map<String, String> getMachineEnvironment(String name) throws IOException {
+        List<String> env = exec("docker-machine env", name);
+        Map<String, String> variables = new HashMap<>();
+        for (String variable : env) {
+            String[] split = variable.substring(7).split("=");
+            if (DOCKER_ENV_VARS.contains(split[0])) {
+                variables.put(split[0], split[1].replace("\"", ""));
+            }
+        }
+        return variables;
     }
 
     protected void writePublicKey(KeyPair keyPair, File file) throws IOException {
