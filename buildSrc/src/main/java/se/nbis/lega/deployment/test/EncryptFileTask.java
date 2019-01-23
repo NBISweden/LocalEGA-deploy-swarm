@@ -11,7 +11,7 @@ import org.bouncycastle.openpgp.PGPException;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
-import no.ifi.uio.crypt4gh.stream.Crypt4GHOutputStream;
+import no.uio.ifi.crypt4gh.stream.Crypt4GHOutputStream;
 
 public class EncryptFileTask extends TestTask {
 
