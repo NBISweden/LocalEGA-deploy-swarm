@@ -153,8 +153,8 @@ pipeline {
         docker swarm leave --force
         '''
       }
-    cleanup { 
-    }
+  //  cleanup { 
+  //  }
   }
   
 }
