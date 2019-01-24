@@ -23,93 +23,83 @@ pipeline {
   }
   
   stages {
-  
-      stage('Create VMs') {
+    stage('Create CEGA VM') {
       steps {
-      parallel(
-            "CEGA": {
-                      sh '''
-                        docker-machine create --driver generic \
-                        --generic-ip-address=158.39.75.139 \
-                        --generic-ssh-user=ubuntu \
-                        --generic-ssh-key=tsd.pem CEGA-${GIT_COMMIT}
-                          eval "$(docker-machine env CEGA-${GIT_COMMIT})"
-                          docker swarm init
-                        '''
-            },
-            "LEGA Public": {
-                      sh '''
-                        docker-machine create --driver generic \
-                        --generic-ip-address=158.37.63.170 \
-                        --generic-ssh-user=ubuntu \
-                        --generic-ssh-key=tsd.pem LEGA-public-${GIT_COMMIT_SHORT}
-                          eval "$(docker-machine env LEGA-public-${GIT_COMMIT_SHORT})"
-                          docker swarm init
-                        '''
-            },
-            "LEGA Private": {
-                    sh '''
-                      docker-machine create --driver generic \
-                      --generic-ip-address=158.37.63.36 \
-                      --generic-ssh-user=ubuntu \
-                      --generic-ssh-key=tsd.pem LEGA-private-${GIT_COMMIT_SHORT}
-                        eval "$(docker-machine env LEGA-private-${GIT_COMMIT_SHORT})"
-                        docker swarm init
-                      '''
-            }
-          )
+        sh '''
+        docker-machine create --driver generic \
+        --generic-ip-address=158.39.75.139 \
+        --generic-ssh-user=ubuntu \
+        --generic-ssh-key=tsd.pem CEGA-${GIT_COMMIT_SHORT}
+          eval "$(docker-machine env CEGA-${GIT_COMMIT_SHORT})"
+          docker swarm init
+        '''
       }
     }
-
-    stage('Bootstrap') {
+    stage('Create private VM') {
       steps {
-      parallel(
-            "CEGA": {
-                      sh '''
-                        gradle :cega:createConfiguration -Pmachine=CEGA-${GIT_COMMIT_SHORT}
-                      '''
-            },
-            "LEGA": {
-                      sh '''
-                        gradle :lega-private:createConfiguration -Pmachine=LEGA-private-${GIT_COMMIT_SHORT}
-                        gradle :lega-public:createConfiguration -Pmachine=LEGA-public-${GIT_COMMIT_SHORT} -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT_SHORT}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${GIT_COMMIT_SHORT})
-                       '''
-            }
-          )
+        sh '''
+        docker-machine create --driver generic \
+        --generic-ip-address=158.37.63.36 \
+        --generic-ssh-user=ubuntu \
+        --generic-ssh-key=tsd.pem LEGA-private-${GIT_COMMIT_SHORT}
+          eval "$(docker-machine env LEGA-private-${GIT_COMMIT_SHORT})"
+          docker swarm init
+        '''
       }
     }
-    stage('Deploy') {
+    stage('Bootstrap private') {
       steps {
-      parallel(
-            "CEGA": {
-                      sh '''
-                        gradle :cega:deployStack -Pmachine=CEGA-${GIT_COMMIT_SHORT}
-                        sleep 120
-                        gradle ls
-                      '''
-            },
-            "LEGA Public": {
-                      sh '''
-                        gradle :lega-public:deployStack -Pmachine=LEGA-public-${GIT_COMMIT_SHORT}
-                        sleep 120
-                        gradle ls
-                      '''
-            },
-            "LEGA Private": {
-                      sh '''
-                        gradle :lega-private:deployStack -Pmachine=LEGA-private-${GIT_COMMIT_SHORT}
-                        sleep 120
-                        gradle ls
-                      '''
-            }
-          )
+        sh '''
+          eval "$(docker-machine env LEGA-private-${GIT_COMMIT_SHORT})"
+          gradle bootstrap
+        '''
       }
     }
-
+    stage('Deploy private') {
+      steps {
+        sh '''
+          eval "$(docker-machine env LEGA-private-${GIT_COMMIT_SHORT})"
+          gradle deployPrivate
+          sleep 30
+          gradle ls
+        '''
+      }
+    }
+    stage('Create public VM') {
+      steps {
+        sh '''
+        docker-machine create --driver generic \
+        --generic-ip-address=158.37.63.170 \
+        --generic-ssh-user=ubuntu \
+        --generic-ssh-key=tsd.pem public-${GIT_COMMIT}
+          eval "$(docker-machine env LEGA-public-${GIT_COMMIT_SHORT})"
+          docker swarm init
+        '''
+      }
+    }
+    stage('Bootstrap public') {
+      steps {
+        sh '''
+          eval "$(docker-machine env LEGA-public-${GIT_COMMIT_SHORT})"
+          gradle bootstrap
+        '''
+      }
+    }
+    stage('Deploy public') {
+      steps {
+        sh '''
+          eval "$(docker-machine env LEGA-public-${GIT_COMMIT_SHORT})"
+          gradle deployPublic
+          sleep 60
+          gradle ls
+        '''
+      }
+    }
     stage('Test') {
       steps {
         sh '''
-          gradle ingest -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT_SHORT}) -PlegaPublicIP=$(docker-machine ip LEGA-public-${GIT_COMMIT_SHORT}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${GIT_COMMIT_SHORT})
+          eval "$(docker-machine env LEGA-public-${GIT_COMMIT_SHORT})"
+          gradle ingest
         '''
       }
     }
@@ -141,7 +131,21 @@ pipeline {
         '''
       }
     cleanup { 
-      sh 'docker-machine rm -y CEGA-${GIT_COMMIT_SHORT} LEGA-public-${GIT_COMMIT_SHORT} LEGA-private-${GIT_COMMIT_SHORT}'
+      sh '''
+       eval "$(docker-machine env CEGA-${GIT_COMMIT_SHORT})"
+       docker-machine rm -y CEGA-${GIT_COMMIT_SHORT}
+       docker swarm leave --force
+        '''
+      sh '''
+       eval "$(docker-machine env LEGA-public-${GIT_COMMIT_SHORT})"
+       docker-machine rm -y LEGA-private-${GIT_COMMIT_SHORT}
+       docker swarm leave --force
+        '''
+      sh '''
+        eval "$(docker-machine env LEGA-private-${GIT_COMMIT_SHORT})"
+        docker-machine rm -y LEGA-public-${GIT_COMMIT_SHORT}
+        docker swarm leave --force
+        '''
     }
   }
   
