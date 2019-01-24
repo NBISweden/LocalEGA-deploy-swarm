@@ -23,17 +23,43 @@ pipeline {
   }
   
   stages {
-    stage('Create private VM') {
+    stage('Create VMs') {
       steps {
-        sh '''
-        docker-machine create --driver generic \
-        --generic-ip-address=158.37.63.36 \
-        --generic-ssh-user=ubuntu \
-        --generic-ssh-key=$PWD/tsd.pem \
-        LEGA-private-${GIT_COMMIT_SHORT}
-          eval "$(docker-machine env LEGA-private-${GIT_COMMIT_SHORT})"
-          docker swarm init
-        '''
+        parallel(
+         "LEGA-private": {
+            sh '''
+              docker-machine create --driver generic \
+                --generic-ip-address=158.37.63.36 \
+                --generic-ssh-user=ubuntu \
+                --generic-ssh-key=tsd.pem \
+                LEGA-private-${GIT_COMMIT_SHORT}
+              eval "$(docker-machine env LEGA-private-${GIT_COMMIT_SHORT})"
+              docker swarm init
+            '''
+           },
+         "LEGA-public": {
+            sh '''
+              docker-machine create --driver generic \
+                --generic-ip-address=158.37.63.170 \
+                --generic-ssh-user=ubuntu \
+                --generic-ssh-key=tsd.pem \
+                LEGA-public-${GIT_COMMIT}
+              eval "$(docker-machine env LEGA-public-${GIT_COMMIT_SHORT})"
+              docker swarm init
+            '''
+           },
+         "CEGA": {
+            sh '''
+              docker-machine create --driver generic \
+                --generic-ip-address=158.39.75.139 \
+                --generic-ssh-user=ubuntu \
+                --generic-ssh-key=tsd.pem \
+                CEGA-${GIT_COMMIT_SHORT}
+              eval "$(docker-machine env CEGA-${GIT_COMMIT_SHORT})"
+              docker swarm init
+            '''
+           }
+         )
       }
     }
     stage('Bootstrap private') {
