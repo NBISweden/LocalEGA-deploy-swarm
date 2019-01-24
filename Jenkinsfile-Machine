@@ -70,19 +70,7 @@ pipeline {
         '''
       }
     }
-    stage('Create CEGA VM') {
-      steps {
-        sh '''
-        docker-machine create --driver generic \
-        --generic-ip-address=158.39.75.139 \
-        --generic-ssh-user=ubuntu \
-        --generic-ssh-key=tsd.pem \
-        CEGA-${GIT_COMMIT}
-          eval "$(docker-machine env CEGA-${GIT_COMMIT})"
-          docker swarm init
-        '''
-      }
-    }
+
     stage('Deploy private') {
       steps {
         sh '''
@@ -90,19 +78,6 @@ pipeline {
           gradle deployPrivate
           sleep 30
           gradle ls
-        '''
-      }
-    }
-    stage('Create public VM') {
-      steps {
-        sh '''
-        docker-machine create --driver generic \
-        --generic-ip-address=158.37.63.170 \
-        --generic-ssh-user=ubuntu \
-        --generic-ssh-key=tsd.pem \
-        LEGA-public-${GIT_COMMIT}
-          eval "$(docker-machine env LEGA-public-${GIT_COMMIT})"
-          docker swarm init
         '''
       }
     }
