@@ -114,7 +114,7 @@ pipeline {
   }
   
   post('Remove VM') { 
-    always {
+    failure {
         sh '''
           eval "$(docker-machine env LEGA-public-${GIT_COMMIT_SHORT})"
           echo '---=== lega-public_inbox Logs ===---'
@@ -137,22 +137,34 @@ pipeline {
           echo '---=== lega-private_verify Logs ===---'
           docker service logs lega-private_verify
         '''
-      sh '''
-       eval "$(docker-machine env CEGA-${GIT_COMMIT_SHORT})"
-       docker-machine rm -y CEGA-${GIT_COMMIT_SHORT}
-       docker swarm leave --force
-        '''
-      sh '''
-       eval "$(docker-machine env LEGA-public-${GIT_COMMIT_SHORT})"
-       docker-machine rm -y LEGA-private-${GIT_COMMIT_SHORT}
-       docker swarm leave --force
-        '''
-      sh '''
-        eval "$(docker-machine env LEGA-private-${GIT_COMMIT_SHORT})"
-        docker-machine rm -y LEGA-public-${GIT_COMMIT_SHORT}
-        docker swarm leave --force
-        '''
-      }
+    }
+    always {
+      steps{
+        parallel(
+              "CEGA": {
+                              sh '''
+                               eval "$(docker-machine env CEGA-${GIT_COMMIT_SHORT})"
+                               docker-machine rm -y CEGA-${GIT_COMMIT_SHORT}
+                               docker swarm leave --force
+                                '''
+              },
+              "LEGA Public": {
+                                sh '''
+                                 eval "$(docker-machine env LEGA-public-${GIT_COMMIT_SHORT})"
+                                 docker-machine rm -y LEGA-private-${GIT_COMMIT_SHORT}
+                                 docker swarm leave --force
+                                  '''
+              },
+              "LEGA Private": {
+                                sh '''
+                                  eval "$(docker-machine env LEGA-private-${GIT_COMMIT_SHORT})"
+                                  docker-machine rm -y LEGA-public-${GIT_COMMIT_SHORT}
+                                  docker swarm leave --force
+                                  '''
+              }
+         )
+       }
+     }
   //  cleanup { 
   //  }
   }
