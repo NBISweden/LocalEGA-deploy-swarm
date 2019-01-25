@@ -101,6 +101,10 @@ pipeline {
     }
   }
   
-
+  post('Remove VM') {
+    cleanup {
+      sh 'docker-machine rm -y CEGA-${GIT_COMMIT_SHORT} LEGA-public-${GIT_COMMIT_SHORT} LEGA-private-${GIT_COMMIT_SHORT}'
+    }
+  }
   
 }
