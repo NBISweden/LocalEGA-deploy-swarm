@@ -72,21 +72,18 @@ pipeline {
                       sh '''
                         gradle :cega:deployStack -Pmachine=CEGA-${GIT_COMMIT_SHORT}
                         sleep 120
-                        gradle ls
                       '''
             },
             "LEGA Public": {
                       sh '''
                         gradle :lega-public:deployStack -Pmachine=LEGA-public-${GIT_COMMIT_SHORT}
                         sleep 120
-                        gradle ls
                       '''
             },
             "LEGA Private": {
                       sh '''
                         gradle :lega-private:deployStack -Pmachine=LEGA-private-${GIT_COMMIT_SHORT}
                         sleep 120
-                        gradle ls
                       '''
             }
           )
