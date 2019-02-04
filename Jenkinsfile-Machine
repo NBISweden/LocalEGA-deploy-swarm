@@ -126,22 +126,19 @@ pipeline {
   post('Remove VM') { 
 
     always {
+      sh 'docker-machine rm -y CEGA-${GIT_COMMIT_SHORT} LEGA-public-${GIT_COMMIT_SHORT} LEGA-private-${GIT_COMMIT_SHORT}'
       sh '''
         eval "$(docker-machine env CEGA-${GIT_COMMIT_SHORT})"
-        docker-machine rm -y CEGA-${GIT_COMMIT_SHORT}
         docker swarm leave --force
         '''
       sh '''
         eval "$(docker-machine env LEGA-public-${GIT_COMMIT_SHORT})"
-        docker-machine rm -y LEGA-private-${GIT_COMMIT_SHORT}
         docker swarm leave --force
         '''
       sh '''
         eval "$(docker-machine env LEGA-private-${GIT_COMMIT_SHORT})"
-        docker-machine rm -y LEGA-public-${GIT_COMMIT_SHORT}
         docker swarm leave --force
       '''
-      sh 'docker-machine rm -y CEGA-${GIT_COMMIT_SHORT} LEGA-public-${GIT_COMMIT_SHORT} LEGA-private-${GIT_COMMIT_SHORT}'
      }
   //  cleanup { 
   //  }
