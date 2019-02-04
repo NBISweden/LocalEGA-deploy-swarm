@@ -41,7 +41,7 @@ pipeline {
                 --generic-ssh-key=tsd.pem \
                 LEGA-private-${GIT_COMMIT_SHORT}
               eval "$(docker-machine env LEGA-private-${GIT_COMMIT_SHORT})"
-              docker swarm init --advertise-addr ${LEGA_private_IP}
+              docker swarm init
             '''
            },
          "LEGA-public": {
@@ -52,7 +52,7 @@ pipeline {
                 --generic-ssh-key=tsd.pem \
                 LEGA-public-${GIT_COMMIT_SHORT}
               eval "$(docker-machine env LEGA-public-${GIT_COMMIT_SHORT})"
-              docker swarm init --advertise-addr ${LEGA_public_IP}
+              docker swarm init
             '''
            },
          "CEGA": {
@@ -63,7 +63,7 @@ pipeline {
                 --generic-ssh-key=tsd.pem \
                 CEGA-${GIT_COMMIT_SHORT}
               eval "$(docker-machine env CEGA-${GIT_COMMIT_SHORT})"
-              docker swarm init --advertise-addr ${CEGA_IP}
+              docker swarm init
             '''
            }
          )
