@@ -20,10 +20,8 @@ pipeline {
     OS_SSH_USER=credentials('OS_SSH_USER')
     OS_FLAVOR_NAME=credentials('OS_FLAVOR_NAME')
     OS_IMAGE_ID=credentials('OS_IMAGE_ID')
-    
     GIT_COMMIT_SHORT = sh(
-                    STARTTIME = 'date +%s.%N'
-                    script: "printf \$(git rev-parse --short ${GIT_COMMIT})+${STARTTIME}",
+                    script: "printf \$(git rev-parse --short ${GIT_COMMIT})+${BUILD_NUMBER}",
                     returnStdout: true
             )
     LEGA_private_IP='158.37.63.36'
