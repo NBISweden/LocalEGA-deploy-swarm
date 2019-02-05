@@ -105,7 +105,7 @@ pipeline {
             "LEGA Public": {
                       sh '''
                         gradle :lega-public:deployStack -Pmachine=LEGA-public-${GIT_COMMIT_SHORT}
-                        sleep 70
+                        sleep 90
                         eval "$(docker-machine env LEGA-public-${GIT_COMMIT_SHORT})"
                         gradle ls
                       '''
