@@ -97,7 +97,8 @@ pipeline {
             "CEGA": {
                       sh '''
                         gradle :cega:deployStack -Pmachine=CEGA-${GIT_COMMIT_SHORT}
-                        sleep 120
+                        sleep 70
+                        eval "$(docker-machine env CEGA-${GIT_COMMIT_SHORT})"
                         cd LocalEGA-deploy-swarm
                         gradle ls
                       '''
@@ -105,7 +106,8 @@ pipeline {
             "LEGA Public": {
                       sh '''
                         gradle :lega-public:deployStack -Pmachine=LEGA-public-${GIT_COMMIT_SHORT}
-                        sleep 120
+                        sleep 70
+                        eval "$(docker-machine env LEGA-public-${GIT_COMMIT_SHORT})"
                         cd LocalEGA-deploy-swarm
                         gradle ls
                       '''
@@ -113,7 +115,8 @@ pipeline {
             "LEGA Private": {
                       sh '''
                         gradle :lega-private:deployStack -Pmachine=LEGA-private-${GIT_COMMIT_SHORT}
-                        sleep 120
+                        sleep 70
+                        eval "$(docker-machine env LEGA-private-${GIT_COMMIT_SHORT})"
                         cd LocalEGA-deploy-swarm
                         gradle ls
                       '''
