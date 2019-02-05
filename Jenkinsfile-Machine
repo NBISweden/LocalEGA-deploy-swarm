@@ -77,9 +77,13 @@ pipeline {
                         gradle :cega:createConfiguration -Pmachine=CEGA-${GIT_COMMIT_SHORT}
                       '''
             },
-            "LEGA": {
+            "LEGA Private": {
                       sh '''
                         gradle :lega-private:createConfiguration -Pmachine=LEGA-private-${GIT_COMMIT_SHORT}
+                      '''
+            },
+            "LEGA Public": {
+                      sh '''
                         gradle :lega-public:createConfiguration -Pmachine=LEGA-public-${GIT_COMMIT_SHORT} -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT_SHORT}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${GIT_COMMIT_SHORT})
                       '''
             }
@@ -126,17 +130,20 @@ pipeline {
   post('Remove VM') { 
 
     always {
-      sh 'docker-machine rm -y CEGA-${GIT_COMMIT_SHORT} LEGA-public-${GIT_COMMIT_SHORT} LEGA-private-${GIT_COMMIT_SHORT}'
+//      sh 'docker-machine rm -y CEGA-${GIT_COMMIT_SHORT} LEGA-public-${GIT_COMMIT_SHORT} LEGA-private-${GIT_COMMIT_SHORT}'
       sh '''
         eval "$(docker-machine env CEGA-${GIT_COMMIT_SHORT})"
+        docker-machine rm -y CEGA-${GIT_COMMIT_SHORT}
         docker swarm leave --force
         '''
       sh '''
         eval "$(docker-machine env LEGA-public-${GIT_COMMIT_SHORT})"
+        docker-machine rm -y  LEGA-public-${GIT_COMMIT_SHORT}
         docker swarm leave --force
         '''
       sh '''
         eval "$(docker-machine env LEGA-private-${GIT_COMMIT_SHORT})"
+        docker-machine rm -y  LEGA-private-${GIT_COMMIT_SHORT}
         docker swarm leave --force
       '''
      }
