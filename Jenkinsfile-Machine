@@ -131,23 +131,49 @@ pipeline {
   }
   
   post('Remove VM') { 
-
+    failure {
+        sh '''
+          eval "$(docker-machine env LEGA-public-${GIT_COMMIT_SHORT})"
+          echo '---=== lega-public_inbox Logs ===---'
+          docker service logs lega-public_inbox
+          echo '---=== lega-public_mq Logs ===---'
+          docker service logs lega-public_mq
+        '''
+        sh '''
+          eval "$(docker-machine env CEGA-${GIT_COMMIT_SHORT})"
+          echo '---=== cega_cega-mq Logs ===---'
+          docker service logs cega_cega-mq
+        '''
+        sh '''
+          eval "$(docker-machine env LEGA-private-${GIT_COMMIT_SHORT})"
+          echo '---=== lega-private_private-mq Logs ===---'
+          docker service logs lega-private_private-mq
+          echo '---=== lega-private_ingest Logs ===---'
+          docker service logs lega-private_ingest
+          echo '---=== lega-private_inbox-s3 Logs ===---'
+          docker service logs lega-private_inbox-s3
+          echo '---=== lega-private_db Logs ===---'
+          docker service logs lega-private_db
+          echo '---=== lega-private_verify Logs ===---'
+          docker service logs lega-private_verify
+        '''
+    }
     always {
 //      sh 'docker-machine rm -y CEGA-${GIT_COMMIT_SHORT} LEGA-public-${GIT_COMMIT_SHORT} LEGA-private-${GIT_COMMIT_SHORT}'
       sh '''
         eval "$(docker-machine env CEGA-${GIT_COMMIT_SHORT})"
-        docker-machine rm -y CEGA-${GIT_COMMIT_SHORT}
         docker swarm leave --force
+        docker-machine rm -y CEGA-${GIT_COMMIT_SHORT}
         '''
       sh '''
         eval "$(docker-machine env LEGA-public-${GIT_COMMIT_SHORT})"
-        docker-machine rm -y  LEGA-public-${GIT_COMMIT_SHORT}
         docker swarm leave --force
+        docker-machine rm -y  LEGA-public-${GIT_COMMIT_SHORT}
         '''
       sh '''
         eval "$(docker-machine env LEGA-private-${GIT_COMMIT_SHORT})"
-        docker-machine rm -y  LEGA-private-${GIT_COMMIT_SHORT}
         docker swarm leave --force
+        docker-machine rm -y  LEGA-private-${GIT_COMMIT_SHORT}
       '''
      }
   //  cleanup { 
