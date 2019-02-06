@@ -6,7 +6,7 @@ pipeline {
     cron('0 0 * * *')
     upstream(upstreamProjects: 'LocalEGA Build Trigger')
   }
-  
+  options { disableConcurrentBuilds() }
   environment {
     OS_USERNAME=credentials('OS_USERNAME')
     OS_PASSWORD=credentials('OS_PASSWORD')
@@ -215,6 +215,27 @@ pipeline {
           docker service logs LEGA-private-${GIT_COMMIT_SHORT}_verify
         '''
         
+
+    }
+//   always {
+//      sh 'docker-machine rm -y CEGA-${GIT_COMMIT_SHORT} LEGA-public-${GIT_COMMIT_SHORT} LEGA-private-${GIT_COMMIT_SHORT}'
+//      sh '''
+//        eval "$(docker-machine env CEGA-${GIT_COMMIT_SHORT})"
+//        docker swarm leave --force
+//        docker-machine rm -y CEGA-${GIT_COMMIT_SHORT}
+//        '''
+//      sh '''
+//        eval "$(docker-machine env LEGA-public-${GIT_COMMIT_SHORT})"
+//        docker swarm leave --force
+//        docker-machine rm -y  LEGA-public-${GIT_COMMIT_SHORT}
+//        '''
+//      sh '''
+//        eval "$(docker-machine env LEGA-private-${GIT_COMMIT_SHORT})"
+//        docker swarm leave --force
+//        docker-machine rm -y  LEGA-private-${GIT_COMMIT_SHORT}
+//      '''
+//   }
+    cleanup { 
             sh '''
               docker-machine rm -f $(docker-machine ls -q)
             '''
@@ -262,26 +283,6 @@ pipeline {
                 exit
             '''
     }
-//   always {
-//      sh 'docker-machine rm -y CEGA-${GIT_COMMIT_SHORT} LEGA-public-${GIT_COMMIT_SHORT} LEGA-private-${GIT_COMMIT_SHORT}'
-//      sh '''
-//        eval "$(docker-machine env CEGA-${GIT_COMMIT_SHORT})"
-//        docker swarm leave --force
-//        docker-machine rm -y CEGA-${GIT_COMMIT_SHORT}
-//        '''
-//      sh '''
-//        eval "$(docker-machine env LEGA-public-${GIT_COMMIT_SHORT})"
-//        docker swarm leave --force
-//        docker-machine rm -y  LEGA-public-${GIT_COMMIT_SHORT}
-//        '''
-//      sh '''
-//        eval "$(docker-machine env LEGA-private-${GIT_COMMIT_SHORT})"
-//        docker swarm leave --force
-//        docker-machine rm -y  LEGA-private-${GIT_COMMIT_SHORT}
-//      '''
-//   }
-//  cleanup { 
-//  }
   }
   
 }
