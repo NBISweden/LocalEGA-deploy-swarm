@@ -35,7 +35,7 @@ pipeline {
         parallel(
          "LEGA-private": {
             sh '''
-              ssh -i tsd.pem -p 22 ubuntu@${LEGA_private_IP}
+              ssh -i tsd.pem -l ubuntu -p 22 ${LEGA_private_IP}
               docker swarm leave --force
               rm -rf  LocalEGA-deploy-swarm
               docker-machine rm -f $(docker-machine ls -q)
@@ -46,7 +46,7 @@ pipeline {
            },
          "LEGA-public": {
             sh '''
-              ssh -i tsd.pem -p 22 ubuntu@${LEGA-public_IP}
+              ssh -i tsd.pem -l ubuntu -p 22 ${LEGA-public_IP}
               docker swarm leave --force
               rm -rf  LocalEGA-deploy-swarm
               docker-machine rm -f $(docker-machine ls -q)
@@ -57,7 +57,7 @@ pipeline {
            },
          "CEGA": {
             sh '''
-              ssh -i tsd.pem -p 22 ubuntu@${CEGA_IP}
+              ssh -i tsd.pem -l ubuntu -p 22 ${CEGA_IP}
               docker swarm leave --force
               rm -rf  LocalEGA-deploy-swarm
               docker-machine rm -f $(docker-machine ls -q)
