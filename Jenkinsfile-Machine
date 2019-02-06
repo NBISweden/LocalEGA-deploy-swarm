@@ -36,7 +36,6 @@ pipeline {
          "local": {
             sh '''
               docker-machine rm -f $(docker-machine ls -q)
-              chmod 400 keys/tsd.pem*
             '''
            },
          "LEGA-private": {
@@ -57,11 +56,13 @@ pipeline {
            },
          "LEGA-public": {
             sh '''
+              chmod 400 keys/tsd.pem*
               #ssh-keygen -R ${LEGA_private_IP}
               ssh -v -tt -o StrictHostKeyChecking=no -i keys/tsd.pem -l ubuntu -p 22 ${LEGA_public_IP} << EOF
                 docker swarm leave --force
                 rm -rf  LocalEGA-deploy-swarm
-                docker-machine rm -f $(docker-machine ls -q)
+                MACHINES=$(docker-machine ls -q)
+                docker-machine rm -f ${MACHINES}
                 docker system prune -f
                 sudo systemctl start docker
                 sudo service docker start
@@ -70,11 +71,13 @@ pipeline {
            },
          "CEGA": {
             sh '''
+              chmod 400 keys/tsd.pem*
               #ssh-keygen -R ${LEGA_private_IP}
               ssh -v -tt -o StrictHostKeyChecking=no -i keys/tsd.pem -l ubuntu -p 22 ${CEGA_IP} << EOF
                 docker swarm leave --force
                 rm -rf  LocalEGA-deploy-swarm
-                docker-machine rm -f $(docker-machine ls -q)
+                MACHINES=$(docker-machine ls -q)
+                docker-machine rm -f ${MACHINES}
                 docker system prune -f
                 sudo systemctl start docker
                 sudo service docker start
