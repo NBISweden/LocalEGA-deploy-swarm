@@ -2,10 +2,10 @@ pipeline {
   
   agent any
   
-  triggers {
-    cron('0 0 * * *')
-    upstream(upstreamProjects: 'LocalEGA Build Trigger')
-  }
+//  triggers {
+//    cron('0 0 * * *')
+//    upstream(upstreamProjects: 'LocalEGA Build Trigger')
+//  }
   options { disableConcurrentBuilds() }
   environment {
     OS_USERNAME=credentials('OS_USERNAME')
