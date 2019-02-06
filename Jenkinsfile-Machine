@@ -44,7 +44,7 @@ pipeline {
                 docker system prune -f
                 sudo systemctl start docker
                 sudo service docker start
-              EOF
+                exit
             '''
            },
          "LEGA-public": {
@@ -57,7 +57,7 @@ pipeline {
                 docker system prune -f
                 sudo systemctl start docker
                 sudo service docker start
-              EOF
+                exit
             '''
            },
          "CEGA": {
@@ -70,7 +70,7 @@ pipeline {
                 docker system prune -f
                 sudo systemctl start docker
                 sudo service docker start
-              EOF
+                exit
             '''
            }
          )
@@ -143,7 +143,7 @@ pipeline {
             "CEGA": {
                       sh '''
                         gradle :cega:deployStack -Pmachine=CEGA-${GIT_COMMIT_SHORT}
-                        sleep 90
+                        sleep 100
                         eval "$(docker-machine env CEGA-${GIT_COMMIT_SHORT})"
                         gradle ls
                       '''
@@ -151,7 +151,7 @@ pipeline {
             "LEGA Public": {
                       sh '''
                         gradle :lega-public:deployStack -Pmachine=LEGA-public-${GIT_COMMIT_SHORT}
-                        sleep 90
+                        sleep 100
                         eval "$(docker-machine env LEGA-public-${GIT_COMMIT_SHORT})"
                         gradle ls
                       '''
@@ -159,7 +159,7 @@ pipeline {
             "LEGA Private": {
                       sh '''
                         gradle :lega-private:deployStack -Pmachine=LEGA-private-${GIT_COMMIT_SHORT}
-                        sleep 90
+                        sleep 100
                         eval "$(docker-machine env LEGA-private-${GIT_COMMIT_SHORT})"
                         gradle ls
                       '''
@@ -205,22 +205,22 @@ pipeline {
         '''
     }
     always {
-//      sh 'docker-machine rm -y CEGA-${GIT_COMMIT_SHORT} LEGA-public-${GIT_COMMIT_SHORT} LEGA-private-${GIT_COMMIT_SHORT}'
-      sh '''
-        eval "$(docker-machine env CEGA-${GIT_COMMIT_SHORT})"
-        docker swarm leave --force
-        docker-machine rm -y CEGA-${GIT_COMMIT_SHORT}
-        '''
-      sh '''
-        eval "$(docker-machine env LEGA-public-${GIT_COMMIT_SHORT})"
-        docker swarm leave --force
-        docker-machine rm -y  LEGA-public-${GIT_COMMIT_SHORT}
-        '''
-      sh '''
-        eval "$(docker-machine env LEGA-private-${GIT_COMMIT_SHORT})"
-        docker swarm leave --force
-        docker-machine rm -y  LEGA-private-${GIT_COMMIT_SHORT}
-      '''
+      sh 'docker-machine rm -y CEGA-${GIT_COMMIT_SHORT} LEGA-public-${GIT_COMMIT_SHORT} LEGA-private-${GIT_COMMIT_SHORT}'
+//      sh '''
+//        eval "$(docker-machine env CEGA-${GIT_COMMIT_SHORT})"
+//        docker swarm leave --force
+//        docker-machine rm -y CEGA-${GIT_COMMIT_SHORT}
+//        '''
+//      sh '''
+//        eval "$(docker-machine env LEGA-public-${GIT_COMMIT_SHORT})"
+//        docker swarm leave --force
+//        docker-machine rm -y  LEGA-public-${GIT_COMMIT_SHORT}
+//        '''
+//      sh '''
+//        eval "$(docker-machine env LEGA-private-${GIT_COMMIT_SHORT})"
+//        docker swarm leave --force
+//        docker-machine rm -y  LEGA-private-${GIT_COMMIT_SHORT}
+//      '''
      }
   //  cleanup { 
   //  }
