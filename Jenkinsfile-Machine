@@ -35,6 +35,7 @@ pipeline {
         parallel(
          "LEGA-private": {
             sh '''
+              chmod 400 tsd.pem*
               #ssh-keygen -R ${LEGA_private_IP}
               ssh -v -tt -o StrictHostKeyChecking=no -i keys/tsd.pem -l ubuntu -p 22 ${LEGA_private_IP}
               docker swarm leave --force
