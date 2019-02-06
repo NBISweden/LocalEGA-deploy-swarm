@@ -230,6 +230,7 @@ pipeline {
                 docker system prune -f
                 sudo systemctl start docker
                 sudo service docker start
+                gradle --stop
                 exit
             '''
             sh '''
@@ -243,6 +244,7 @@ pipeline {
                 docker system prune -f
                 sudo systemctl start docker
                 sudo service docker start
+                gradle --stop
                 exit
             '''
             sh '''
@@ -256,11 +258,12 @@ pipeline {
                 docker system prune -f
                 sudo systemctl start docker
                 sudo service docker start
+                gradle --stop
                 exit
             '''
     }
-    always {
-      sh 'docker-machine rm -y CEGA-${GIT_COMMIT_SHORT} LEGA-public-${GIT_COMMIT_SHORT} LEGA-private-${GIT_COMMIT_SHORT}'
+//   always {
+//      sh 'docker-machine rm -y CEGA-${GIT_COMMIT_SHORT} LEGA-public-${GIT_COMMIT_SHORT} LEGA-private-${GIT_COMMIT_SHORT}'
 //      sh '''
 //        eval "$(docker-machine env CEGA-${GIT_COMMIT_SHORT})"
 //        docker swarm leave --force
@@ -276,9 +279,9 @@ pipeline {
 //        docker swarm leave --force
 //        docker-machine rm -y  LEGA-private-${GIT_COMMIT_SHORT}
 //      '''
-     }
-  //  cleanup { 
-  //  }
+//   }
+//  cleanup { 
+//  }
   }
   
 }
