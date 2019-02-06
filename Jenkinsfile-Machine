@@ -138,7 +138,6 @@ pipeline {
            },
          "LEGA-private": {
             sh '''
-              docker-machine rm -f $(docker-machine ls -q)
               chmod 400 keys/tsd.pem*
               #ssh-keygen -R ${LEGA_private_IP}
               ssh -v -tt -o StrictHostKeyChecking=no -i keys/tsd.pem -l ubuntu -p 22 ${LEGA_private_IP} << EOF
@@ -236,9 +235,6 @@ pipeline {
 //      '''
 //   }
     cleanup { 
-            sh '''
-              docker-machine rm -f $(docker-machine ls -q)
-            '''
             sh '''
               docker-machine rm -f $(docker-machine ls -q)
               chmod 400 keys/tsd.pem*
