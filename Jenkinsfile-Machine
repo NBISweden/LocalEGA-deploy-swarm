@@ -41,7 +41,7 @@ pipeline {
                 --generic-ssh-key=tsd.pem \
                 LEGA-private-${GIT_COMMIT_SHORT}
               eval "$(docker-machine env LEGA-private-${GIT_COMMIT_SHORT})"
-              docker swarm init
+              docker swarm init --advertise-addr ${LEGA_private_IP}
             '''
            },
          "LEGA-public": {
@@ -52,7 +52,7 @@ pipeline {
                 --generic-ssh-key=tsd.pem \
                 LEGA-public-${GIT_COMMIT_SHORT}
               eval "$(docker-machine env LEGA-public-${GIT_COMMIT_SHORT})"
-              docker swarm init
+              docker swarm init --advertise-addr ${LEGA_public_IP}
             '''
            },
          "CEGA": {
@@ -63,7 +63,7 @@ pipeline {
                 --generic-ssh-key=tsd.pem \
                 CEGA-${GIT_COMMIT_SHORT}
               eval "$(docker-machine env CEGA-${GIT_COMMIT_SHORT})"
-              docker swarm init
+              docker swarm init --advertise-addr ${CEGA_IP}
             '''
            }
          )
@@ -97,7 +97,7 @@ pipeline {
             "CEGA": {
                       sh '''
                         gradle :cega:deployStack -Pmachine=CEGA-${GIT_COMMIT_SHORT}
-                        sleep 70
+                        sleep 90
                         eval "$(docker-machine env CEGA-${GIT_COMMIT_SHORT})"
                         gradle ls
                       '''
@@ -113,7 +113,7 @@ pipeline {
             "LEGA Private": {
                       sh '''
                         gradle :lega-private:deployStack -Pmachine=LEGA-private-${GIT_COMMIT_SHORT}
-                        sleep 70
+                        sleep 90
                         eval "$(docker-machine env LEGA-private-${GIT_COMMIT_SHORT})"
                         gradle ls
                       '''
