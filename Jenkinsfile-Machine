@@ -183,7 +183,7 @@ pipeline {
                 docker swarm leave --force
                 rm -rf  LocalEGA-deploy-swarm
                 MACHINES=$(docker-machine ls -q)
-                docker-machine rm -f ${MACHINES}
+                [ -z "$MACHINES" ] && echo "No docker machines" || docker-machine rm -f ${MACHINES}
                 docker system prune -f
                 sudo systemctl start docker
                 sudo service docker start
@@ -196,7 +196,7 @@ pipeline {
                 docker swarm leave --force
                 rm -rf  LocalEGA-deploy-swarm
                 MACHINES=$(docker-machine ls -q)
-                docker-machine rm -f ${MACHINES}
+                [ -z "$MACHINES" ] && echo "No docker machines" || docker-machine rm -f ${MACHINES}
                 docker system prune -f
                 sudo systemctl start docker
                 sudo service docker start
@@ -209,7 +209,7 @@ pipeline {
                 docker swarm leave --force
                 rm -rf  LocalEGA-deploy-swarm
                 MACHINES=$(docker-machine ls -q)
-                docker-machine rm -f ${MACHINES}
+                [ -z "$MACHINES" ] && echo "No docker machines" || docker-machine rm -f ${MACHINES}
                 docker system prune -f
                 sudo systemctl start docker
                 sudo service docker start
