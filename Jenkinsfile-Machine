@@ -25,7 +25,7 @@ pipeline {
             sh '''
               gradle :cluster:createLEGAPrivateMachine \
               -Pmachine=LEGA-private-${GIT_COMMIT_SHORT} \
-              -PmachineIp=LEGA_private_IP \
+              -PmachineIp=${LEGA_private_IP} \
               -PsshUser=ubuntu \
               -PsshKeyFile=keys/tsd.pem
 
