@@ -27,7 +27,8 @@ pipeline {
               -Pmachine=LEGA-private-${GIT_COMMIT_SHORT} \
               -PmachineIp=${LEGA_private_IP} \
               -PsshUser=ubuntu \
-              -PsshKeyFile=keys/tsd.pem
+              -PsshKeyFile=keys/tsd.pem \
+              -S
 
 #              docker-machine create --driver generic \
 #                --generic-ip-address=${LEGA_private_IP} \
