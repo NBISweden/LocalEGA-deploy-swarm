@@ -47,14 +47,6 @@ pipeline {
               -PsshUser=ubuntu \
               -PsshKeyFile=keys/tsd.pem \
               -i
-                          
-#              docker-machine create --driver generic \
-#                --generic-ip-address=${LEGA_public_IP} \
-#                --generic-ssh-user=ubuntu \
-#                --generic-ssh-key=keys/tsd.pem \
-#                LEGA-public-${GIT_COMMIT_SHORT}
-#              eval "$(docker-machine env LEGA-public-${GIT_COMMIT_SHORT})"
-#              docker swarm init --advertise-addr ${LEGA_public_IP}
             '''
            },
          "CEGA": {
@@ -65,14 +57,6 @@ pipeline {
               -PsshUser=ubuntu \
               -PsshKeyFile=keys/tsd.pem \
               -i
-              
-#              docker-machine create --driver generic \
-#                --generic-ip-address=${CEGA_IP} \
-#                --generic-ssh-user=ubuntu \
-#                --generic-ssh-key=keys/tsd.pem \
-#                CEGA-${GIT_COMMIT_SHORT}
-#              eval "$(docker-machine env CEGA-${GIT_COMMIT_SHORT})"
-#              docker swarm init --advertise-addr ${CEGA_IP}
             '''
            }
          )
@@ -133,64 +117,12 @@ pipeline {
     stage('Test') {
       steps {
         sh '''
-          gradle ingest -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT_SHORT}) -PlegaPublicIP=$(docker-machine ip LEGA-public-${GIT_COMMIT_SHORT}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${GIT_COMMIT_SHORT})
+          gradle ingest \
+          -PcegaIP=${CEGA_IP} \
+          -PlegaPublicIP=${LEGA_public_IP} \
+          -PlegaPrivateIP=${LEGA_private_IP} \
+          -d
         '''
-      }
-    }
-    stage('Cleanup') {
-      steps {
-        parallel(
-         "local": {
-            sh '''
-              docker-machine rm -f $(docker-machine ls -q)
-            '''
-           },
-         "LEGA-private": {
-            sh '''
-              chmod 400 keys/tsd.pem*
-              #ssh-keygen -R ${LEGA_private_IP}
-              ssh -v -tt -o StrictHostKeyChecking=no -i keys/tsd.pem -l ubuntu -p 22 ${LEGA_private_IP} << EOF
-                docker swarm leave --force
-                rm -rf  LocalEGA-deploy-swarm
-                MACHINES=$(docker-machine ls -q)
-                docker-machine rm -f ${MACHINES}
-                docker system prune -f
-                sudo systemctl start docker
-                sudo service docker start
-                exit
-            '''
-           },
-         "LEGA-public": {
-            sh '''
-              chmod 400 keys/tsd.pem*
-              #ssh-keygen -R ${LEGA_private_IP}
-              ssh -v -tt -o StrictHostKeyChecking=no -i keys/tsd.pem -l ubuntu -p 22 ${LEGA_public_IP} << EOF
-                docker swarm leave --force
-                rm -rf  LocalEGA-deploy-swarm
-                MACHINES=$(docker-machine ls -q)
-                docker-machine rm -f ${MACHINES}
-                docker system prune -f
-                sudo systemctl start docker
-                sudo service docker start
-                exit
-            '''
-           },
-         "CEGA": {
-            sh '''
-              chmod 400 keys/tsd.pem*
-              #ssh-keygen -R ${LEGA_private_IP}
-              ssh -v -tt -o StrictHostKeyChecking=no -i keys/tsd.pem -l ubuntu -p 22 ${CEGA_IP} << EOF
-                docker swarm leave --force
-                rm -rf  LocalEGA-deploy-swarm
-                MACHINES=$(docker-machine ls -q)
-                docker-machine rm -f ${MACHINES}
-                docker system prune -f
-                sudo systemctl start docker
-                sudo service docker start
-                exit
-            '''
-           }
-         )
       }
     }
   }
@@ -247,7 +179,6 @@ pipeline {
             sh '''
               docker-machine rm -f $(docker-machine ls -q)
               chmod 400 keys/tsd.pem*
-              #ssh-keygen -R ${LEGA_private_IP}
               ssh -v -tt -o StrictHostKeyChecking=no -i keys/tsd.pem -l ubuntu -p 22 ${LEGA_private_IP} << EOF
                 docker swarm leave --force
                 rm -rf  LocalEGA-deploy-swarm
@@ -261,7 +192,6 @@ pipeline {
             '''
             sh '''
               chmod 400 keys/tsd.pem*
-              #ssh-keygen -R ${LEGA_private_IP}
               ssh -v -tt -o StrictHostKeyChecking=no -i keys/tsd.pem -l ubuntu -p 22 ${LEGA_public_IP} << EOF
                 docker swarm leave --force
                 rm -rf  LocalEGA-deploy-swarm
@@ -275,7 +205,6 @@ pipeline {
             '''
             sh '''
               chmod 400 keys/tsd.pem*
-              #ssh-keygen -R ${LEGA_private_IP}
               ssh -v -tt -o StrictHostKeyChecking=no -i keys/tsd.pem -l ubuntu -p 22 ${CEGA_IP} << EOF
                 docker swarm leave --force
                 rm -rf  LocalEGA-deploy-swarm
