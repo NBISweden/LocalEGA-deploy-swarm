@@ -8,18 +8,6 @@ pipeline {
 //  }
   options { disableConcurrentBuilds() }
   environment {
-    OS_USERNAME=credentials('OS_USERNAME')
-    OS_PASSWORD=credentials('OS_PASSWORD')
-    OS_TENANT_ID=credentials('OS_TENANT_ID')
-    OS_DOMAIN_NAME=credentials('OS_DOMAIN_NAME')
-    OS_AUTH_URL=credentials('OS_AUTH_URL')
-    OS_IDENTITY_API_VERSION=credentials('OS_IDENTITY_API_VERSION')
-    OS_REGION_NAME=credentials('OS_REGION_NAME')
-    OS_NETWORK_NAME=credentials('OS_NETWORK_NAME')
-    OS_SECURITY_GROUPS=credentials('OS_SECURITY_GROUPS')
-    OS_SSH_USER=credentials('OS_SSH_USER')
-    OS_FLAVOR_NAME=credentials('OS_FLAVOR_NAME')
-    OS_IMAGE_ID=credentials('OS_IMAGE_ID')
     GIT_COMMIT_SHORT = sh(
                     script: "printf \$(git rev-parse --short ${GIT_COMMIT})${BUILD_NUMBER}",
                     returnStdout: true
@@ -35,13 +23,19 @@ pipeline {
         parallel(
          "LEGA-private": {
             sh '''
-              docker-machine create --driver generic \
-                --generic-ip-address=${LEGA_private_IP} \
-                --generic-ssh-user=ubuntu \
-                --generic-ssh-key=keys/tsd.pem \
-                LEGA-private-${GIT_COMMIT_SHORT}
-              eval "$(docker-machine env LEGA-private-${GIT_COMMIT_SHORT})"
-              docker swarm init --advertise-addr ${LEGA_private_IP}
+              gradle :cluster:createLEGAPrivateMachine \
+              -Pmachine=LEGA-private-${GIT_COMMIT_SHORT} \
+              -PmachineIp=LEGA_private_IP \
+              -PsshUser=ubuntu \
+              -PsshKeyFile=keys/tsd.pem
+
+#              docker-machine create --driver generic \
+#                --generic-ip-address=${LEGA_private_IP} \
+#                --generic-ssh-user=ubuntu \
+#                --generic-ssh-key=keys/tsd.pem \
+#                LEGA-private-${GIT_COMMIT_SHORT}
+#              eval "$(docker-machine env LEGA-private-${GIT_COMMIT_SHORT})"
+#              docker swarm init --advertise-addr ${LEGA_private_IP}
             '''
            },
          "LEGA-public": {
@@ -97,7 +91,7 @@ pipeline {
             "CEGA": {
                       sh '''
                         gradle :cega:deployStack -Pmachine=CEGA-${GIT_COMMIT_SHORT}
-                        sleep 120
+                        sleep 150
                         eval "$(docker-machine env CEGA-${GIT_COMMIT_SHORT})"
                         gradle ls
                       '''
@@ -105,7 +99,7 @@ pipeline {
             "LEGA Public": {
                       sh '''
                         gradle :lega-public:deployStack -Pmachine=LEGA-public-${GIT_COMMIT_SHORT}
-                        sleep 140
+                        sleep 150
                         eval "$(docker-machine env LEGA-public-${GIT_COMMIT_SHORT})"
                         gradle ls
                       '''
@@ -113,7 +107,7 @@ pipeline {
             "LEGA Private": {
                       sh '''
                         gradle :lega-private:deployStack -Pmachine=LEGA-private-${GIT_COMMIT_SHORT}
-                        sleep 120
+                        sleep 150
                         eval "$(docker-machine env LEGA-private-${GIT_COMMIT_SHORT})"
                         gradle ls
                       '''

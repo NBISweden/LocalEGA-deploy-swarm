@@ -1,13 +1,12 @@
 package se.nbis.lega.deployment.cluster;
 
-import se.nbis.lega.deployment.Groups;
-import se.nbis.lega.deployment.LocalEGATask;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import se.nbis.lega.deployment.Groups;
+import se.nbis.lega.deployment.LocalEGATask;
 
 public abstract class ClusterTask extends LocalEGATask {
 
@@ -34,14 +33,32 @@ public abstract class ClusterTask extends LocalEGATask {
         return getMachines(name).get(name);
     }
 
-    protected Map<String, String> createMachineOpenStack(String name, String openStackConfig)
-        throws IOException {
+    protected Map<String, String> createMachineOpenStack(String name, String openStackConfig) throws IOException {
         return createMachineOpenStack(name, readFileAsMap(new File(openStackConfig)));
     }
 
     protected Map<String, String> createMachineOpenStack(String name, Map<String, String> openStackEnvironment)
-        throws IOException {
+                    throws IOException {
         exec(true, openStackEnvironment, "docker-machine create", "--driver", "openstack", name);
+        return getMachines(name).get(name);
+    }
+
+    /**
+     * Create Docker Machine using generic driver
+     * 
+     * @param name
+     * @param openStackEnvironment
+     * @param ip
+     * @param user
+     * @param sshKeyFile
+     * @return
+     * @throws IOException
+     */
+    protected Map<String, String> createMachineWithIp(String name, String ip, String user, String sshKeyFile)
+                    throws IOException {
+        exec(true, "docker-machine create", "--driver", "generic", "--generic-ip-address", ip, "--generic-ssh-user",
+                        user, "--generic-ssh-key", sshKeyFile, name);
+        exec(true, "eval", "\"$(docker-machine env " + machineName + "\")");
         return getMachines(name).get(name);
     }
 

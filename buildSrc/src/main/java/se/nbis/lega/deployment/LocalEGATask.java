@@ -28,6 +28,8 @@ import org.gradle.api.DefaultTask;
 
 public abstract class LocalEGATask extends DefaultTask {
 
+    private static final String MACHINE_IP = "machineIp";
+    public static final String MACHINE = "machine";
     public static final String TMP_TRACE = ".tmp/.trace";
     public static final String CEGA_TMP_TRACE = "cega/.tmp/.trace";
     public static final String LEGA_PRIVATE_TMP_TRACE = "lega-private/.tmp/.trace";
@@ -62,13 +64,23 @@ public abstract class LocalEGATask extends DefaultTask {
     }
 
     protected String machineName;
+    protected String machineIp;
 
     public void setMachineName(String machineName) {
-        String machineNameProperty = getProperty("machine");
+        String machineNameProperty = getProperty(MACHINE);
         if (machineNameProperty != null) {
             this.machineName = machineNameProperty;
         } else {
             this.machineName = machineName;
+        }
+    }
+
+    public void setMachineIp(String machineIp) {
+        String machineIpProperty = getProperty(MACHINE_IP);
+        if (machineIp != null) {
+            this.machineIp = machineIpProperty;
+        } else {
+            this.machineIp = machineIp;
         }
     }
 
@@ -182,7 +194,11 @@ public abstract class LocalEGATask extends DefaultTask {
     }
 
     protected String getMachineIPAddress(String name) throws IOException {
+        if (machineIp == null) {
             return exec("docker-machine ip", name).iterator().next();
+        } else {
+            return machineIp;
+        }
     }
 
     protected Map<String, String> getMachineEnvironment(String name) throws IOException {
