@@ -25,10 +25,13 @@ import org.apache.commons.io.FileUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.gradle.api.DefaultTask;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class LocalEGATask extends DefaultTask {
+    private static final Logger logger = LoggerFactory.getLogger(LocalEGATask.class);
 
-    private static final String MACHINE_IP = "machineIp";
+    public static final String MACHINE_IP = "machineIp";
     public static final String MACHINE = "machine";
     public static final String TMP_TRACE = ".tmp/.trace";
     public static final String CEGA_TMP_TRACE = "cega/.tmp/.trace";
@@ -178,7 +181,7 @@ public abstract class LocalEGATask extends DefaultTask {
         CommandLine commandLine = CommandLine.parse(command);
         commandLine.addArguments(arguments);
         try {
-            System.out.println(command);
+            logger.debug(command);
             executor.execute(commandLine, systemEnvironment);
             String output = outputStream.toString();
             return Arrays.asList(output.split(System.lineSeparator()));
@@ -194,11 +197,11 @@ public abstract class LocalEGATask extends DefaultTask {
     }
 
     protected String getMachineIPAddress(String name) throws IOException {
-        if (machineIp == null) {
-            return exec("docker-machine ip", name).iterator().next();
-        } else {
-            return machineIp;
-        }
+        // if (machineIp == null) {
+        return exec("docker-machine ip", name).iterator().next();
+        // } else {
+        // return machineIp;
+        // }
     }
 
     protected Map<String, String> getMachineEnvironment(String name) throws IOException {

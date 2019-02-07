@@ -5,10 +5,13 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.nbis.lega.deployment.Groups;
 import se.nbis.lega.deployment.LocalEGATask;
 
 public abstract class ClusterTask extends LocalEGATask {
+    private static final Logger logger = LoggerFactory.getLogger(ClusterTask.class);
 
     public ClusterTask() {
         super();
@@ -29,6 +32,7 @@ public abstract class ClusterTask extends LocalEGATask {
     }
 
     protected Map<String, String> createMachineVirtualBox(String name) throws IOException {
+        logger.debug("createMachineVirtualBox");
         exec(true, "docker-machine create", "--driver", "virtualbox", name);
         return getMachines(name).get(name);
     }
@@ -39,6 +43,7 @@ public abstract class ClusterTask extends LocalEGATask {
 
     protected Map<String, String> createMachineOpenStack(String name, Map<String, String> openStackEnvironment)
                     throws IOException {
+        logger.debug("createMachineOpenStack");
         exec(true, openStackEnvironment, "docker-machine create", "--driver", "openstack", name);
         return getMachines(name).get(name);
     }
@@ -56,9 +61,9 @@ public abstract class ClusterTask extends LocalEGATask {
      */
     protected Map<String, String> createMachineWithIp(String name, String ip, String user, String sshKeyFile)
                     throws IOException {
+        logger.debug("createMachineWithIp");
         exec(true, "docker-machine create", "--driver", "generic", "--generic-ip-address", ip, "--generic-ssh-user",
                         user, "--generic-ssh-key", sshKeyFile, name);
-        exec(true, "eval", "\"$(docker-machine env " + machineName + "\")");
         return getMachines(name).get(name);
     }
 

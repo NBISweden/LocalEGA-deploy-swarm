@@ -28,7 +28,7 @@ pipeline {
               -PmachineIp=${LEGA_private_IP} \
               -PsshUser=ubuntu \
               -PsshKeyFile=keys/tsd.pem \
-              -S
+              -i
 
 #              docker-machine create --driver generic \
 #                --generic-ip-address=${LEGA_private_IP} \
@@ -41,24 +41,38 @@ pipeline {
            },
          "LEGA-public": {
             sh '''
-              docker-machine create --driver generic \
-                --generic-ip-address=${LEGA_public_IP} \
-                --generic-ssh-user=ubuntu \
-                --generic-ssh-key=keys/tsd.pem \
-                LEGA-public-${GIT_COMMIT_SHORT}
-              eval "$(docker-machine env LEGA-public-${GIT_COMMIT_SHORT})"
-              docker swarm init --advertise-addr ${LEGA_public_IP}
+              gradle :cluster:createLEGAPublicMachine \
+              -Pmachine=LEGA-public-${GIT_COMMIT_SHORT} \
+              -PmachineIp=${LEGA_public_IP} \
+              -PsshUser=ubuntu \
+              -PsshKeyFile=keys/tsd.pem \
+              -i
+                          
+#              docker-machine create --driver generic \
+#                --generic-ip-address=${LEGA_public_IP} \
+#                --generic-ssh-user=ubuntu \
+#                --generic-ssh-key=keys/tsd.pem \
+#                LEGA-public-${GIT_COMMIT_SHORT}
+#              eval "$(docker-machine env LEGA-public-${GIT_COMMIT_SHORT})"
+#              docker swarm init --advertise-addr ${LEGA_public_IP}
             '''
            },
          "CEGA": {
             sh '''
-              docker-machine create --driver generic \
-                --generic-ip-address=${CEGA_IP} \
-                --generic-ssh-user=ubuntu \
-                --generic-ssh-key=keys/tsd.pem \
-                CEGA-${GIT_COMMIT_SHORT}
-              eval "$(docker-machine env CEGA-${GIT_COMMIT_SHORT})"
-              docker swarm init --advertise-addr ${CEGA_IP}
+              gradle :cluster:createCEGAMachine \
+              -Pmachine=CEGA-${GIT_COMMIT_SHORT} \
+              -PmachineIp=${CEGA_IP} \
+              -PsshUser=ubuntu \
+              -PsshKeyFile=keys/tsd.pem \
+              -i
+              
+#              docker-machine create --driver generic \
+#                --generic-ip-address=${CEGA_IP} \
+#                --generic-ssh-user=ubuntu \
+#                --generic-ssh-key=keys/tsd.pem \
+#                CEGA-${GIT_COMMIT_SHORT}
+#              eval "$(docker-machine env CEGA-${GIT_COMMIT_SHORT})"
+#              docker swarm init --advertise-addr ${CEGA_IP}
             '''
            }
          )
