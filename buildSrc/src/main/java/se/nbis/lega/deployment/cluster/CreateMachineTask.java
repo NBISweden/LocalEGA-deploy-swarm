@@ -15,7 +15,6 @@ public class CreateMachineTask extends ClusterTask {
         Map<String, String> env;
         String openStackConfig = getProperty("openStackConfig");
         Map<String, String> openStackEnvironment = getOpenStackEnvironment();
-        setMachineIp(getMachineIPAddress(machineName));
         if (openStackConfig != null) {
             env = createMachineOpenStack(machineName, openStackConfig);
         } else if (openStackEnvironment != null) {
@@ -25,6 +24,7 @@ public class CreateMachineTask extends ClusterTask {
         } else {
             env = createMachineVirtualBox(machineName);
         }
+        setMachineIp(getMachineIPAddress(machineName));
         exec(true, env, "docker swarm init", "--advertise-addr", machineIp);
     }
 
