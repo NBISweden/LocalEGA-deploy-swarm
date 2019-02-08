@@ -26,7 +26,7 @@ pipeline {
               gradle :cluster:createLEGAPrivateMachine \
               -PmachineIp=${LEGA_private_IP} \
               -PsshUser=ubuntu \
-              -PsshKeyFile=keys/tsd.pem \
+              -PsshKeyFile=keys/tsd.pem 
 
 #              -Pmachine=lega-private \
 #              docker-machine create --driver generic \
@@ -43,7 +43,7 @@ pipeline {
               gradle :cluster:createLEGAPublicMachine \
               -PmachineIp=${LEGA_public_IP} \
               -PsshUser=ubuntu \
-              -PsshKeyFile=keys/tsd.pem \
+              -PsshKeyFile=keys/tsd.pem 
 
 #              -Pmachine=lega-public \
             '''
@@ -53,7 +53,7 @@ pipeline {
               gradle :cluster:createCEGAMachine \
               -PmachineIp=${CEGA_IP} \
               -PsshUser=ubuntu \
-              -PsshKeyFile=keys/tsd.pem \
+              -PsshKeyFile=keys/tsd.pem 
 
 #              -Pmachine=cega \
             '''
@@ -63,31 +63,19 @@ pipeline {
     }
     stage('Bootstrap') {
       steps {
-      parallel(
-            "CEGA": {
+
                       sh '''
                         gradle :cega:createConfiguration \
                         -i
-                        #-Pmachine=cega
-                      '''
-            },
-            "LEGA Private": {
-                      sh '''
+      
                         gradle :lega-private:createConfiguration \
                         -i
-                        #-Pmachine=lega-private
-                      '''
-            },
-            "LEGA Public": {
-                      sh '''
+       
                         gradle :lega-public:createConfiguration \
-                        -PcegaIP=$(docker-machine ip cega) \
-                        -PlegaPrivateIP=$(docker-machine ip lega-private)\
+                        -PcegaIP=${CEGA_IP} \
+                        -PlegaPrivateIP=${LEGA_private_IP} \
                         -i
-                        #-Pmachine=lega-public 
                       '''
-            }
-          )
       }
     }
 
