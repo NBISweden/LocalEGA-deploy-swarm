@@ -144,12 +144,14 @@ pipeline {
         '''
         sh '''
           eval "$(docker-machine env lega-private)"
-          echo '---=== lega-private_private-mq Logs ===---'
-          docker service logs lega-private_private-mq
+          echo '---=== lega-private-mq Logs ===---'
+          docker service logs lega-private_mq
           echo '---=== lega-private_ingest Logs ===---'
           docker service logs lega-private_ingest
           echo '---=== lega-private_inbox-s3 Logs ===---'
           docker service logs lega-private_inbox-s3
+          echo '---=== lega-private_vault-s3 Logs ===---'
+          docker service logs lega-private_vault-s3
           echo '---=== lega-private_db Logs ===---'
           docker service logs lega-private_db
           echo '---=== lega-private_verify Logs ===---'
