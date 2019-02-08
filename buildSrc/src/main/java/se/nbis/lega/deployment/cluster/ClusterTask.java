@@ -68,7 +68,10 @@ public abstract class ClusterTask extends LocalEGATask {
     }
 
     protected void removeMachine(String name) throws IOException {
-        exec("docker-machine rm -y", name);
+        List<String> machines = exec("docker-machine ls --filter name=", name);
+        if (machines.size() > 0) {
+            exec("docker-machine rm -y", name);
+        }
     }
 
 }

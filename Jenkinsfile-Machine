@@ -28,9 +28,8 @@ pipeline {
               -PmachineIp=${LEGA_private_IP} \
               -PsshUser=ubuntu \
               -PsshKeyFile=keys/tsd.pem \
-              -i
-#              -Pmachine=lega-private \
 
+#              -Pmachine=lega-private \
 #              docker-machine create --driver generic \
 #                --generic-ip-address=${LEGA_private_IP} \
 #                --generic-ssh-user=ubuntu \
@@ -46,7 +45,7 @@ pipeline {
               -PmachineIp=${LEGA_public_IP} \
               -PsshUser=ubuntu \
               -PsshKeyFile=keys/tsd.pem \
-              -i
+
 #              -Pmachine=lega-public \
             '''
            },
@@ -56,7 +55,7 @@ pipeline {
               -PmachineIp=${CEGA_IP} \
               -PsshUser=ubuntu \
               -PsshKeyFile=keys/tsd.pem \
-              -i
+
 #              -Pmachine=cega \
             '''
            }
