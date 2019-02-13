@@ -12,66 +12,27 @@ pipeline {
                     script: "printf \$(git rev-parse --short ${GIT_COMMIT})${BUILD_NUMBER}",
                     returnStdout: true
             )
-    LEGA_private_IP='158.37.63.36'
-    LEGA_public_IP='158.37.63.170'
-    CEGA_IP='158.39.75.139'
+    LEGA_private_IP='158.39.75.163'
+    LEGA_public_IP='158.39.75.126'
+    CEGA_IP='158.39.75.136'
   }
   
   stages {
-    stage('Create VMs') {
-      steps {
-        parallel(
-         "LEGA-private": {
-            sh '''
-              gradle :cluster:createLEGAPrivateMachine \
-              -PmachineIp=${LEGA_private_IP} \
-              -PsshUser=ubuntu \
-              -PsshKeyFile=keys/tsd.pem 
-
-#              -Pmachine=lega-private \
-#              docker-machine create --driver generic \
-#                --generic-ip-address=${LEGA_private_IP} \
-#                --generic-ssh-user=ubuntu \
-#                --generic-ssh-key=keys/tsd.pem \
-#                lega-private
-#              eval "$(docker-machine env lega-private)"
-#              docker swarm init --advertise-addr ${LEGA_private_IP}
-            '''
-           },
-         "LEGA-public": {
-            sh '''
-              gradle :cluster:createLEGAPublicMachine \
-              -PmachineIp=${LEGA_public_IP} \
-              -PsshUser=ubuntu \
-              -PsshKeyFile=keys/tsd.pem 
-
-#              -Pmachine=lega-public \
-            '''
-           },
-         "CEGA": {
-            sh '''
-              gradle :cluster:createCEGAMachine \
-              -PmachineIp=${CEGA_IP} \
-              -PsshUser=ubuntu \
-              -PsshKeyFile=keys/tsd.pem 
-
-#              -Pmachine=cega \
-            '''
-           }
-         )
-      }
-    }
+     
     stage('Bootstrap') {
       steps {
 
                       sh '''
                         gradle :cega:createConfiguration \
+                        -Pmachine=cega-staging \
                         -i
       
                         gradle :lega-private:createConfiguration \
+                        -Pmachine=lega-private-staging \
                         -i
        
                         gradle :lega-public:createConfiguration \
+                        -Pmachine=lega-public-staging \
                         -PcegaIP=${CEGA_IP} \
                         -PlegaPrivateIP=${LEGA_private_IP} \
                         -i
@@ -85,30 +46,33 @@ pipeline {
             "CEGA": {
                       sh '''
                         gradle :cega:deployStack \
+                        -Pmachine=cega-staging \
                         -i
-                        #-Pmachine=cega
+                        #
                         sleep 150
-                        eval "$(docker-machine env cega)"
+                        eval "$(docker-machine env cega-staging)"
                         gradle ls
                       '''
             },
             "LEGA Public": {
                       sh '''
                         gradle :lega-public:deployStack \
+                        -Pmachine=lega-public-staging \
                         -i
-                        #-Pmachine=lega-public
+                        #
                         sleep 150
-                        eval "$(docker-machine env lega-public)"
+                        eval "$(docker-machine env lega-public-staging)"
                         gradle ls
                       '''
             },
             "LEGA Private": {
                       sh '''
                         gradle :lega-private:deployStack \
+                        -Pmachine=lega-private-staging \
                         -i
-                        #-Pmachine=lega-private
+                        #
                         sleep 150
-                        eval "$(docker-machine env lega-private)"
+                        eval "$(docker-machine env lega-private-staging)"
                         gradle ls
                       '''
             }
@@ -128,34 +92,34 @@ pipeline {
     }
   }
   
-  post('Remove VM') { 
+  post('Logging') { 
     failure {
         sh '''
-          eval "$(docker-machine env lega-public)"
-          echo '---=== lega-public_inbox Logs ===---'
-          docker service logs lega-public_inbox
-          echo '---=== lega-public_mq Logs ===---'
-          docker service logs lega-public_mq
+          eval "$(docker-machine env lega-public-staging)"
+          echo '---=== lega-public-staging_inbox Logs ===---'
+          docker service logs lega-public-staging_inbox
+          echo '---=== lega-public-staging_mq Logs ===---'
+          docker service logs lega-public-staging_mq
         '''
         sh '''
-          eval "$(docker-machine env cega)"
-          echo '---=== cega_cega-mq Logs ===---'
-          docker service logs cega_cega-mq
+          eval "$(docker-machine env cega-staging)"
+          echo '---=== cega-staging_cega-mq Logs ===---'
+          docker service logs cega-staging_cega-mq
         '''
         sh '''
-          eval "$(docker-machine env lega-private)"
-          echo '---=== lega-private-mq Logs ===---'
-          docker service logs lega-private_mq
-          echo '---=== lega-private_ingest Logs ===---'
-          docker service logs lega-private_ingest
-          echo '---=== lega-private_inbox-s3 Logs ===---'
-          docker service logs lega-private_inbox-s3
-          echo '---=== lega-private_vault-s3 Logs ===---'
-          docker service logs lega-private_vault-s3
-          echo '---=== lega-private_db Logs ===---'
-          docker service logs lega-private_db
-          echo '---=== lega-private_verify Logs ===---'
-          docker service logs lega-private_verify
+          eval "$(docker-machine env lega-private-staging)"
+          echo '---=== lega-private-staging-mq Logs ===---'
+          docker service logs lega-private-staging_mq
+          echo '---=== lega-private-staging_ingest Logs ===---'
+          docker service logs lega-private-staging_ingest
+          echo '---=== lega-private-staging_inbox-s3 Logs ===---'
+          docker service logs lega-private-staging_inbox-s3
+          echo '---=== lega-private-staging_vault-s3 Logs ===---'
+          docker service logs lega-private-staging_vault-s3
+          echo '---=== lega-private-staging_db Logs ===---'
+          docker service logs lega-private-staging_db
+          echo '---=== lega-private-staging_verify Logs ===---'
+          docker service logs lega-private-staging_verify
         '''
         
 
