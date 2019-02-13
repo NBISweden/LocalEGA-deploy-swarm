@@ -175,7 +175,7 @@ services:
     entrypoint: ["gosu", "lega", "ega-id-mapper"]
 
   ingest:
-    image: nbisweden/ega-base:s3
+    image: nbisweden/ega-base:latest
     deploy:
       restart_policy:
         condition: on-failure
