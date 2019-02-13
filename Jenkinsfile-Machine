@@ -122,7 +122,7 @@ pipeline {
           -PcegaIP=${CEGA_IP} \
           -PlegaPublicIP=${LEGA_public_IP} \
           -PlegaPrivateIP=${LEGA_private_IP} \
-          -i
+          -d
         '''
       }
     }
