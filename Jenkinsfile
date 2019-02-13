@@ -63,22 +63,26 @@ pipeline {
             "CEGA": {
                       sh '''
                         gradle :cega:deployStack -Pmachine=CEGA-${GIT_COMMIT_SHORT} --stacktrace
-                        sleep 120
                       '''
             },
             "LEGA Public": {
                       sh '''
                         gradle :lega-public:deployStack -Pmachine=LEGA-public-${GIT_COMMIT_SHORT} --stacktrace
-                        sleep 120
                       '''
             },
             "LEGA Private": {
                       sh '''
                         gradle :lega-private:deployStack -Pmachine=LEGA-private-${GIT_COMMIT_SHORT} --stacktrace
-                        sleep 120
                       '''
             }
           )
+      }
+    }
+    stage('Initialization') {
+      steps {
+        sh '''
+          sleep 180
+        '''
       }
     }
     stage('Test') {
