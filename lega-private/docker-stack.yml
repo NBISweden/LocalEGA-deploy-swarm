@@ -109,7 +109,7 @@ services:
         target: /etc/ega/pgp/ega.shared.pass
 
   verify:
-    image: egarchive/lega-base:latest
+    image: nbisweden/ega-base:latest
     deploy:
       restart_policy:
         condition: on-failure
@@ -160,7 +160,7 @@ services:
         target: /etc/ega/pgp/ega.shared.pass
 
   id-mapper:
-    image: egarchive/lega-base:latest
+    image: nbisweden/ega-base:latest
     deploy:
       restart_policy:
         condition: on-failure
@@ -175,7 +175,7 @@ services:
     entrypoint: ["gosu", "lega", "ega-id-mapper"]
 
   ingest:
-    image: egarchive/lega-base:latest
+    image: nbisweden/ega-base:s3
     deploy:
       restart_policy:
         condition: on-failure
