@@ -1,3 +1,4 @@
+import se.nbis.lega.deployment.PruneTask
 import se.nbis.lega.deployment.test.EncryptFileTask
 import se.nbis.lega.deployment.test.GenerateFileTask
 import se.nbis.lega.deployment.test.IngestFileTask
@@ -16,6 +17,10 @@ task purge() {
     setGroup "swarm"
 
     dependsOn ":lega-public:removeVolumes", ":lega-private:removeVolumes"
+}
+
+task prune(type: PruneTask) {
+    setGroup "swarm"
 }
 
 task clean() {
