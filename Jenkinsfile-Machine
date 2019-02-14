@@ -18,25 +18,35 @@ pipeline {
   }
   
   stages {
+      stage('Tear down') {
+        steps {
+            sh '''
+              gradle :cega:removeStack -Pmachine=cega-staging -i
+              gradle :lega-private:removeStack -Pmachine=lega-private-staging -i
+              gradle :lega-private:removeVolumes -Pmachine=lega-private-staging -i
+              gradle :lega-public:removeStack -Pmachine=lega-public-staging -i
+              gradle :lega-public:removeVolumes -Pmachine=lega-public-staging -i
+            '''
+        }
+      }
      
     stage('Bootstrap') {
       steps {
+          sh '''
+            gradle :cega:createConfiguration \
+            -Pmachine=cega-staging \
+            -i
 
-                      sh '''
-                        gradle :cega:createConfiguration \
-                        -Pmachine=cega-staging \
-                        -i
-      
-                        gradle :lega-private:createConfiguration \
-                        -Pmachine=lega-private-staging \
-                        -i
-       
-                        gradle :lega-public:createConfiguration \
-                        -Pmachine=lega-public-staging \
-                        -PcegaIP=${CEGA_IP} \
-                        -PlegaPrivateIP=${LEGA_private_IP} \
-                        -i
-                      '''
+            gradle :lega-private:createConfiguration \
+            -Pmachine=lega-private-staging \
+            -i
+
+            gradle :lega-public:createConfiguration \
+            -Pmachine=lega-public-staging \
+            -PcegaIP=${CEGA_IP} \
+            -PlegaPrivateIP=${LEGA_private_IP} \
+            -i
+          '''
       }
     }
 
@@ -44,37 +54,37 @@ pipeline {
       steps {
       parallel(
             "CEGA": {
-                      sh '''
-                        gradle :cega:deployStack \
-                        -Pmachine=cega-staging \
-                        -i
-                        #
-                        sleep 150
-                        eval "$(docker-machine env cega-staging)"
-                        gradle ls
-                      '''
+              sh '''
+                gradle :cega:deployStack \
+                -Pmachine=cega-staging \
+                -i
+                #
+                sleep 150
+                eval "$(docker-machine env cega-staging)"
+                gradle ls
+              '''
             },
             "LEGA Public": {
-                      sh '''
-                        gradle :lega-public:deployStack \
-                        -Pmachine=lega-public-staging \
-                        -i
-                        #
-                        sleep 150
-                        eval "$(docker-machine env lega-public-staging)"
-                        gradle ls
-                      '''
+              sh '''
+                gradle :lega-public:deployStack \
+                -Pmachine=lega-public-staging \
+                -i
+                #
+                sleep 150
+                eval "$(docker-machine env lega-public-staging)"
+                gradle ls
+              '''
             },
             "LEGA Private": {
-                      sh '''
-                        gradle :lega-private:deployStack \
-                        -Pmachine=lega-private-staging \
-                        -i
-                        #
-                        sleep 150
-                        eval "$(docker-machine env lega-private-staging)"
-                        gradle ls
-                      '''
+              sh '''
+                gradle :lega-private:deployStack \
+                -Pmachine=lega-private-staging \
+                -i
+                #
+                sleep 150
+                eval "$(docker-machine env lega-private-staging)"
+                gradle ls
+              '''
             }
           )
       }

@@ -1,6 +1,5 @@
 import se.nbis.lega.deployment.*
 import se.nbis.lega.deployment.cluster.Machine
-import se.nbis.lega.deployment.lega.Volume
 import se.nbis.lega.deployment.lega.priv.*
 
 import java.util.stream.Collectors
