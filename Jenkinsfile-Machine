@@ -21,11 +21,11 @@ pipeline {
       stage('Tear down') {
         steps {
             sh '''
-              gradle :cega:removeStack -Pmachine=cega-staging -i
-              gradle :lega-private:removeStack -Pmachine=lega-private-staging -i
-              gradle :lega-private:removeVolumes -Pmachine=lega-private-staging -i
-              gradle :lega-public:removeStack -Pmachine=lega-public-staging -i
-              gradle :lega-public:removeVolumes -Pmachine=lega-public-staging -i
+              gradle :cega:removeStack -Pmachine=cega-staging --stacktrace
+              gradle :lega-private:removeStack -Pmachine=lega-private-staging --stacktrace
+              gradle :lega-private:removeVolumes -Pmachine=lega-private-staging --stacktrace
+              gradle :lega-public:removeStack -Pmachine=lega-public-staging --stacktrace
+              gradle :lega-public:removeVolumes -Pmachine=lega-public-staging --stacktrace
             '''
         }
       }
@@ -35,17 +35,17 @@ pipeline {
           sh '''
             gradle :cega:createConfiguration \
             -Pmachine=cega-staging \
-            -i
+            --stacktrace
 
             gradle :lega-private:createConfiguration \
             -Pmachine=lega-private-staging \
-            -i
+            --stacktrace
 
             gradle :lega-public:createConfiguration \
             -Pmachine=lega-public-staging \
             -PcegaIP=${CEGA_IP} \
             -PlegaPrivateIP=${LEGA_private_IP} \
-            -i
+            --stacktrace
           '''
       }
     }
@@ -57,7 +57,7 @@ pipeline {
               sh '''
                 gradle :cega:deployStack \
                 -Pmachine=cega-staging \
-                -i
+                --stacktrace
                 #
                 sleep 150
                 eval "$(docker-machine env cega-staging)"
@@ -68,7 +68,7 @@ pipeline {
               sh '''
                 gradle :lega-public:deployStack \
                 -Pmachine=lega-public-staging \
-                -i
+                --stacktrace
                 #
                 sleep 150
                 eval "$(docker-machine env lega-public-staging)"
@@ -79,7 +79,7 @@ pipeline {
               sh '''
                 gradle :lega-private:deployStack \
                 -Pmachine=lega-private-staging \
-                -i
+                --stacktrace
                 #
                 sleep 150
                 eval "$(docker-machine env lega-private-staging)"
@@ -96,7 +96,7 @@ pipeline {
           -PcegaIP=${CEGA_IP} \
           -PlegaPublicIP=${LEGA_public_IP} \
           -PlegaPrivateIP=${LEGA_private_IP} \
-          -d
+          --stacktrace
         '''
       }
     }
