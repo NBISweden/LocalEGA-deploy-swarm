@@ -21,6 +21,9 @@ pipeline {
       stage('Tear down') {
         steps {
             sh '''
+              gradle :cega:removeStack -Pmachine=cega-staging --stacktrace
+              gradle :lega-private:removeStack -Pmachine=lega-private-staging --stacktrace
+              gradle :lega-public:removeStack -Pmachine=lega-public-staging --stacktrace
               gradle prune -Pmachine=cega-staging --stacktrace
               gradle prune -Pmachine=lega-private-staging --stacktrace
               gradle prune -Pmachine=lega-public-staging --stacktrace
