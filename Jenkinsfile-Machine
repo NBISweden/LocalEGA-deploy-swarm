@@ -1,12 +1,9 @@
 pipeline {
   
   agent any
-  
-//  triggers {
-//    cron('0 0 * * *')
-//    upstream(upstreamProjects: 'LocalEGA Build Trigger')
-//  }
+
   options { disableConcurrentBuilds() }
+
   environment {
     GIT_COMMIT_SHORT = sh(
                     script: "printf \$(git rev-parse --short ${GIT_COMMIT})${BUILD_NUMBER}",
@@ -24,6 +21,9 @@ pipeline {
               gradle :cega:removeStack -Pmachine=cega-staging --stacktrace
               gradle :lega-private:removeStack -Pmachine=lega-private-staging --stacktrace
               gradle :lega-public:removeStack -Pmachine=lega-public-staging --stacktrace
+
+              sleep 30
+
               gradle prune -Pmachine=cega-staging --stacktrace
               gradle prune -Pmachine=lega-private-staging --stacktrace
               gradle prune -Pmachine=lega-public-staging --stacktrace
@@ -35,18 +35,18 @@ pipeline {
       steps {
           sh '''
             gradle :cega:createConfiguration \
-            -Pmachine=cega-staging \
-            --stacktrace
+                -Pmachine=cega-staging \
+                --stacktrace
 
             gradle :lega-private:createConfiguration \
-            -Pmachine=lega-private-staging \
-            --stacktrace
+                -Pmachine=lega-private-staging \
+                --stacktrace
 
             gradle :lega-public:createConfiguration \
-            -Pmachine=lega-public-staging \
-            -PcegaIP=${CEGA_IP} \
-            -PlegaPrivateIP=${LEGA_private_IP} \
-            --stacktrace
+                -Pmachine=lega-public-staging \
+                -PcegaIP=${CEGA_IP} \
+                -PlegaPrivateIP=${LEGA_private_IP} \
+                --stacktrace
           '''
       }
     }
@@ -56,48 +56,37 @@ pipeline {
       parallel(
             "CEGA": {
               sh '''
-                gradle :cega:deployStack \
-                -Pmachine=cega-staging \
-                --stacktrace
-                #
-                sleep 150
-                eval "$(docker-machine env cega-staging)"
-                gradle ls
+                gradle :cega:deployStack -Pmachine=cega-staging --stacktrace
               '''
             },
             "LEGA Public": {
               sh '''
-                gradle :lega-public:deployStack \
-                -Pmachine=lega-public-staging \
-                --stacktrace
-                #
-                sleep 150
-                eval "$(docker-machine env lega-public-staging)"
-                gradle ls
+                gradle :lega-public:deployStack -Pmachine=lega-public-staging --stacktrace
               '''
             },
             "LEGA Private": {
               sh '''
-                gradle :lega-private:deployStack \
-                -Pmachine=lega-private-staging \
-                --stacktrace
-                #
-                sleep 150
-                eval "$(docker-machine env lega-private-staging)"
-                gradle ls
+                gradle :lega-private:deployStack -Pmachine=lega-private-staging --stacktrace
               '''
             }
           )
+      }
+    }
+    stage('Initialization') {
+      steps {
+        sh '''
+          sleep 120
+        '''
       }
     }
     stage('Test') {
       steps {
         sh '''
           gradle ingest \
-          -PcegaIP=${CEGA_IP} \
-          -PlegaPublicIP=${LEGA_public_IP} \
-          -PlegaPrivateIP=${LEGA_private_IP} \
-          --stacktrace
+            -PcegaIP=${CEGA_IP} \
+            -PlegaPublicIP=${LEGA_public_IP} \
+            -PlegaPrivateIP=${LEGA_private_IP} \
+            --stacktrace
         '''
       }
     }
@@ -132,27 +121,7 @@ pipeline {
           echo '---=== lega-private-staging_verify Logs ===---'
           docker service logs lega-private-staging_verify
         '''
-        
-
     }
-//   always {
-//      sh 'docker-machine rm -y CEGA-${GIT_COMMIT_SHORT} LEGA-public-${GIT_COMMIT_SHORT} LEGA-private-${GIT_COMMIT_SHORT}'
-//      sh '''
-//        eval "$(docker-machine env CEGA-${GIT_COMMIT_SHORT})"
-//        docker swarm leave --force
-//        docker-machine rm -y CEGA-${GIT_COMMIT_SHORT}
-//        '''
-//      sh '''
-//        eval "$(docker-machine env LEGA-public-${GIT_COMMIT_SHORT})"
-//        docker swarm leave --force
-//        docker-machine rm -y  LEGA-public-${GIT_COMMIT_SHORT}
-//        '''
-//      sh '''
-//        eval "$(docker-machine env LEGA-private-${GIT_COMMIT_SHORT})"
-//        docker swarm leave --force
-//        docker-machine rm -y  LEGA-private-${GIT_COMMIT_SHORT}
-//      '''
-//   }
   }
   
 }
