@@ -2,8 +2,8 @@ package se.nbis.lega.deployment.lega.pub;
 
 public enum Volume {
 
-    INBOX("lega-public_inbox"),
-    PORTAINER("lega-public_portainer");
+    INBOX("lega-public-staging_inbox"),
+    PORTAINER("lega-public-staging_portainer");
 
     private String name;
 
