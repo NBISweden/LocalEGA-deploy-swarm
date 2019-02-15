@@ -23,7 +23,7 @@ pipeline {
     OS_FLAVOR_NAME=credentials('OS_FLAVOR_NAME')
     OS_IMAGE_ID=credentials('OS_IMAGE_ID')
     GIT_COMMIT_SHORT = sh(
-                    script: "printf \$(git rev-parse --short ${GIT_COMMIT})",
+                    script: "printf \$(git rev-parse --short ${GIT_COMMIT})${BUILD_NUMBER}",
                     returnStdout: true
             )
   }
