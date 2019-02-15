@@ -23,7 +23,7 @@ pipeline {
                 )
         }
         when {
-           branch "master"
+           branch "feature/isolate-networks"
         }
         stages{
           stage('Tear down') {
@@ -33,7 +33,7 @@ pipeline {
                   gradle :lega-private:removeStack -Pmachine=lega-private-staging --stacktrace
                   gradle :lega-public:removeStack -Pmachine=lega-public-staging --stacktrace
     
-                  sleep 30
+                  sleep 20
     
                   gradle prune -Pmachine=cega-staging --stacktrace
                   gradle prune -Pmachine=lega-private-staging --stacktrace
@@ -86,7 +86,7 @@ pipeline {
           stage('Initialization') {
             steps {
               sh '''
-                sleep 90
+                sleep 80
               '''
             }
           }
