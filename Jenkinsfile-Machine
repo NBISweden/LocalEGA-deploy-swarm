@@ -22,7 +22,7 @@ pipeline {
   stages {
     stage('master'){
         when {
-           branch "master"
+           branch "feature/isolate-networks"
         }
         stages{
           stage('Tear down') {
@@ -101,39 +101,40 @@ pipeline {
             }
           }
         }
+        
+        post('Logging') {
+          failure {
+              sh '''
+                eval "$(docker-machine env lega-public-staging)"
+                echo '---=== lega-public-staging_inbox Logs ===---'
+                docker service logs lega-public-staging_inbox
+                echo '---=== lega-public-staging_mq Logs ===---'
+                docker service logs lega-public-staging_mq
+              '''
+              sh '''
+                eval "$(docker-machine env cega-staging)"
+                echo '---=== cega-staging_cega-mq Logs ===---'
+                docker service logs cega-staging_cega-mq
+              '''
+              sh '''
+                eval "$(docker-machine env lega-private-staging)"
+                echo '---=== lega-private-staging-mq Logs ===---'
+                docker service logs lega-private-staging_mq
+                echo '---=== lega-private-staging_ingest Logs ===---'
+                docker service logs lega-private-staging_ingest
+                echo '---=== lega-private-staging_inbox-s3 Logs ===---'
+                docker service logs lega-private-staging_inbox-s3
+                echo '---=== lega-private-staging_vault-s3 Logs ===---'
+                docker service logs lega-private-staging_vault-s3
+                echo '---=== lega-private-staging_db Logs ===---'
+                docker service logs lega-private-staging_db
+                echo '---=== lega-private-staging_verify Logs ===---'
+                docker service logs lega-private-staging_verify
+              '''
+          }
+        }
     }
   }
   
-  post('Logging') { 
-    failure {
-        sh '''
-          eval "$(docker-machine env lega-public-staging)"
-          echo '---=== lega-public-staging_inbox Logs ===---'
-          docker service logs lega-public-staging_inbox
-          echo '---=== lega-public-staging_mq Logs ===---'
-          docker service logs lega-public-staging_mq
-        '''
-        sh '''
-          eval "$(docker-machine env cega-staging)"
-          echo '---=== cega-staging_cega-mq Logs ===---'
-          docker service logs cega-staging_cega-mq
-        '''
-        sh '''
-          eval "$(docker-machine env lega-private-staging)"
-          echo '---=== lega-private-staging-mq Logs ===---'
-          docker service logs lega-private-staging_mq
-          echo '---=== lega-private-staging_ingest Logs ===---'
-          docker service logs lega-private-staging_ingest
-          echo '---=== lega-private-staging_inbox-s3 Logs ===---'
-          docker service logs lega-private-staging_inbox-s3
-          echo '---=== lega-private-staging_vault-s3 Logs ===---'
-          docker service logs lega-private-staging_vault-s3
-          echo '---=== lega-private-staging_db Logs ===---'
-          docker service logs lega-private-staging_db
-          echo '---=== lega-private-staging_verify Logs ===---'
-          docker service logs lega-private-staging_verify
-        '''
-    }
-  }
   
 }
