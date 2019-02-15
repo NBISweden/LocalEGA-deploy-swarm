@@ -20,83 +20,87 @@ pipeline {
   }
   
   stages {
-      when {
-         branch "master"
-      }
-      stage('Tear down') {
-        steps {
-            sh '''
-              gradle :cega:removeStack -Pmachine=cega-staging --stacktrace
-              gradle :lega-private:removeStack -Pmachine=lega-private-staging --stacktrace
-              gradle :lega-public:removeStack -Pmachine=lega-public-staging --stacktrace
-
-              sleep 30
-
-              gradle prune -Pmachine=cega-staging --stacktrace
-              gradle prune -Pmachine=lega-private-staging --stacktrace
-              gradle prune -Pmachine=lega-public-staging --stacktrace
-            '''
+    stage('master'){
+        when {
+           branch "master"
         }
-      }
-     
-    stage('Bootstrap') {
-      steps {
-          sh '''
-            gradle :cega:createConfiguration \
-                -Pmachine=cega-staging \
-                --stacktrace
-
-            gradle :lega-private:createConfiguration \
-                -Pmachine=lega-private-staging \
-                --stacktrace
-
-            gradle :lega-public:createConfiguration \
-                -Pmachine=lega-public-staging \
-                -PcegaIP=${CEGA_IP} \
-                -PlegaPrivateIP=${LEGA_private_IP} \
-                --stacktrace
-          '''
-      }
-    }
-
-    stage('Deploy') {
-      steps {
-      parallel(
-            "CEGA": {
+        stages{
+          stage('Tear down') {
+            steps {
+                sh '''
+                  gradle :cega:removeStack -Pmachine=cega-staging --stacktrace
+                  gradle :lega-private:removeStack -Pmachine=lega-private-staging --stacktrace
+                  gradle :lega-public:removeStack -Pmachine=lega-public-staging --stacktrace
+    
+                  sleep 30
+    
+                  gradle prune -Pmachine=cega-staging --stacktrace
+                  gradle prune -Pmachine=lega-private-staging --stacktrace
+                  gradle prune -Pmachine=lega-public-staging --stacktrace
+                '''
+            }
+          }
+         
+          stage('Bootstrap') {
+            steps {
+                sh '''
+                  gradle :cega:createConfiguration \
+                      -Pmachine=cega-staging \
+                      --stacktrace
+      
+                  gradle :lega-private:createConfiguration \
+                      -Pmachine=lega-private-staging \
+                      --stacktrace
+      
+                  gradle :lega-public:createConfiguration \
+                      -Pmachine=lega-public-staging \
+                      -PcegaIP=${CEGA_IP} \
+                      -PlegaPrivateIP=${LEGA_private_IP} \
+                      --stacktrace
+                '''
+            }
+          }
+      
+          stage('Deploy') {
+            steps {
+            parallel(
+                  "CEGA": {
+                    sh '''
+                      gradle :cega:deployStack -Pmachine=cega-staging --stacktrace
+                    '''
+                  },
+                  "LEGA Public": {
+                    sh '''
+                      gradle :lega-public:deployStack -Pmachine=lega-public-staging --stacktrace
+                    '''
+                  },
+                  "LEGA Private": {
+                    sh '''
+                      gradle :lega-private:deployStack -Pmachine=lega-private-staging --stacktrace
+                    '''
+                  }
+                )
+            }
+          }
+          stage('Initialization') {
+            steps {
               sh '''
-                gradle :cega:deployStack -Pmachine=cega-staging --stacktrace
-              '''
-            },
-            "LEGA Public": {
-              sh '''
-                gradle :lega-public:deployStack -Pmachine=lega-public-staging --stacktrace
-              '''
-            },
-            "LEGA Private": {
-              sh '''
-                gradle :lega-private:deployStack -Pmachine=lega-private-staging --stacktrace
+                sleep 100
               '''
             }
-          )
-      }
-    }
-    stage('Initialization') {
-      steps {
-        sh '''
-          sleep 100
-        '''
-      }
-    }
-    stage('Test') {
-      steps {
-        sh '''
-          gradle ingest \
-            -PcegaIP=${CEGA_IP} \
-            -PlegaPublicIP=${LEGA_public_IP} \
-            -PlegaPrivateIP=${LEGA_private_IP} \
-            --stacktrace
-        '''
-      }
+          }
+          stage('Test') {
+            steps {
+              sh '''
+                gradle ingest \
+                  -PcegaIP=${CEGA_IP} \
+                  -PlegaPublicIP=${LEGA_public_IP} \
+                  -PlegaPrivateIP=${LEGA_private_IP} \
+                  --stacktrace
+              '''
+            }
+          }
+        }
     }
   }
   
