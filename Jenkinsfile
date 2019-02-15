@@ -34,17 +34,17 @@ pipeline {
       parallel(
             "CEGA": {
               sh '''
-                gradle :cluster:createCEGAMachine -Pmachine=CEGA-${GIT_COMMIT_SHORT} --stacktrace
+                gradle :cluster:createCEGAMachine -Pmachine=CEGA-${GIT_COMMIT_SHORT} --stacktrace -i
               '''
             },
             "LEGA Public": {
               sh '''
-                gradle :cluster:createLEGAPublicMachine -Pmachine=LEGA-public-${GIT_COMMIT_SHORT} --stacktrace
+                gradle :cluster:createLEGAPublicMachine -Pmachine=LEGA-public-${GIT_COMMIT_SHORT} --stacktrace -i
               '''
             },
             "LEGA Private": {
               sh '''
-                gradle :cluster:createLEGAPrivateMachine -Pmachine=LEGA-private-${GIT_COMMIT_SHORT} --stacktrace
+                gradle :cluster:createLEGAPrivateMachine -Pmachine=LEGA-private-${GIT_COMMIT_SHORT} --stacktrace -i
               '''
             }
           )

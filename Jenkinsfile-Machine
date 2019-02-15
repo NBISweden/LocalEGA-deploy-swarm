@@ -86,7 +86,7 @@ pipeline {
           stage('Initialization') {
             steps {
               sh '''
-                sleep 70
+                sleep 80
               '''
             }
           }
