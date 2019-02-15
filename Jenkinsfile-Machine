@@ -5,13 +5,21 @@ pipeline {
   options { disableConcurrentBuilds() }
 
   environment {
-    GIT_COMMIT_SHORT = sh(
-                    script: "printf \$(git rev-parse --short ${GIT_COMMIT})${BUILD_NUMBER}",
+    LEGA_private_IP = sh(
+                    script: "printf \$(docker-machine ip lega-private-staging)",
                     returnStdout: true
             )
-    LEGA_private_IP='158.39.75.163'
-    LEGA_public_IP='158.39.75.126'
-    CEGA_IP='158.39.75.136'
+    LEGA_public_IP = sh(
+                    script: "printf \$(docker-machine ip lega-public-staging)",
+                    returnStdout: true
+            )
+    CEGA_IP = sh(
+                    script: "printf \$(docker-machine ip cega-staging)",
+                    returnStdout: true
+            )
+    //LEGA_private_IP='158.39.75.163'
+    //LEGA_public_IP='158.39.75.126'
+    //CEGA_IP='158.39.75.136'
   }
   
   stages {
@@ -75,7 +83,7 @@ pipeline {
     stage('Initialization') {
       steps {
         sh '''
-          sleep 120
+          sleep 100
         '''
       }
     }
