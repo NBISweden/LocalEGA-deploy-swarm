@@ -4,23 +4,23 @@ pipeline {
 
   options { disableConcurrentBuilds() }
 
-  environment {
-    LEGA_private_IP = sh(
-                    script: "printf \$(docker-machine ip lega-private-staging)",
-                    returnStdout: true
-            )
-    LEGA_public_IP = sh(
-                    script: "printf \$(docker-machine ip lega-public-staging)",
-                    returnStdout: true
-            )
-    CEGA_IP = sh(
-                    script: "printf \$(docker-machine ip cega-staging)",
-                    returnStdout: true
-            )
-  }
   
   stages {
     stage('master'){
+      environment {
+        LEGA_private_IP = sh(
+                        script: "printf \$(docker-machine ip lega-private-staging)",
+                        returnStdout: true
+                )
+        LEGA_public_IP = sh(
+                        script: "printf \$(docker-machine ip lega-public-staging)",
+                        returnStdout: true
+                )
+        CEGA_IP = sh(
+                        script: "printf \$(docker-machine ip cega-staging)",
+                        returnStdout: true
+                )
+        }
         when {
            branch "feature/isolate-networks"
         }
@@ -85,7 +85,7 @@ pipeline {
           stage('Initialization') {
             steps {
               sh '''
-                sleep 100
+                sleep 90
               '''
             }
           }
