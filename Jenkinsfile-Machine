@@ -33,7 +33,7 @@ pipeline {
                   gradle :lega-private:removeStack -Pmachine=lega-private-staging --stacktrace
                   gradle :lega-public:removeStack -Pmachine=lega-public-staging --stacktrace
     
-                  sleep 20
+                  sleep 10
     
                   gradle prune -Pmachine=cega-staging --stacktrace
                   gradle prune -Pmachine=lega-private-staging --stacktrace
@@ -86,7 +86,7 @@ pipeline {
           stage('Initialization') {
             steps {
               sh '''
-                sleep 80
+                sleep 70
               '''
             }
           }
