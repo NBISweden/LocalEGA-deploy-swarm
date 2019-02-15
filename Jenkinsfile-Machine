@@ -1,5 +1,5 @@
 pipeline {
-  
+
   agent any
 
   options { disableConcurrentBuilds() }
@@ -17,12 +17,12 @@ pipeline {
                     script: "printf \$(docker-machine ip cega-staging)",
                     returnStdout: true
             )
-    //LEGA_private_IP='158.39.75.163'
-    //LEGA_public_IP='158.39.75.126'
-    //CEGA_IP='158.39.75.136'
   }
   
   stages {
+      when {
+         branch "master"
+      }
       stage('Tear down') {
         steps {
             sh '''
