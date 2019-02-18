@@ -181,7 +181,7 @@ public abstract class LocalEGATask extends DefaultTask {
         CommandLine commandLine = CommandLine.parse(command);
         commandLine.addArguments(arguments);
         try {
-            logger.debug(command);
+            logger.info(command);
             executor.execute(commandLine, systemEnvironment);
             String output = outputStream.toString();
             return Arrays.asList(output.split(System.lineSeparator()));
