@@ -181,13 +181,14 @@ public abstract class LocalEGATask extends DefaultTask {
         CommandLine commandLine = CommandLine.parse(command);
         commandLine.addArguments(arguments);
         try {
-            logger.info(command);
+            logger.info("Executing Command: " + commandLine.toString());
             executor.execute(commandLine, systemEnvironment);
             String output = outputStream.toString();
+            logger.info("Execution result: " + output);
             return Arrays.asList(output.split(System.lineSeparator()));
         } catch (ExecuteException e) {
             String output = outputStream.toString();
-            System.out.println(output);
+            logger.error(output);
             if (ignoreExitCode) {
                 return Arrays.asList(output.split(System.lineSeparator()));
             } else {
