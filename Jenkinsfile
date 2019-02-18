@@ -32,17 +32,17 @@ pipeline {
       parallel(
             "CEGA": {
                       sh '''
-                        gradle :cluster:createCEGAMachine -Pmachine=CEGA-${GIT_COMMIT_SHORT}
+                        gradle :cluster:createCEGAMachine -Pmachine=CEGA-${GIT_COMMIT_SHORT} --stacktrace
                       '''
             },
             "LEGA Public": {
                       sh '''
-                        gradle :cluster:createLEGAPublicMachine -Pmachine=LEGA-public-${GIT_COMMIT_SHORT}
+                        gradle :cluster:createLEGAPublicMachine -Pmachine=LEGA-public-${GIT_COMMIT_SHORT} --stacktrace
                       '''
             },
             "LEGA Private": {
                       sh '''
-                        gradle :cluster:createLEGAPrivateMachine -Pmachine=LEGA-private-${GIT_COMMIT_SHORT}
+                        gradle :cluster:createLEGAPrivateMachine -Pmachine=LEGA-private-${GIT_COMMIT_SHORT} --stacktrace
                       '''
             }
           )
@@ -50,19 +50,11 @@ pipeline {
     }
     stage('Bootstrap') {
       steps {
-      parallel(
-            "CEGA": {
-                      sh '''
-                        gradle :cega:createConfiguration -Pmachine=CEGA-${GIT_COMMIT_SHORT}
-                      '''
-            },
-            "LEGA": {
-                      sh '''
-                        gradle :lega-private:createConfiguration -Pmachine=LEGA-private-${GIT_COMMIT_SHORT}
-                        gradle :lega-public:createConfiguration -Pmachine=LEGA-public-${GIT_COMMIT_SHORT} -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT_SHORT}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${GIT_COMMIT_SHORT})
-                      '''
-            }
-          )
+          sh '''
+            gradle :cega:createConfiguration -Pmachine=CEGA-${GIT_COMMIT_SHORT} --stacktrace
+            gradle :lega-private:createConfiguration -Pmachine=LEGA-private-${GIT_COMMIT_SHORT} --stacktrace
+            gradle :lega-public:createConfiguration -Pmachine=LEGA-public-${GIT_COMMIT_SHORT} -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT_SHORT}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${GIT_COMMIT_SHORT}) --stacktrace
+          '''
       }
     }
     stage('Deploy') {
@@ -70,32 +62,33 @@ pipeline {
       parallel(
             "CEGA": {
                       sh '''
-                        gradle :cega:deployStack -Pmachine=CEGA-${GIT_COMMIT_SHORT}
-                        sleep 120
-                        gradle ls
+                        gradle :cega:deployStack -Pmachine=CEGA-${GIT_COMMIT_SHORT} --stacktrace
                       '''
             },
             "LEGA Public": {
                       sh '''
-                        gradle :lega-public:deployStack -Pmachine=LEGA-public-${GIT_COMMIT_SHORT}
-                        sleep 120
-                        gradle ls
+                        gradle :lega-public:deployStack -Pmachine=LEGA-public-${GIT_COMMIT_SHORT} --stacktrace
                       '''
             },
             "LEGA Private": {
                       sh '''
-                        gradle :lega-private:deployStack -Pmachine=LEGA-private-${GIT_COMMIT_SHORT}
-                        sleep 120
-                        gradle ls
+                        gradle :lega-private:deployStack -Pmachine=LEGA-private-${GIT_COMMIT_SHORT} --stacktrace
                       '''
             }
           )
       }
     }
+    stage('Initialization') {
+      steps {
+        sh '''
+          sleep 180
+        '''
+      }
+    }
     stage('Test') {
       steps {
         sh '''
-          gradle ingest -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT_SHORT}) -PlegaPublicIP=$(docker-machine ip LEGA-public-${GIT_COMMIT_SHORT}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${GIT_COMMIT_SHORT})
+          gradle ingest -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT_SHORT}) -PlegaPublicIP=$(docker-machine ip LEGA-public-${GIT_COMMIT_SHORT}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${GIT_COMMIT_SHORT}) --stacktrace
         '''
       }
     }
