@@ -31,8 +31,6 @@ services:
     ports:
       - "2222:2222"
     deploy:
-      placement:
-        constraints: [node.role == manager]
       restart_policy:
         condition: on-failure
         delay: 5s

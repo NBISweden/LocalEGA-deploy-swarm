@@ -51,7 +51,7 @@ services:
     entrypoint: ["/bin/bash", "/usr/bin/ega-entrypoint.sh"]
 
   inbox-s3:
-    image: minio/minio:latest
+    image: minio/minio:RELEASE.2018-12-19T23-46-24Z
     ports:
       - "9001:9000"
     deploy:
@@ -67,7 +67,7 @@ services:
     command: server /data
 
   vault-s3:
-    image: minio/minio:latest
+    image: minio/minio:RELEASE.2018-12-19T23-46-24Z
     ports:
       - "9000:9000"
     deploy:
@@ -139,7 +139,7 @@ services:
         delay: 5s
         window: 120s
     depends_on:
-      - s3
+      - vault-s3
       - keys
     environment:
       - SPRING_PROFILES_ACTIVE=no-oss,LocalEGA
@@ -175,10 +175,8 @@ services:
     entrypoint: ["gosu", "lega", "ega-id-mapper"]
 
   ingest:
-    image: nbisweden/ega-base:latest
+    image: nbisweden/ega-base:s3
     deploy:
-      placement:
-        constraints: [node.role == manager]
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -186,12 +184,11 @@ services:
     depends_on:
       - mq
       - db
-      - s3
+      - inbox-s3
+      - vault-s3
     environment:
       - S3_ACCESS_KEY=${VAULT_S3_ACCESS_KEY}
       - S3_SECRET_KEY=${VAULT_S3_SECRET_KEY}
-    volumes:
-      - inbox_s3:/ega/inbox
     configs:
       - source: conf.ini
         target: /etc/ega/conf.ini

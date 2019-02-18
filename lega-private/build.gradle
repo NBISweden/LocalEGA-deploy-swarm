@@ -33,14 +33,13 @@ task createKeysIniConfiguration(type: CreateKeysIniConfigurationTask) {
 }
 
 task createConfIniConfiguration(type: CreateConfIniConfigurationTask) {
-    dependsOn "createDBConfiguration", "createVaultS3Configuration"
+    dependsOn "createDBConfiguration", "createInboxS3Configuration", "createVaultS3Configuration"
 }
 
 task createConfiguration {
     setGroup Groups.LEGA_PRIVATE.getName()
 
     dependsOn "clearConfiguration",
-            "createInboxS3Configuration",
             "createConfIniConfiguration",
             "createKeysIniConfiguration",
             "createMQConfiguration"
