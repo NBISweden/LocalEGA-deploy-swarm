@@ -29,8 +29,7 @@ public class CreateMachineTask extends ClusterTask {
         } else {
             env = createMachineVirtualBox(machineName);
         }
-        setMachineIp(getMachineIPAddress(machineName));
-        exec(true, env, "docker swarm init", "--advertise-addr", machineIp);
+        exec(true, env, "docker swarm init", "--advertise-addr", getMachineIPAddress(machineName));
     }
 
     private Map<String, String> getOpenStackEnvironment() {
