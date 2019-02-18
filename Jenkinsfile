@@ -34,17 +34,17 @@ pipeline {
       parallel(
             "CEGA": {
                       sh '''
-                        gradle --stacktrace :cluster:createCEGAMachine -Pmachine=CEGA-${GIT_COMMIT_SHORT} --stacktrace
+                        gradle :cluster:createCEGAMachine -Pmachine=CEGA-${GIT_COMMIT_SHORT} --stacktrace
                       '''
             },
             "LEGA Public": {
                       sh '''
-                        gradle --stacktrace :cluster:createLEGAPublicMachine -Pmachine=LEGA-public-${GIT_COMMIT_SHORT} --stacktrace
+                        gradle :cluster:createLEGAPublicMachine -Pmachine=LEGA-public-${GIT_COMMIT_SHORT} --stacktrace
                       '''
             },
             "LEGA Private": {
                       sh '''
-                        gradle --stacktrace :cluster:createLEGAPrivateMachine -Pmachine=LEGA-private-${GIT_COMMIT_SHORT} --stacktrace
+                        gradle :cluster:createLEGAPrivateMachine -Pmachine=LEGA-private-${GIT_COMMIT_SHORT} --stacktrace
                       '''
             }
           )
@@ -53,9 +53,9 @@ pipeline {
     stage('Bootstrap') {
       steps {
           sh '''
-            gradle --stacktrace :cega:createConfiguration -Pmachine=CEGA-${GIT_COMMIT_SHORT} --stacktrace
-            gradle --stacktrace :lega-private:createConfiguration -Pmachine=LEGA-private-${GIT_COMMIT_SHORT} --stacktrace
-            gradle --stacktrace :lega-public:createConfiguration -Pmachine=LEGA-public-${GIT_COMMIT_SHORT} -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT_SHORT}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${GIT_COMMIT_SHORT}) --stacktrace
+            gradle :cega:createConfiguration -Pmachine=CEGA-${GIT_COMMIT_SHORT} --stacktrace
+            gradle :lega-private:createConfiguration -Pmachine=LEGA-private-${GIT_COMMIT_SHORT} --stacktrace
+            gradle :lega-public:createConfiguration -Pmachine=LEGA-public-${GIT_COMMIT_SHORT} -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT_SHORT}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${GIT_COMMIT_SHORT}) --stacktrace
           '''
       }
     }
@@ -64,17 +64,17 @@ pipeline {
       parallel(
             "CEGA": {
                       sh '''
-                        gradle --stacktrace :cega:deployStack -Pmachine=CEGA-${GIT_COMMIT_SHORT} --stacktrace
+                        gradle :cega:deployStack -Pmachine=CEGA-${GIT_COMMIT_SHORT} --stacktrace
                       '''
             },
             "LEGA Public": {
                       sh '''
-                        gradle --stacktrace :lega-public:deployStack -Pmachine=LEGA-public-${GIT_COMMIT_SHORT} --stacktrace
+                        gradle :lega-public:deployStack -Pmachine=LEGA-public-${GIT_COMMIT_SHORT} --stacktrace
                       '''
             },
             "LEGA Private": {
                       sh '''
-                        gradle --stacktrace :lega-private:deployStack -Pmachine=LEGA-private-${GIT_COMMIT_SHORT} --stacktrace
+                        gradle :lega-private:deployStack -Pmachine=LEGA-private-${GIT_COMMIT_SHORT} --stacktrace
                       '''
             }
           )
@@ -90,7 +90,7 @@ pipeline {
     stage('Test') {
       steps {
         sh '''
-          gradle --stacktrace ingest -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT_SHORT}) -PlegaPublicIP=$(docker-machine ip LEGA-public-${GIT_COMMIT_SHORT}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${GIT_COMMIT_SHORT}) --stacktrace
+          gradle ingest -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT_SHORT}) -PlegaPublicIP=$(docker-machine ip LEGA-public-${GIT_COMMIT_SHORT}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${GIT_COMMIT_SHORT}) --stacktrace
         '''
       }
     }
