@@ -32,7 +32,7 @@ public abstract class ClusterTask extends LocalEGATask {
     }
 
     protected Map<String, String> createMachineVirtualBox(String name) throws IOException {
-        logger.debug("createMachineVirtualBox");
+        logger.info("createMachineVirtualBox");
         exec(true, "docker-machine create", "--driver", "virtualbox", name);
         return getMachines(name).get(name);
     }
@@ -43,7 +43,7 @@ public abstract class ClusterTask extends LocalEGATask {
 
     protected Map<String, String> createMachineOpenStack(String name, Map<String, String> openStackEnvironment)
                     throws IOException {
-        logger.debug("createMachineOpenStack");
+        logger.info("createMachineOpenStack");
         exec(true, openStackEnvironment, "docker-machine create", "--driver", "openstack", name);
         return getMachines(name).get(name);
     }
@@ -61,7 +61,7 @@ public abstract class ClusterTask extends LocalEGATask {
      */
     protected Map<String, String> createMachineWithIp(String name, String ip, String user, String sshKeyFile)
                     throws IOException {
-        logger.debug("createMachineWithIp");
+        logger.info("createMachineWithIp");
         exec(true, "docker-machine create", "--driver", "generic", "--generic-ip-address", ip, "--generic-ssh-user",
                         user, "--generic-ssh-key", sshKeyFile, name);
         return getMachines(name).get(name);
