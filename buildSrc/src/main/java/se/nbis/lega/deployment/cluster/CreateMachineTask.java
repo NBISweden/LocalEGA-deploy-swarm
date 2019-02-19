@@ -10,9 +10,6 @@ import org.slf4j.LoggerFactory;
 public class CreateMachineTask extends ClusterTask {
     private static final Logger logger = LoggerFactory.getLogger(CreateMachineTask.class);
 
-    // public static final String SSH_KEY_FILE = "sshKeyFile";
-    // public static final String SSH_USER = "sshUser";
-
     @TaskAction
     public void run() throws IOException {
         try {
@@ -23,9 +20,6 @@ public class CreateMachineTask extends ClusterTask {
                 env = createMachineOpenStack(machineName, openStackConfig);
             } else if (openStackEnvironment != null) {
                 env = createMachineOpenStack(machineName, openStackEnvironment);
-                // } else if (machineIp != null) {
-                // env = createMachineWithIp(machineName, machineIp, getProperty(SSH_USER),
-                // getProperty(SSH_KEY_FILE));
             } else {
                 env = createMachineVirtualBox(machineName);
             }

@@ -187,11 +187,7 @@ public abstract class LocalEGATask extends DefaultTask {
     }
 
     protected String getMachineIPAddress(String name) throws IOException {
-        // if (machineIp == null) {
         return exec("docker-machine ip", name).iterator().next();
-        // } else {
-        // return machineIp;
-        // }
     }
 
     protected Map<String, String> getMachineEnvironment(String name) throws IOException {
