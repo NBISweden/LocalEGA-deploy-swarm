@@ -34,17 +34,17 @@ pipeline {
       parallel(
             "CEGA": {
                       sh '''
-                        gradle -i :cluster:createCEGAMachine -Pmachine=CEGA-${GIT_COMMIT_SHORT} --stacktrace
+                        gradle -d :cluster:createCEGAMachine -Pmachine=CEGA-${GIT_COMMIT_SHORT} --stacktrace
                       '''
             },
             "LEGA Public": {
                       sh '''
-                        gradle -i :cluster:createLEGAPublicMachine -Pmachine=LEGA-public-${GIT_COMMIT_SHORT} --stacktrace
+                        gradle -d :cluster:createLEGAPublicMachine -Pmachine=LEGA-public-${GIT_COMMIT_SHORT} --stacktrace
                       '''
             },
             "LEGA Private": {
                       sh '''
-                        gradle -i :cluster:createLEGAPrivateMachine -Pmachine=LEGA-private-${GIT_COMMIT_SHORT} --stacktrace
+                        gradle -d :cluster:createLEGAPrivateMachine -Pmachine=LEGA-private-${GIT_COMMIT_SHORT} --stacktrace
                       '''
             }
           )
@@ -53,9 +53,9 @@ pipeline {
     stage('Bootstrap') {
       steps {
           sh '''
-            gradle -i :cega:createConfiguration -Pmachine=CEGA-${GIT_COMMIT_SHORT} --stacktrace
-            gradle -i :lega-private:createConfiguration -Pmachine=LEGA-private-${GIT_COMMIT_SHORT} --stacktrace
-            gradle -i :lega-public:createConfiguration -Pmachine=LEGA-public-${GIT_COMMIT_SHORT} -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT_SHORT}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${GIT_COMMIT_SHORT}) --stacktrace
+            gradle -d :cega:createConfiguration -Pmachine=CEGA-${GIT_COMMIT_SHORT} --stacktrace
+            gradle -d :lega-private:createConfiguration -Pmachine=LEGA-private-${GIT_COMMIT_SHORT} --stacktrace
+            gradle -d :lega-public:createConfiguration -Pmachine=LEGA-public-${GIT_COMMIT_SHORT} -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT_SHORT}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${GIT_COMMIT_SHORT}) --stacktrace
           '''
       }
     }
@@ -64,17 +64,17 @@ pipeline {
       parallel(
             "CEGA": {
                       sh '''
-                        gradle -i :cega:deployStack -Pmachine=CEGA-${GIT_COMMIT_SHORT} --stacktrace
+                        gradle -d :cega:deployStack -Pmachine=CEGA-${GIT_COMMIT_SHORT} --stacktrace
                       '''
             },
             "LEGA Public": {
                       sh '''
-                        gradle -i :lega-public:deployStack -Pmachine=LEGA-public-${GIT_COMMIT_SHORT} --stacktrace
+                        gradle -d :lega-public:deployStack -Pmachine=LEGA-public-${GIT_COMMIT_SHORT} --stacktrace
                       '''
             },
             "LEGA Private": {
                       sh '''
-                        gradle -i :lega-private:deployStack -Pmachine=LEGA-private-${GIT_COMMIT_SHORT} --stacktrace
+                        gradle -d :lega-private:deployStack -Pmachine=LEGA-private-${GIT_COMMIT_SHORT} --stacktrace
                       '''
             }
           )
@@ -90,7 +90,7 @@ pipeline {
     stage('Test') {
       steps {
         sh '''
-          gradle -i ingest -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT_SHORT}) -PlegaPublicIP=$(docker-machine ip LEGA-public-${GIT_COMMIT_SHORT}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${GIT_COMMIT_SHORT}) --stacktrace
+          gradle -d ingest -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT_SHORT}) -PlegaPublicIP=$(docker-machine ip LEGA-public-${GIT_COMMIT_SHORT}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${GIT_COMMIT_SHORT}) --stacktrace
         '''
       }
     }
@@ -117,15 +117,15 @@ pipeline {
           stage('Tear down') {
             steps {
                 sh '''
-                  gradle -i :cega:removeStack -Pmachine=cega-staging --stacktrace
-                  gradle -i :lega-private:removeStack -Pmachine=lega-private-staging --stacktrace
-                  gradle -i :lega-public:removeStack -Pmachine=lega-public-staging --stacktrace
+                  gradle -d :cega:removeStack -Pmachine=cega-staging --stacktrace
+                  gradle -d :lega-private:removeStack -Pmachine=lega-private-staging --stacktrace
+                  gradle -d :lega-public:removeStack -Pmachine=lega-public-staging --stacktrace
     
                   sleep 10
     
-                  gradle -i prune -Pmachine=cega-staging --stacktrace
-                  gradle -i prune -Pmachine=lega-private-staging --stacktrace
-                  gradle -i prune -Pmachine=lega-public-staging --stacktrace
+                  gradle -d prune -Pmachine=cega-staging --stacktrace
+                  gradle -d prune -Pmachine=lega-private-staging --stacktrace
+                  gradle -d prune -Pmachine=lega-public-staging --stacktrace
                 '''
             }
           }
@@ -133,15 +133,15 @@ pipeline {
           stage('Bootstrap') {
             steps {
                 sh '''
-                  gradle -i :cega:createConfiguration \
+                  gradle -d :cega:createConfiguration \
                       -Pmachine=cega-staging \
                       --stacktrace
       
-                  gradle -i :lega-private:createConfiguration \
+                  gradle -d :lega-private:createConfiguration \
                       -Pmachine=lega-private-staging \
                       --stacktrace
       
-                  gradle -i :lega-public:createConfiguration \
+                  gradle -d :lega-public:createConfiguration \
                       -Pmachine=lega-public-staging \
                       -PcegaIP=${CEGA_IP} \
                       -PlegaPrivateIP=${LEGA_private_IP} \
@@ -155,17 +155,17 @@ pipeline {
             parallel(
                   "CEGA": {
                     sh '''
-                      gradle -i :cega:deployStack -Pmachine=cega-staging --stacktrace
+                      gradle -d :cega:deployStack -Pmachine=cega-staging --stacktrace
                     '''
                   },
                   "LEGA Public": {
                     sh '''
-                      gradle -i :lega-public:deployStack -Pmachine=lega-public-staging --stacktrace
+                      gradle -d :lega-public:deployStack -Pmachine=lega-public-staging --stacktrace
                     '''
                   },
                   "LEGA Private": {
                     sh '''
-                      gradle -i :lega-private:deployStack -Pmachine=lega-private-staging --stacktrace
+                      gradle -d :lega-private:deployStack -Pmachine=lega-private-staging --stacktrace
                     '''
                   }
                 )
@@ -181,7 +181,7 @@ pipeline {
           stage('Test') {
             steps {
               sh '''
-                gradle -i ingest \
+                gradle -d ingest \
                   -PcegaIP=${CEGA_IP} \
                   -PlegaPublicIP=${LEGA_public_IP} \
                   -PlegaPrivateIP=${LEGA_private_IP} \
