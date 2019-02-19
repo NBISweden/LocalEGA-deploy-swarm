@@ -227,13 +227,6 @@ pipeline {
   }
   
   post('Remove VM') {
-    failure {
-        sh '''
-          docker -v
-          docker-machine --version
-          journalctl --no-pager -u docker
-        '''
-    }
     cleanup {
       sh 'docker-machine rm -y CEGA-${GIT_COMMIT_SHORT} LEGA-public-${GIT_COMMIT_SHORT} LEGA-private-${GIT_COMMIT_SHORT}'
     }

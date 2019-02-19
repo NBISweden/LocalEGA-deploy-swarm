@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 public abstract class LocalEGATask extends DefaultTask {
     private static final Logger logger = LoggerFactory.getLogger(LocalEGATask.class);
 
-    public static final String MACHINE_IP = "machineIp";
     public static final String MACHINE = "machine";
     public static final String TMP_TRACE = ".tmp/.trace";
     public static final String CEGA_TMP_TRACE = "cega/.tmp/.trace";
@@ -67,7 +66,6 @@ public abstract class LocalEGATask extends DefaultTask {
     }
 
     protected String machineName;
-    protected String machineIp;
 
     public void setMachineName(String machineName) {
         String machineNameProperty = getProperty(MACHINE);
@@ -75,15 +73,6 @@ public abstract class LocalEGATask extends DefaultTask {
             this.machineName = machineNameProperty;
         } else {
             this.machineName = machineName;
-        }
-    }
-
-    public void setMachineIp(String machineIp) {
-        String machineIpProperty = getProperty(MACHINE_IP);
-        if (machineIp != null) {
-            this.machineIp = machineIpProperty;
-        } else {
-            this.machineIp = machineIp;
         }
     }
 
@@ -197,12 +186,18 @@ public abstract class LocalEGATask extends DefaultTask {
         }
     }
 
+    protected void regenrateCerts(String name, Map<String, String> openStackEnvironment) throws IOException {
+        logger.info("regenerate-certs");
+        try {
+            exec(true, openStackEnvironment, "docker-machine regenerate-certs", "--client-certs", "--force", name);
+        } catch (Exception e) {
+            logger.error("Error regenerate-certs for: " + name);
+            throw e;
+        }
+    }
+
     protected String getMachineIPAddress(String name) throws IOException {
-        // if (machineIp == null) {
         return exec("docker-machine ip", name).iterator().next();
-        // } else {
-        // return machineIp;
-        // }
     }
 
     protected Map<String, String> getMachineEnvironment(String name) throws IOException {

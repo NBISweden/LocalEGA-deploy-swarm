@@ -3,6 +3,7 @@ package se.nbis.lega.deployment.cluster;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -44,26 +45,21 @@ public abstract class ClusterTask extends LocalEGATask {
     protected Map<String, String> createMachineOpenStack(String name, Map<String, String> openStackEnvironment)
                     throws IOException {
         logger.info("createMachineOpenStack");
-        exec(true, openStackEnvironment, "docker-machine create", "--driver", "openstack", name);
-        return getMachines(name).get(name);
-    }
-
-    /**
-     * Create Docker Machine using generic driver
-     * 
-     * @param name
-     * @param openStackEnvironment
-     * @param ip
-     * @param user
-     * @param sshKeyFile
-     * @return
-     * @throws IOException
-     */
-    protected Map<String, String> createMachineWithIp(String name, String ip, String user, String sshKeyFile)
-                    throws IOException {
-        logger.info("createMachineWithIp");
-        exec(true, "docker-machine create", "--driver", "generic", "--generic-ip-address", ip, "--generic-ssh-user",
-                        user, "--generic-ssh-key", sshKeyFile, name);
+        try {
+            List<String> output =
+                            exec(true, openStackEnvironment, "docker-machine create", "--driver", "openstack", name);
+            for (Iterator<String> iterator = output.iterator(); iterator.hasNext();) {
+                String line = (String) iterator.next();
+                logger.info(line);
+            }
+            if (output.get(0).startsWith("Error checking TLS connection")) {
+                regenrateCerts(name, openStackEnvironment);
+            }
+        } catch (Exception e) {
+            logger.error("Error Creating openStack machine: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
         return getMachines(name).get(name);
     }
 
