@@ -178,11 +178,26 @@ public abstract class LocalEGATask extends DefaultTask {
         } catch (ExecuteException e) {
             String output = outputStream.toString();
             logger.error(output);
+            if (output.startsWith("Error checking TLS connection")) {
+                regenrateCerts(commandLine.getArguments()[1], systemEnvironment);
+                exec(ignoreExitCode, environment, command, arguments);
+            }
             if (ignoreExitCode) {
                 return Arrays.asList(output.split(System.lineSeparator()));
             } else {
                 throw e;
             }
+        }
+    }
+
+    protected void regenrateCerts(String name, Map<String, String> openStackEnvironment) throws IOException {
+        logger.info("regenerate-certs");
+        try {
+            exec(true, openStackEnvironment, "docker-machine regenerate-certs", "--client-certs", "--force", name);
+        } catch (Exception e) {
+            logger.error("Error  regenerate-certs machine " + name);
+            e.printStackTrace();
+            throw e;
         }
     }
 

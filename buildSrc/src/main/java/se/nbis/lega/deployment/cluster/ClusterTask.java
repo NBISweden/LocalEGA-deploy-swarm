@@ -43,7 +43,6 @@ public abstract class ClusterTask extends LocalEGATask {
 
     protected Map<String, String> createMachineOpenStack(String name, Map<String, String> openStackEnvironment)
                     throws IOException {
-        regenrateCerts(name, openStackEnvironment);
         logger.info("createMachineOpenStack");
         try {
             exec(true, openStackEnvironment, "docker-machine create", "--driver", "openstack", name);
@@ -55,18 +54,6 @@ public abstract class ClusterTask extends LocalEGATask {
         return getMachines(name).get(name);
     }
 
-    protected Map<String, String> regenrateCerts(String name, Map<String, String> openStackEnvironment)
-                    throws IOException {
-        logger.info("regenerate-certs");
-        try {
-            exec(true, openStackEnvironment, "docker-machine regenerate-certs", "--client-certs", "--force", name);
-        } catch (Exception e) {
-            logger.error("Error  regenerate-certs machine " + name);
-            e.printStackTrace();
-            throw e;
-        }
-        return getMachines(name).get(name);
-    }
 
     protected void removeMachine(String name) throws IOException {
         List<String> machines = exec("docker-machine ls --filter name=", name);
