@@ -3,6 +3,7 @@ package se.nbis.lega.deployment.cluster;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -47,13 +48,15 @@ public abstract class ClusterTask extends LocalEGATask {
         try {
             List<String> output =
                             exec(true, openStackEnvironment, "docker-machine create", "--driver", "openstack", name);
-            // if (output.startsWith("Error checking TLS connection")) {
-            // regenrateCerts(commandLine.getArguments()[1], systemEnvironment);
-            // exec(ignoreExitCode, environment, command, arguments);
-            // }
-            regenrateCerts(name, openStackEnvironment);
+            for (Iterator<String> iterator = output.iterator(); iterator.hasNext();) {
+                String string = (String) iterator.next();
+                logger.info(string);
+            }
+            if (output.get(0).startsWith("Error checking TLS connection")) {
+                regenrateCerts(name, openStackEnvironment);
+            }
         } catch (Exception e) {
-            logger.error("Error Creating openStack machine");
+            logger.error("Error Creating openStack machine: " + e.getMessage());
             e.printStackTrace();
             throw e;
         }
