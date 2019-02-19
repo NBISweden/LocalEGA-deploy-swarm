@@ -15,21 +15,27 @@ public class CreateMachineTask extends ClusterTask {
 
     @TaskAction
     public void run() throws IOException {
-        Map<String, String> env;
-        String openStackConfig = getProperty("openStackConfig");
-        machineIp = getProperty(MACHINE_IP);
-        logger.info("machineIp:" + machineIp);
-        Map<String, String> openStackEnvironment = getOpenStackEnvironment();
-        if (openStackConfig != null) {
-            env = createMachineOpenStack(machineName, openStackConfig);
-        } else if (openStackEnvironment != null) {
-            env = createMachineOpenStack(machineName, openStackEnvironment);
-        } else if (machineIp != null) {
-            env = createMachineWithIp(machineName, machineIp, getProperty(SSH_USER), getProperty(SSH_KEY_FILE));
-        } else {
-            env = createMachineVirtualBox(machineName);
+        try {
+            Map<String, String> env;
+            String openStackConfig = getProperty("openStackConfig");
+            machineIp = getProperty(MACHINE_IP);
+            logger.info("machineIp:" + machineIp);
+            Map<String, String> openStackEnvironment = getOpenStackEnvironment();
+            if (openStackConfig != null) {
+                env = createMachineOpenStack(machineName, openStackConfig);
+            } else if (openStackEnvironment != null) {
+                env = createMachineOpenStack(machineName, openStackEnvironment);
+            } else if (machineIp != null) {
+                env = createMachineWithIp(machineName, machineIp, getProperty(SSH_USER), getProperty(SSH_KEY_FILE));
+            } else {
+                env = createMachineVirtualBox(machineName);
+            }
+            exec(true, env, "docker swarm init", "--advertise-addr", getMachineIPAddress(machineName));
+        } catch (IOException e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            throw e;
         }
-        exec(true, env, "docker swarm init", "--advertise-addr", getMachineIPAddress(machineName));
     }
 
     private Map<String, String> getOpenStackEnvironment() {
