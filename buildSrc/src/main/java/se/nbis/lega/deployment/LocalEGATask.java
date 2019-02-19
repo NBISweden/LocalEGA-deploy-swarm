@@ -1,5 +1,22 @@
 package se.nbis.lega.deployment;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.attribute.PosixFilePermission;
+import java.security.KeyPair;
+import java.security.Security;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
@@ -8,23 +25,20 @@ import org.apache.commons.io.FileUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.gradle.api.DefaultTask;
-
-import java.io.*;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.attribute.PosixFilePermission;
-import java.security.KeyPair;
-import java.security.Security;
-import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class LocalEGATask extends DefaultTask {
+    private static final Logger logger = LoggerFactory.getLogger(LocalEGATask.class);
 
+    public static final String MACHINE_IP = "machineIp";
+    public static final String MACHINE = "machine";
     public static final String TMP_TRACE = ".tmp/.trace";
     public static final String CEGA_TMP_TRACE = "cega/.tmp/.trace";
     public static final String LEGA_PRIVATE_TMP_TRACE = "lega-private/.tmp/.trace";
 
-    public static final List<String> DOCKER_ENV_VARS = Arrays
-        .asList("DOCKER_TLS_VERIFY", "DOCKER_HOST", "DOCKER_CERT_PATH", "DOCKER_MACHINE_NAME");
+    public static final List<String> DOCKER_ENV_VARS =
+                    Arrays.asList("DOCKER_TLS_VERIFY", "DOCKER_HOST", "DOCKER_CERT_PATH", "DOCKER_MACHINE_NAME");
 
     public static final String LEGA_INSTANCES = "LEGA_INSTANCES";
     public static final String LEGA_INSTANCE_NAME = "lega";
@@ -53,13 +67,23 @@ public abstract class LocalEGATask extends DefaultTask {
     }
 
     protected String machineName;
+    protected String machineIp;
 
     public void setMachineName(String machineName) {
-        String machineNameProperty = getProperty("machine");
+        String machineNameProperty = getProperty(MACHINE);
         if (machineNameProperty != null) {
             this.machineName = machineNameProperty;
         } else {
             this.machineName = machineName;
+        }
+    }
+
+    public void setMachineIp(String machineIp) {
+        String machineIpProperty = getProperty(MACHINE_IP);
+        if (machineIp != null) {
+            this.machineIp = machineIpProperty;
+        } else {
+            this.machineIp = machineIp;
         }
     }
 
@@ -85,9 +109,7 @@ public abstract class LocalEGATask extends DefaultTask {
     public void writeTrace(File traceFile, String key, String value) throws IOException {
         String existingValue = readTrace(traceFile, key);
         if (existingValue == null) {
-            FileUtils
-                .writeLines(traceFile, Collections.singleton(String.format("%s=%s", key, value)),
-                    true);
+            FileUtils.writeLines(traceFile, Collections.singleton(String.format("%s=%s", key, value)), true);
         }
     }
 
@@ -126,30 +148,28 @@ public abstract class LocalEGATask extends DefaultTask {
     }
 
     protected void removeVolume(String name) throws IOException {
-        exec(true, getMachineEnvironment(machineName), "docker volume rm", name);
+        exec(true, getMachineEnvironment(machineName), "docker volume rm --force", name);
     }
 
     protected void createConfig(String name, File file) throws IOException {
-        exec(true, getMachineEnvironment(machineName), "docker config create", name,
-            file.getAbsolutePath());
+        exec(true, getMachineEnvironment(machineName), "docker config create", name, file.getAbsolutePath());
     }
 
     protected List<String> exec(String command, String... arguments) throws IOException {
         return exec(false, null, command, arguments);
     }
 
-    protected List<String> exec(boolean ignoreExitCode, String command, String... arguments)
-        throws IOException {
+    protected List<String> exec(boolean ignoreExitCode, String command, String... arguments) throws IOException {
         return exec(ignoreExitCode, null, command, arguments);
     }
 
-    protected List<String> exec(Map<String, String> environment, String command,
-        String... arguments) throws IOException {
+    protected List<String> exec(Map<String, String> environment, String command, String... arguments)
+                    throws IOException {
         return exec(false, environment, command, arguments);
     }
 
-    protected List<String> exec(boolean ignoreExitCode, Map<String, String> environment,
-        String command, String... arguments) throws IOException {
+    protected List<String> exec(boolean ignoreExitCode, Map<String, String> environment, String command,
+                    String... arguments) throws IOException {
         Map<String, String> systemEnvironment = new HashMap<>(System.getenv());
         if (environment != null) {
             systemEnvironment.putAll(environment);
@@ -161,12 +181,14 @@ public abstract class LocalEGATask extends DefaultTask {
         CommandLine commandLine = CommandLine.parse(command);
         commandLine.addArguments(arguments);
         try {
+            logger.info("Executing Command: " + commandLine.toString());
             executor.execute(commandLine, systemEnvironment);
             String output = outputStream.toString();
+            logger.info("Execution result: " + output);
             return Arrays.asList(output.split(System.lineSeparator()));
         } catch (ExecuteException e) {
             String output = outputStream.toString();
-            System.out.println(output);
+            logger.error(output);
             if (ignoreExitCode) {
                 return Arrays.asList(output.split(System.lineSeparator()));
             } else {
@@ -176,7 +198,11 @@ public abstract class LocalEGATask extends DefaultTask {
     }
 
     protected String getMachineIPAddress(String name) throws IOException {
+        // if (machineIp == null) {
         return exec("docker-machine ip", name).iterator().next();
+        // } else {
+        // return machineIp;
+        // }
     }
 
     protected Map<String, String> getMachineEnvironment(String name) throws IOException {

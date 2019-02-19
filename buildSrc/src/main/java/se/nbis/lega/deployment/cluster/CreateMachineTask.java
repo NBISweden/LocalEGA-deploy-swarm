@@ -1,27 +1,35 @@
 package se.nbis.lega.deployment.cluster;
 
-import org.gradle.api.tasks.TaskAction;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import org.gradle.api.tasks.TaskAction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CreateMachineTask extends ClusterTask {
+    private static final Logger logger = LoggerFactory.getLogger(CreateMachineTask.class);
+
+    public static final String SSH_KEY_FILE = "sshKeyFile";
+    public static final String SSH_USER = "sshUser";
 
     @TaskAction
     public void run() throws IOException {
         Map<String, String> env;
         String openStackConfig = getProperty("openStackConfig");
+        machineIp = getProperty(MACHINE_IP);
+        logger.info("machineIp:" + machineIp);
         Map<String, String> openStackEnvironment = getOpenStackEnvironment();
         if (openStackConfig != null) {
             env = createMachineOpenStack(machineName, openStackConfig);
         } else if (openStackEnvironment != null) {
             env = createMachineOpenStack(machineName, openStackEnvironment);
+        } else if (machineIp != null) {
+            env = createMachineWithIp(machineName, machineIp, getProperty(SSH_USER), getProperty(SSH_KEY_FILE));
         } else {
             env = createMachineVirtualBox(machineName);
         }
-        String machineIPAddress = getMachineIPAddress(machineName);
-        exec(true, env, "docker swarm init", "--advertise-addr", machineIPAddress);
+        exec(true, env, "docker swarm init", "--advertise-addr", getMachineIPAddress(machineName));
     }
 
     private Map<String, String> getOpenStackEnvironment() {
