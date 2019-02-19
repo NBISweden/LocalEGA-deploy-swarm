@@ -45,7 +45,13 @@ public abstract class ClusterTask extends LocalEGATask {
                     throws IOException {
         logger.info("createMachineOpenStack");
         try {
-            exec(true, openStackEnvironment, "docker-machine create", "--driver", "openstack", name);
+            List<String> output =
+                            exec(true, openStackEnvironment, "docker-machine create", "--driver", "openstack", name);
+            // if (output.startsWith("Error checking TLS connection")) {
+            // regenrateCerts(commandLine.getArguments()[1], systemEnvironment);
+            // exec(ignoreExitCode, environment, command, arguments);
+            // }
+            regenrateCerts(name, openStackEnvironment);
         } catch (Exception e) {
             logger.error("Error Creating openStack machine");
             e.printStackTrace();

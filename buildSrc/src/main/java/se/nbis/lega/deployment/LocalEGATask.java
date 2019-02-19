@@ -178,10 +178,6 @@ public abstract class LocalEGATask extends DefaultTask {
         } catch (ExecuteException e) {
             String output = outputStream.toString();
             logger.error(output);
-            if (output.startsWith("Error checking TLS connection")) {
-                regenrateCerts(commandLine.getArguments()[1], systemEnvironment);
-                exec(ignoreExitCode, environment, command, arguments);
-            }
             if (ignoreExitCode) {
                 return Arrays.asList(output.split(System.lineSeparator()));
             } else {
