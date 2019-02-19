@@ -44,7 +44,13 @@ public abstract class ClusterTask extends LocalEGATask {
     protected Map<String, String> createMachineOpenStack(String name, Map<String, String> openStackEnvironment)
                     throws IOException {
         logger.info("createMachineOpenStack");
-        exec(true, openStackEnvironment, "docker-machine create", "--driver", "openstack", name);
+        try {
+            exec(true, openStackEnvironment, "docker-machine create", "--driver", "openstack", name);
+        } catch (Exception e) {
+            logger.error("Error Creating openStack machine");
+            e.printStackTrace();
+            throw e;
+        }
         return getMachines(name).get(name);
     }
 
@@ -59,13 +65,15 @@ public abstract class ClusterTask extends LocalEGATask {
      * @return
      * @throws IOException
      */
-    protected Map<String, String> createMachineWithIp(String name, String ip, String user, String sshKeyFile)
-                    throws IOException {
-        logger.info("createMachineWithIp");
-        exec(true, "docker-machine create", "--driver", "generic", "--generic-ip-address", ip, "--generic-ssh-user",
-                        user, "--generic-ssh-key", sshKeyFile, name);
-        return getMachines(name).get(name);
-    }
+    // protected Map<String, String> createMachineWithIp(String name, String ip, String user, String
+    // sshKeyFile)
+    // throws IOException {
+    // logger.info("createMachineWithIp");
+    // exec(true, "docker-machine create", "--driver", "generic", "--generic-ip-address", ip,
+    // "--generic-ssh-user",
+    // user, "--generic-ssh-key", sshKeyFile, name);
+    // return getMachines(name).get(name);
+    // }
 
     protected void removeMachine(String name) throws IOException {
         List<String> machines = exec("docker-machine ls --filter name=", name);

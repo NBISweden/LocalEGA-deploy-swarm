@@ -25,15 +25,16 @@ public class CreateMachineTask extends ClusterTask {
                 env = createMachineOpenStack(machineName, openStackConfig);
             } else if (openStackEnvironment != null) {
                 env = createMachineOpenStack(machineName, openStackEnvironment);
-            } else if (machineIp != null) {
-                env = createMachineWithIp(machineName, machineIp, getProperty(SSH_USER), getProperty(SSH_KEY_FILE));
+                // } else if (machineIp != null) {
+                // env = createMachineWithIp(machineName, machineIp, getProperty(SSH_USER),
+                // getProperty(SSH_KEY_FILE));
             } else {
                 env = createMachineVirtualBox(machineName);
             }
             exec(true, env, "docker swarm init", "--advertise-addr", getMachineIPAddress(machineName));
         } catch (IOException e) {
+            logger.error("error:" + e.getMessage());
             e.printStackTrace();
-            logger.error(e.getMessage());
             throw e;
         }
     }
