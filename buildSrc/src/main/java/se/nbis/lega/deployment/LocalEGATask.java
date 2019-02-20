@@ -1,5 +1,6 @@
 package se.nbis.lega.deployment;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
@@ -17,14 +18,16 @@ import java.security.KeyPair;
 import java.security.Security;
 import java.util.*;
 
+@Slf4j
 public abstract class LocalEGATask extends DefaultTask {
 
+    public static final String MACHINE = "machine";
     public static final String TMP_TRACE = ".tmp/.trace";
     public static final String CEGA_TMP_TRACE = "cega/.tmp/.trace";
     public static final String LEGA_PRIVATE_TMP_TRACE = "lega-private/.tmp/.trace";
 
-    public static final List<String> DOCKER_ENV_VARS = Arrays
-        .asList("DOCKER_TLS_VERIFY", "DOCKER_HOST", "DOCKER_CERT_PATH", "DOCKER_MACHINE_NAME");
+    public static final List<String> DOCKER_ENV_VARS =
+                    Arrays.asList("DOCKER_TLS_VERIFY", "DOCKER_HOST", "DOCKER_CERT_PATH", "DOCKER_MACHINE_NAME");
 
     public static final String LEGA_INSTANCES = "LEGA_INSTANCES";
     public static final String LEGA_INSTANCE_NAME = "lega";
@@ -55,7 +58,7 @@ public abstract class LocalEGATask extends DefaultTask {
     protected String machineName;
 
     public void setMachineName(String machineName) {
-        String machineNameProperty = getProperty("machine");
+        String machineNameProperty = getProperty(MACHINE);
         if (machineNameProperty != null) {
             this.machineName = machineNameProperty;
         } else {
@@ -85,9 +88,7 @@ public abstract class LocalEGATask extends DefaultTask {
     public void writeTrace(File traceFile, String key, String value) throws IOException {
         String existingValue = readTrace(traceFile, key);
         if (existingValue == null) {
-            FileUtils
-                .writeLines(traceFile, Collections.singleton(String.format("%s=%s", key, value)),
-                    true);
+            FileUtils.writeLines(traceFile, Collections.singleton(String.format("%s=%s", key, value)), true);
         }
     }
 
@@ -126,30 +127,28 @@ public abstract class LocalEGATask extends DefaultTask {
     }
 
     protected void removeVolume(String name) throws IOException {
-        exec(true, getMachineEnvironment(machineName), "docker volume rm", name);
+        exec(true, getMachineEnvironment(machineName), "docker volume rm --force", name);
     }
 
     protected void createConfig(String name, File file) throws IOException {
-        exec(true, getMachineEnvironment(machineName), "docker config create", name,
-            file.getAbsolutePath());
+        exec(true, getMachineEnvironment(machineName), "docker config create", name, file.getAbsolutePath());
     }
 
     protected List<String> exec(String command, String... arguments) throws IOException {
         return exec(false, null, command, arguments);
     }
 
-    protected List<String> exec(boolean ignoreExitCode, String command, String... arguments)
-        throws IOException {
+    protected List<String> exec(boolean ignoreExitCode, String command, String... arguments) throws IOException {
         return exec(ignoreExitCode, null, command, arguments);
     }
 
-    protected List<String> exec(Map<String, String> environment, String command,
-        String... arguments) throws IOException {
+    protected List<String> exec(Map<String, String> environment, String command, String... arguments)
+                    throws IOException {
         return exec(false, environment, command, arguments);
     }
 
-    protected List<String> exec(boolean ignoreExitCode, Map<String, String> environment,
-        String command, String... arguments) throws IOException {
+    protected List<String> exec(boolean ignoreExitCode, Map<String, String> environment, String command,
+                    String... arguments) throws IOException {
         Map<String, String> systemEnvironment = new HashMap<>(System.getenv());
         if (environment != null) {
             systemEnvironment.putAll(environment);
@@ -161,17 +160,29 @@ public abstract class LocalEGATask extends DefaultTask {
         CommandLine commandLine = CommandLine.parse(command);
         commandLine.addArguments(arguments);
         try {
+            log.info("Executing Command: " + commandLine.toString());
             executor.execute(commandLine, systemEnvironment);
             String output = outputStream.toString();
+            log.info("Execution result: " + output);
             return Arrays.asList(output.split(System.lineSeparator()));
         } catch (ExecuteException e) {
             String output = outputStream.toString();
-            System.out.println(output);
+            log.error(output);
             if (ignoreExitCode) {
                 return Arrays.asList(output.split(System.lineSeparator()));
             } else {
                 throw e;
             }
+        }
+    }
+
+    protected void regenrateCerts(String name, Map<String, String> openStackEnvironment) throws IOException {
+        log.info("regenerate-certs");
+        try {
+            exec(true, openStackEnvironment, "docker-machine regenerate-certs", "--client-certs", "--force", name);
+        } catch (Exception e) {
+            log.error("Error regenerate-certs for: " + name);
+            throw e;
         }
     }
 

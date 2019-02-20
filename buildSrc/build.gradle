@@ -22,4 +22,6 @@ dependencies {
     compile "com.rabbitmq:amqp-client:5.1.1"
     compile "io.minio:minio:4.0.2"
     compile "no.uio.ifi:crypt4gh:1.2.0"
+    compileOnly 'org.projectlombok:lombok:1.18.6'
+    annotationProcessor 'org.projectlombok:lombok:1.18.6'
 }

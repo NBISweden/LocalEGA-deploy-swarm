@@ -1,27 +1,33 @@
 package se.nbis.lega.deployment.cluster;
 
+import lombok.extern.slf4j.Slf4j;
 import org.gradle.api.tasks.TaskAction;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 public class CreateMachineTask extends ClusterTask {
 
     @TaskAction
     public void run() throws IOException {
-        Map<String, String> env;
-        String openStackConfig = getProperty("openStackConfig");
-        Map<String, String> openStackEnvironment = getOpenStackEnvironment();
-        if (openStackConfig != null) {
-            env = createMachineOpenStack(machineName, openStackConfig);
-        } else if (openStackEnvironment != null) {
-            env = createMachineOpenStack(machineName, openStackEnvironment);
-        } else {
-            env = createMachineVirtualBox(machineName);
+        try {
+            Map<String, String> env;
+            String openStackConfig = getProperty("openStackConfig");
+            Map<String, String> openStackEnvironment = getOpenStackEnvironment();
+            if (openStackConfig != null) {
+                env = createMachineOpenStack(machineName, openStackConfig);
+            } else if (openStackEnvironment != null) {
+                env = createMachineOpenStack(machineName, openStackEnvironment);
+            } else {
+                env = createMachineVirtualBox(machineName);
+            }
+            exec(true, env, "docker swarm init", "--advertise-addr", getMachineIPAddress(machineName));
+        } catch (IOException e) {
+            log.error("error:" + e.getMessage());
+            throw e;
         }
-        String machineIPAddress = getMachineIPAddress(machineName);
-        exec(true, env, "docker swarm init", "--advertise-addr", machineIPAddress);
     }
 
     private Map<String, String> getOpenStackEnvironment() {

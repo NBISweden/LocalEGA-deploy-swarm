@@ -1,10 +1,6 @@
 import se.nbis.lega.deployment.*
 import se.nbis.lega.deployment.cluster.Machine
-import se.nbis.lega.deployment.lega.*
-import se.nbis.lega.deployment.lega.pub.Config
-import se.nbis.lega.deployment.lega.pub.CreateInboxConfigurationTask
-import se.nbis.lega.deployment.lega.pub.CreateMQConfigurationTask
-import se.nbis.lega.deployment.lega.pub.CreateMediatorConfigurationTask
+import se.nbis.lega.deployment.lega.pub.*
 
 import java.util.stream.Collectors
 
