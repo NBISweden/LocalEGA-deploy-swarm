@@ -1,18 +1,18 @@
 package se.nbis.lega.deployment.cluster;
 
+import lombok.extern.slf4j.Slf4j;
+import se.nbis.lega.deployment.Groups;
+import se.nbis.lega.deployment.LocalEGATask;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import se.nbis.lega.deployment.Groups;
-import se.nbis.lega.deployment.LocalEGATask;
 
+@Slf4j
 public abstract class ClusterTask extends LocalEGATask {
-    private static final Logger logger = LoggerFactory.getLogger(ClusterTask.class);
 
     public ClusterTask() {
         super();
@@ -33,7 +33,7 @@ public abstract class ClusterTask extends LocalEGATask {
     }
 
     protected Map<String, String> createMachineVirtualBox(String name) throws IOException {
-        logger.info("createMachineVirtualBox");
+        log.info("createMachineVirtualBox");
         exec(true, "docker-machine create", "--driver", "virtualbox", name);
         return getMachines(name).get(name);
     }
@@ -44,19 +44,19 @@ public abstract class ClusterTask extends LocalEGATask {
 
     protected Map<String, String> createMachineOpenStack(String name, Map<String, String> openStackEnvironment)
                     throws IOException {
-        logger.info("createMachineOpenStack");
+        log.info("createMachineOpenStack");
         try {
             List<String> output =
                             exec(true, openStackEnvironment, "docker-machine create", "--driver", "openstack", name);
             for (Iterator<String> iterator = output.iterator(); iterator.hasNext();) {
-                String line = (String) iterator.next();
-                logger.info(line);
+                String line = iterator.next();
+                log.info(line);
             }
             if (output.get(0).startsWith("Error checking TLS connection")) {
                 regenrateCerts(name, openStackEnvironment);
             }
         } catch (Exception e) {
-            logger.error("Error Creating openStack machine: " + e.getMessage());
+            log.error("Error Creating openStack machine: " + e.getMessage());
             e.printStackTrace();
             throw e;
         }

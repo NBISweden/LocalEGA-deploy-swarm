@@ -1,14 +1,14 @@
 package se.nbis.lega.deployment.cluster;
 
+import lombok.extern.slf4j.Slf4j;
+import org.gradle.api.tasks.TaskAction;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import org.gradle.api.tasks.TaskAction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+@Slf4j
 public class CreateMachineTask extends ClusterTask {
-    private static final Logger logger = LoggerFactory.getLogger(CreateMachineTask.class);
 
     @TaskAction
     public void run() throws IOException {
@@ -25,7 +25,7 @@ public class CreateMachineTask extends ClusterTask {
             }
             exec(true, env, "docker swarm init", "--advertise-addr", getMachineIPAddress(machineName));
         } catch (IOException e) {
-            logger.error("error:" + e.getMessage());
+            log.error("error:" + e.getMessage());
             throw e;
         }
     }

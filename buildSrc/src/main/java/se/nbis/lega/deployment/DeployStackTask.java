@@ -1,13 +1,11 @@
 package se.nbis.lega.deployment;
 
+import org.gradle.api.tasks.TaskAction;
+
 import java.io.IOException;
 import java.util.Map;
-import org.gradle.api.tasks.TaskAction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DeployStackTask extends LocalEGATask {
-    private static final Logger logger = LoggerFactory.getLogger(DeployStackTask.class);
 
     private String composeFile;
     private Map<String, String> environment;

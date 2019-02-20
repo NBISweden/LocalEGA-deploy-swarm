@@ -1,22 +1,6 @@
 package se.nbis.lega.deployment;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.attribute.PosixFilePermission;
-import java.security.KeyPair;
-import java.security.Security;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
@@ -25,11 +9,17 @@ import org.apache.commons.io.FileUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.gradle.api.DefaultTask;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.attribute.PosixFilePermission;
+import java.security.KeyPair;
+import java.security.Security;
+import java.util.*;
+
+@Slf4j
 public abstract class LocalEGATask extends DefaultTask {
-    private static final Logger logger = LoggerFactory.getLogger(LocalEGATask.class);
 
     public static final String MACHINE = "machine";
     public static final String TMP_TRACE = ".tmp/.trace";
@@ -170,14 +160,14 @@ public abstract class LocalEGATask extends DefaultTask {
         CommandLine commandLine = CommandLine.parse(command);
         commandLine.addArguments(arguments);
         try {
-            logger.info("Executing Command: " + commandLine.toString());
+            log.info("Executing Command: " + commandLine.toString());
             executor.execute(commandLine, systemEnvironment);
             String output = outputStream.toString();
-            logger.info("Execution result: " + output);
+            log.info("Execution result: " + output);
             return Arrays.asList(output.split(System.lineSeparator()));
         } catch (ExecuteException e) {
             String output = outputStream.toString();
-            logger.error(output);
+            log.error(output);
             if (ignoreExitCode) {
                 return Arrays.asList(output.split(System.lineSeparator()));
             } else {
@@ -187,11 +177,11 @@ public abstract class LocalEGATask extends DefaultTask {
     }
 
     protected void regenrateCerts(String name, Map<String, String> openStackEnvironment) throws IOException {
-        logger.info("regenerate-certs");
+        log.info("regenerate-certs");
         try {
             exec(true, openStackEnvironment, "docker-machine regenerate-certs", "--client-certs", "--force", name);
         } catch (Exception e) {
-            logger.error("Error regenerate-certs for: " + name);
+            log.error("Error regenerate-certs for: " + name);
             throw e;
         }
     }
