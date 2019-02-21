@@ -31,6 +31,7 @@ public class CreateInboxConfigurationTask extends LegaPublicTask {
             host = getMachineIPAddress(Machine.LEGA_PRIVATE.getName());
         }
         writeTrace(S3_ENDPOINT, host + ":9001");
+        writeTrace(BROKER_HOST, host);
     }
 
 }

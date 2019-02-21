@@ -33,6 +33,7 @@ public abstract class LocalEGATask extends DefaultTask {
     public static final String LEGA_INSTANCE_NAME = "lega";
     public static final String INBOX_S3_ACCESS_KEY = "INBOX_S3_ACCESS_KEY";
     public static final String INBOX_S3_SECRET_KEY = "INBOX_S3_SECRET_KEY";
+    public static final String BROKER_HOST = "BROKER_HOST";
     public static final String S3_ENDPOINT = "S3_ENDPOINT";
     public static final String VAULT_S3_ACCESS_KEY = "VAULT_S3_ACCESS_KEY";
     public static final String VAULT_S3_SECRET_KEY = "VAULT_S3_SECRET_KEY";
