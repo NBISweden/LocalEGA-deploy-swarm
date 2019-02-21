@@ -2,14 +2,12 @@ package se.nbis.lega.deployment.lega.pub;
 
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.tasks.TaskAction;
-import se.nbis.lega.deployment.lega.priv.Config;
-import se.nbis.lega.deployment.lega.priv.LegaPrivateTask;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-public class CreateNginxConfigurationTask extends LegaPrivateTask {
+public class CreateNginxConfigurationTask extends LegaPublicTask {
 
     @TaskAction
     public void run() throws IOException {
