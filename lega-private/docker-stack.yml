@@ -14,7 +14,7 @@ services:
       - LOGZIO_ZONE=us
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    command: ["--no-stats", "--no-dockerEvents", "-a", "stack=private"]
+    command: ["--no-stats", "--no-dockerEvents", "-a", "stack=private", "-a", "${GIT_COMMIT_SHORT}", "-a", "${BUILD_NUMBER}"]
 
   mq:
     image: rabbitmq:3.7.8-management
