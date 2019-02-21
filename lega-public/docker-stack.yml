@@ -2,30 +2,6 @@ version: '3.3'
 
 services:
 
-  mq:
-    image: rabbitmq:3.7.8-management
-    ports:
-      - "4369:4369"
-      - "5672:5672"
-      - "15672:15672"
-      - "35672-35682:35672-35682"
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        window: 120s
-    environment:
-      - CEGA_CONNECTION
-    configs:
-      - source: lega-public.defs.json
-        target: /etc/rabbitmq/defs.json
-      - source: lega-public.rabbitmq.config
-        target: /etc/rabbitmq/rabbitmq.config
-      - source: lega-public.entrypoint.sh
-        target: /usr/bin/ega-entrypoint.sh
-    entrypoint: ["/bin/bash", "/usr/bin/ega-entrypoint.sh"]
-    command: ["rabbitmq-server"]
-
   inbox:
     image: nbisweden/ega-mina-inbox:latest
     ports:
@@ -47,35 +23,8 @@ services:
     volumes:
       - inbox:/ega/inbox
 
-  mediator-client:
-    image: uiobmi/mediator.client:latest
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        window: 120s
-    depends_on:
-      - mq
-    environment:
-      - BROKER_HOST=mq
-      - QUEUES=files,stableIDs
-      - MEDIATOR_SERVER
-
-  portainer:
-    image: portainer/portainer:latest
-    ports:
-        - "40000:9000"
-    command: --no-auth
-    deploy:
-      placement:
-        constraints: [node.role == manager]
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - portainer:/data
-
 volumes:
   inbox:
-  portainer:
 
 configs:
   lega-public.defs.json:

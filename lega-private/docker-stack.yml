@@ -4,16 +4,26 @@ services:
 
   mq:
     image: rabbitmq:3.7.8-management
+    ports:
+      - "4369:4369"
+      - "5672:5672"
+      - "15672:15672"
+      - "35672-35682:35672-35682"
     deploy:
       restart_policy:
         condition: on-failure
         delay: 5s
         window: 120s
+    environment:
+      - CEGA_CONNECTION
     configs:
       - source: lega-private.defs.json
         target: /etc/rabbitmq/defs.json
       - source: lega-private.rabbitmq.config
         target: /etc/rabbitmq/rabbitmq.config
+      - source: lega-private.entrypoint.sh
+        target: /usr/bin/ega-entrypoint.sh
+    entrypoint: ["/bin/bash", "/usr/bin/ega-entrypoint.sh"]
     command: ["rabbitmq-server"]
 
   db:
@@ -193,20 +203,6 @@ services:
       - source: conf.ini
         target: /etc/ega/conf.ini
     entrypoint: ["gosu", "lega", "ega-ingest"]
-
-  mediator-server:
-    image: uiobmi/mediator.server:latest
-    ports:
-      - "8080:8080"
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        window: 120s
-    depends_on:
-      - mq
-    environment:
-      - BROKER_HOST=mq
 
   portainer:
     image: portainer/portainer:latest

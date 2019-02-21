@@ -15,19 +15,15 @@ task clearConfiguration(type: ClearConfigurationTask) {
     setGroup Groups.LEGA_PUBLIC.getName()
 
     setMachineName Machine.LEGA_PUBLIC.getName()
-    setConfigs Arrays.stream(Config.values()).map { c -> c.getName() }.collect(Collectors.toSet())
+    setConfigs Collections.emptyList() as Set<String>
 }
 
-task createMQConfiguration(type: CreateMQConfigurationTask)
-
 task createInboxConfiguration(type: CreateInboxConfigurationTask)
-
-task createMediatorConfiguration(type: CreateMediatorConfigurationTask)
 
 task createConfiguration {
     setGroup Groups.LEGA_PUBLIC.getName()
 
-    dependsOn "clearConfiguration", "createMQConfiguration", "createInboxConfiguration", "createMediatorConfiguration"
+    dependsOn "clearConfiguration", "createInboxConfiguration"
 }
 
 task deployStack(type: DeployStackTask) {
