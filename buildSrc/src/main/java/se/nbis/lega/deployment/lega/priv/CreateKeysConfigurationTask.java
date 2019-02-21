@@ -140,7 +140,7 @@ public class CreateKeysConfigurationTask extends LegaPrivateTask {
         RSAKeyPairGenerator keyPairGenerator = new RSAKeyPairGenerator();
 
         keyPairGenerator.init(
-            new RSAKeyGenerationParameters(BigInteger.valueOf(0x10001), new SecureRandom(), 4096,
+            new RSAKeyGenerationParameters(BigInteger.valueOf(0x10001), new SecureRandom(), 2048,
                 12));
 
         PGPKeyPair rsaKeyPair =
