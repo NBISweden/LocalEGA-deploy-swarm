@@ -176,7 +176,7 @@ public abstract class LocalEGATask extends DefaultTask {
         }
     }
 
-    protected void regenrateCerts(String name, Map<String, String> openStackEnvironment) throws IOException {
+    protected void regenerateCertificates(String name, Map<String, String> openStackEnvironment) throws IOException {
         log.info("regenerate-certs");
         try {
             exec(true, openStackEnvironment, "docker-machine regenerate-certs", "--client-certs", "--force", name);

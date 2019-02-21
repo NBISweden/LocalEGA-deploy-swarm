@@ -83,7 +83,7 @@ pipeline {
     stage('Initialization') {
       steps {
         sh '''
-          sleep 180
+          sleep 240
         '''
       }
     }
@@ -227,6 +227,35 @@ pipeline {
   }
   
   post('Remove VM') {
+    failure {
+      sh '''
+        eval "$(docker-machine env LEGA-public-${GIT_COMMIT_SHORT})"
+        echo '---=== LEGA-public-${GIT_COMMIT_SHORT}_inbox Logs ===---'
+        docker service logs LEGA-public-${GIT_COMMIT_SHORT}_inbox
+        echo '---=== LEGA-public-${GIT_COMMIT_SHORT}_mq Logs ===---'
+        docker service logs LEGA-public-${GIT_COMMIT_SHORT}_mq
+      '''
+      sh '''
+        eval "$(docker-machine env CEGA-${GIT_COMMIT_SHORT})"
+        echo '---=== CEGA-${GIT_COMMIT_SHORT}_cega-mq Logs ===---'
+        docker service logs CEGA-${GIT_COMMIT_SHORT}_cega-mq
+      '''
+      sh '''
+        eval "$(docker-machine env LEGA-private-${GIT_COMMIT_SHORT})"
+        echo '---=== LEGA-private-${GIT_COMMIT_SHORT}-mq Logs ===---'
+        docker service logs LEGA-private-${GIT_COMMIT_SHORT}_mq
+        echo '---=== LEGA-private-${GIT_COMMIT_SHORT}_ingest Logs ===---'
+        docker service logs LEGA-private-${GIT_COMMIT_SHORT}_ingest
+        echo '---=== LEGA-private-${GIT_COMMIT_SHORT}_inbox-s3 Logs ===---'
+        docker service logs LEGA-private-${GIT_COMMIT_SHORT}_inbox-s3
+        echo '---=== LEGA-private-${GIT_COMMIT_SHORT}_vault-s3 Logs ===---'
+        docker service logs LEGA-private-${GIT_COMMIT_SHORT}_vault-s3
+        echo '---=== LEGA-private-${GIT_COMMIT_SHORT}_db Logs ===---'
+        docker service logs LEGA-private-${GIT_COMMIT_SHORT}_db
+        echo '---=== LEGA-private-${GIT_COMMIT_SHORT}_verify Logs ===---'
+        docker service logs LEGA-private-${GIT_COMMIT_SHORT}_verify
+      '''
+    }
     cleanup {
       sh 'docker-machine rm -y CEGA-${GIT_COMMIT_SHORT} LEGA-public-${GIT_COMMIT_SHORT} LEGA-private-${GIT_COMMIT_SHORT}'
     }

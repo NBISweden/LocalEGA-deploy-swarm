@@ -25,7 +25,7 @@ public class CreateMachineTask extends ClusterTask {
             }
             exec(true, env, "docker swarm init", "--advertise-addr", getMachineIPAddress(machineName));
         } catch (IOException e) {
-            log.error("error:" + e.getMessage());
+            log.error(e.getMessage(), e);
             throw e;
         }
     }

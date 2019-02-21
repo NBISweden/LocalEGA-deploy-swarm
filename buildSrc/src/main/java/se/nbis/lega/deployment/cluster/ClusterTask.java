@@ -48,12 +48,11 @@ public abstract class ClusterTask extends LocalEGATask {
         try {
             List<String> output =
                             exec(true, openStackEnvironment, "docker-machine create", "--driver", "openstack", name);
-            for (Iterator<String> iterator = output.iterator(); iterator.hasNext();) {
-                String line = iterator.next();
+            for (String line : output) {
                 log.info(line);
             }
             if (output.get(0).startsWith("Error checking TLS connection")) {
-                regenrateCerts(name, openStackEnvironment);
+                regenerateCertificates(name, openStackEnvironment);
             }
         } catch (Exception e) {
             log.error("Error Creating openStack machine: " + e.getMessage());
