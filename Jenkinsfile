@@ -53,9 +53,20 @@ pipeline {
     stage('Bootstrap') {
       steps {
           sh '''
-            gradle :cega:createConfiguration -Pmachine=CEGA-${GIT_COMMIT_SHORT} --stacktrace
-            gradle :lega-private:createConfiguration -Pmachine=LEGA-private-${GIT_COMMIT_SHORT} -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT_SHORT}) --stacktrace
-            gradle :lega-public:createConfiguration -Pmachine=LEGA-public-${GIT_COMMIT_SHORT} -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT_SHORT}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${GIT_COMMIT_SHORT}) --stacktrace
+            gradle :cega:createConfiguration \
+                -Pmachine=CEGA-${GIT_COMMIT_SHORT} \
+                --stacktrace
+
+            gradle :lega-private:createConfiguration \
+                -Pmachine=LEGA-private-${GIT_COMMIT_SHORT} \
+                -PcegaIP=$(docker-machine ip LEGA-public-${GIT_COMMIT_SHORT}) \
+                --stacktrace
+
+            gradle :lega-public:createConfiguration \
+                -Pmachine=LEGA-public-${GIT_COMMIT_SHORT} \
+                -PcegaIP=$(docker-machine ip CEGA-${GIT_COMMIT_SHORT}) \
+                -PlegaPrivateIP=$(docker-machine ip LEGA-private-${GIT_COMMIT_SHORT}) \
+                --stacktrace
           '''
       }
     }
@@ -139,6 +150,7 @@ pipeline {
       
                   gradle :lega-private:createConfiguration \
                       -Pmachine=lega-private-staging \
+                      -PcegaIP=${LEGA_public_IP} \
                       --stacktrace
       
                   gradle :lega-public:createConfiguration \

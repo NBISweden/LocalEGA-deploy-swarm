@@ -2,6 +2,19 @@ version: '3.3'
 
 services:
 
+  nginx:
+    image: nginx:latest
+    ports:
+      - "5672:5672"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        window: 120s
+    configs:
+      - source: nginx.conf
+        target: /etc/nginx/nginx.conf
+
   inbox:
     image: nbisweden/ega-mina-inbox:latest
     ports:
@@ -25,3 +38,7 @@ services:
 
 volumes:
   inbox:
+
+configs:
+  nginx.conf:
+    external: true

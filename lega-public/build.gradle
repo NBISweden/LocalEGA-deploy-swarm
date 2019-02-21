@@ -15,15 +15,17 @@ task clearConfiguration(type: ClearConfigurationTask) {
     setGroup Groups.LEGA_PUBLIC.getName()
 
     setMachineName Machine.LEGA_PUBLIC.getName()
-    setConfigs Collections.emptyList() as Set<String>
+    setConfigs Arrays.stream(Config.values()).map { c -> c.getName() }.collect(Collectors.toSet())
 }
+
+task createNginxConfiguration(type: CreateNginxConfigurationTask)
 
 task createInboxConfiguration(type: CreateInboxConfigurationTask)
 
 task createConfiguration {
     setGroup Groups.LEGA_PUBLIC.getName()
 
-    dependsOn "clearConfiguration", "createInboxConfiguration"
+    dependsOn "clearConfiguration", "createNginxConfiguration", "createInboxConfiguration"
 }
 
 task deployStack(type: DeployStackTask) {
