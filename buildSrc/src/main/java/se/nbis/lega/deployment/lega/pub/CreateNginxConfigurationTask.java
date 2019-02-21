@@ -19,8 +19,8 @@ public class CreateNginxConfigurationTask extends LegaPublicTask {
         String cegaIP = getProperty("cegaIP");
         File conf = getProject().file(".tmp/nginx.conf");
         FileUtils.write(conf, String.format(
-            "stream {\n" + "\tupstream central_ega {\n" + "\t    server %s:5672;\n" + "\t}\n"
-                + "    server {\n" + "        listen            127.0.0.1:5672;\n"
+            "events { } \n\nstream {\n" + "\tupstream central_ega {\n" + "\t    server %s:5672;\n"
+                + "\t}\n" + "    server {\n" + "        listen            5672;\n"
                 + "        proxy_pass        central_ega;\n" + "    }\n" + "}", cegaIP),
             Charset.defaultCharset());
     }

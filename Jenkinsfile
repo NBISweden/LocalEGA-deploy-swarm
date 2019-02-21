@@ -26,6 +26,7 @@ pipeline {
                     script: "printf \$(git rev-parse --short ${GIT_COMMIT})${BUILD_NUMBER}",
                     returnStdout: true
             )
+    LOGZIO_TOKEN=credentials('LOGZIO_TOKEN')
   }
   
   stages {
@@ -209,8 +210,8 @@ pipeline {
                 eval "$(docker-machine env lega-public-staging)"
                 echo '---=== lega-public-staging_inbox Logs ===---'
                 docker service logs lega-public-staging_inbox
-                echo '---=== lega-public-staging_mq Logs ===---'
-                docker service logs lega-public-staging_mq
+                echo '---=== lega-public-staging_nginx Logs ===---'
+                docker service logs lega-public-staging_nginx
               '''
               sh '''
                 eval "$(docker-machine env cega-staging)"
@@ -244,8 +245,8 @@ pipeline {
         eval "$(docker-machine env LEGA-public-${GIT_COMMIT_SHORT})"
         echo '---=== LEGA-public-${GIT_COMMIT_SHORT}_inbox Logs ===---'
         docker service logs LEGA-public-${GIT_COMMIT_SHORT}_inbox
-        echo '---=== LEGA-public-${GIT_COMMIT_SHORT}_mq Logs ===---'
-        docker service logs LEGA-public-${GIT_COMMIT_SHORT}_mq
+        echo '---=== LEGA-public-${GIT_COMMIT_SHORT}_nginx Logs ===---'
+        docker service logs LEGA-public-${GIT_COMMIT_SHORT}_nginx
       '''
       sh '''
         eval "$(docker-machine env CEGA-${GIT_COMMIT_SHORT})"
