@@ -227,6 +227,8 @@ configs:
     external: true
   lega-private.rabbitmq.config:
     external: true
+  lega-private.entrypoint.sh:
+    external: true
   postgresql.conf:
     external: true
   main.sql:
