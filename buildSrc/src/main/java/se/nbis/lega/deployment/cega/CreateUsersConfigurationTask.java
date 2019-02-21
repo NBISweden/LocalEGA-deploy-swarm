@@ -34,7 +34,7 @@ public class CreateUsersConfigurationTask extends CegaTask {
     }
 
     private String generateUser(String username) throws GeneralSecurityException, IOException {
-        KeyPair keyPair = KeyUtils.generateKeyPair("ssh-rsa", 4096);
+        KeyPair keyPair = KeyUtils.generateKeyPair("ssh-rsa", 2048);
 
         byte[] keyBytes =
             new Buffer.PlainBuffer().putPublicKey(keyPair.getPublic()).getCompactData();
