@@ -14,7 +14,7 @@ services:
       - LOGZIO_ZONE=us
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    command: ["--no-stats", "--no-dockerEvents", "-a", "stack=public", "-a", "${GIT_COMMIT_SHORT}", "-a", "${BUILD_NUMBER}]
+    command: ["--no-stats", "--no-dockerEvents", "-a", "stack=public", "-a", "rev=${GIT_COMMIT_SHORT}", "-a", "build=${BUILD_NUMBER}]
 
   nginx:
     image: nginx:latest
