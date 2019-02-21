@@ -51,6 +51,7 @@ pipeline {
           )
       }
     }
+
     stage('Bootstrap') {
       steps {
           sh '''
@@ -71,6 +72,7 @@ pipeline {
           '''
       }
     }
+
     stage('Deploy') {
       steps {
       parallel(
@@ -92,6 +94,7 @@ pipeline {
           )
       }
     }
+
     stage('Initialization') {
       steps {
         sh '''
@@ -99,6 +102,7 @@ pipeline {
         '''
       }
     }
+
     stage('Test') {
       steps {
         sh '''
@@ -184,6 +188,7 @@ pipeline {
                 )
             }
           }
+
           stage('Initialization') {
             steps {
               sh '''
@@ -191,6 +196,7 @@ pipeline {
               '''
             }
           }
+
           stage('Test') {
             steps {
               sh '''
@@ -203,72 +209,10 @@ pipeline {
             }
           }
         }
-        
-        post('Logging') {
-          failure {
-              sh '''
-                eval "$(docker-machine env lega-public-staging)"
-                echo '---=== lega-public-staging_inbox Logs ===---'
-                docker service logs lega-public-staging_inbox
-                echo '---=== lega-public-staging_nginx Logs ===---'
-                docker service logs lega-public-staging_nginx
-              '''
-              sh '''
-                eval "$(docker-machine env cega-staging)"
-                echo '---=== cega-staging_cega-mq Logs ===---'
-                docker service logs cega-staging_cega-mq
-              '''
-              sh '''
-                eval "$(docker-machine env lega-private-staging)"
-                echo '---=== lega-private-staging-mq Logs ===---'
-                docker service logs lega-private-staging_mq
-                echo '---=== lega-private-staging_ingest Logs ===---'
-                docker service logs lega-private-staging_ingest
-                echo '---=== lega-private-staging_inbox-s3 Logs ===---'
-                docker service logs lega-private-staging_inbox-s3
-                echo '---=== lega-private-staging_vault-s3 Logs ===---'
-                docker service logs lega-private-staging_vault-s3
-                echo '---=== lega-private-staging_db Logs ===---'
-                docker service logs lega-private-staging_db
-                echo '---=== lega-private-staging_verify Logs ===---'
-                docker service logs lega-private-staging_verify
-              '''
-          }
-        }
     }
-    
   }
   
   post('Remove VM') {
-    failure {
-      sh '''
-        eval "$(docker-machine env LEGA-public-${GIT_COMMIT_SHORT})"
-        echo '---=== LEGA-public-${GIT_COMMIT_SHORT}_inbox Logs ===---'
-        docker service logs LEGA-public-${GIT_COMMIT_SHORT}_inbox
-        echo '---=== LEGA-public-${GIT_COMMIT_SHORT}_nginx Logs ===---'
-        docker service logs LEGA-public-${GIT_COMMIT_SHORT}_nginx
-      '''
-      sh '''
-        eval "$(docker-machine env CEGA-${GIT_COMMIT_SHORT})"
-        echo '---=== CEGA-${GIT_COMMIT_SHORT}_cega-mq Logs ===---'
-        docker service logs CEGA-${GIT_COMMIT_SHORT}_cega-mq
-      '''
-      sh '''
-        eval "$(docker-machine env LEGA-private-${GIT_COMMIT_SHORT})"
-        echo '---=== LEGA-private-${GIT_COMMIT_SHORT}-mq Logs ===---'
-        docker service logs LEGA-private-${GIT_COMMIT_SHORT}_mq
-        echo '---=== LEGA-private-${GIT_COMMIT_SHORT}_ingest Logs ===---'
-        docker service logs LEGA-private-${GIT_COMMIT_SHORT}_ingest
-        echo '---=== LEGA-private-${GIT_COMMIT_SHORT}_inbox-s3 Logs ===---'
-        docker service logs LEGA-private-${GIT_COMMIT_SHORT}_inbox-s3
-        echo '---=== LEGA-private-${GIT_COMMIT_SHORT}_vault-s3 Logs ===---'
-        docker service logs LEGA-private-${GIT_COMMIT_SHORT}_vault-s3
-        echo '---=== LEGA-private-${GIT_COMMIT_SHORT}_db Logs ===---'
-        docker service logs LEGA-private-${GIT_COMMIT_SHORT}_db
-        echo '---=== LEGA-private-${GIT_COMMIT_SHORT}_verify Logs ===---'
-        docker service logs LEGA-private-${GIT_COMMIT_SHORT}_verify
-      '''
-    }
     cleanup {
       sh 'docker-machine rm -y CEGA-${GIT_COMMIT_SHORT} LEGA-public-${GIT_COMMIT_SHORT} LEGA-private-${GIT_COMMIT_SHORT}'
     }
