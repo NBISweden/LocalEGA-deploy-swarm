@@ -61,20 +61,6 @@ services:
     volumes:
       - inbox:/ega/inbox
 
-  mediator-client:
-    image: uiobmi/mediator.client:latest
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        window: 120s
-    depends_on:
-      - mq
-    environment:
-      - BROKER_HOST=mq
-      - QUEUES=files,stableIDs
-      - MEDIATOR_SERVER
-
 volumes:
   inbox:
 

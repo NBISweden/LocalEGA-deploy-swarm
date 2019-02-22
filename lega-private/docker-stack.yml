@@ -208,20 +208,6 @@ services:
         target: /etc/ega/conf.ini
     entrypoint: ["gosu", "lega", "ega-ingest"]
 
-  mediator-server:
-    image: uiobmi/mediator.server:latest
-    ports:
-      - "8080:8080"
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        window: 120s
-    depends_on:
-      - mq
-    environment:
-      - BROKER_HOST=mq
-
 volumes:
   inbox_s3:
   vault_s3:

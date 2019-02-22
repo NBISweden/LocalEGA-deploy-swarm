@@ -22,12 +22,10 @@ task createMQConfiguration(type: CreateMQConfigurationTask)
 
 task createInboxConfiguration(type: CreateInboxConfigurationTask)
 
-task createMediatorConfiguration(type: CreateMediatorConfigurationTask)
-
 task createConfiguration {
     setGroup Groups.LEGA_PUBLIC.getName()
 
-    dependsOn "clearConfiguration", "createMQConfiguration", "createInboxConfiguration", "createMediatorConfiguration"
+    dependsOn "clearConfiguration", "createMQConfiguration", "createInboxConfiguration"
 }
 
 task deployStack(type: DeployStackTask) {
