@@ -11,13 +11,6 @@ rabbitmq-plugins enable --offline rabbitmq_federation_management
 rabbitmq-plugins enable --offline rabbitmq_shovel
 rabbitmq-plugins enable --offline rabbitmq_shovel_management
 
-{
-chown rabbitmq:rabbitmq /etc/rabbitmq/rabbitmq.config
-chmod 640 /etc/rabbitmq/rabbitmq.config
-chown rabbitmq:rabbitmq /etc/rabbitmq/defs.json
-chmod 640 /etc/rabbitmq/defs.json
-} || true
-
 # Problem of loading the plugins and definitions out-of-orders.
 # Explanation: https://github.com/rabbitmq/rabbitmq-shovel/issues/13
 # Therefore: we run the server, with some default confs
@@ -84,33 +77,19 @@ cat > /etc/rabbitmq/defs-cega.json <<EOF
 }
 EOF
 
-{
 chown rabbitmq:rabbitmq /etc/rabbitmq/defs-cega.json
 chmod 640 /etc/rabbitmq/defs-cega.json
-} || true
 
-# And...cue music
-{
 chown -R rabbitmq /var/lib/rabbitmq
-} || true
 
 { # Spawn off
-    sleep 5 # Small delay first
-
-    # Wait until the server is ready (because we don't nave netcat we use wait on the pid)
-    ROUND=30
-    until rabbitmqctl wait /var/lib/rabbitmq/mnesia/rabbit@${HOSTNAME}.pid || ((ROUND<0))
-    do
-	sleep 1
-	$((ROUND--))
-    done
-    ((ROUND<0)) && echo "Central EGA broker *_not_* started" 2>&1 && exit 1
+    sleep 30
 
     ROUND=30
     until rabbitmqadmin import /etc/rabbitmq/defs-cega.json || ((ROUND<0))
     do
  	sleep 1
- 	$((ROUND--))
+ 	((ROUND--))
     done
     ((ROUND<0)) && echo "Central EGA connections *_not_* loaded" 2>&1 && exit 1
     echo "Central EGA connections loaded"

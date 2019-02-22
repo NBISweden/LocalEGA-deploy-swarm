@@ -16,19 +16,22 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     command: ["--no-stats", "--no-dockerEvents", "-a", "stack=public", "-a", "rev=${GIT_COMMIT_SHORT}", "-a", "build=${BUILD_NUMBER}"]
 
-  mq:
-    image: rabbitmq:3.7.8-management
+  public-mq:
+    image: rabbitmq:3.7.8-management-alpine
+    hostname: public-mq
     ports:
       - "4369:4369"
       - "5672:5672"
       - "15672:15672"
-      - "35672-35682:35672-35682"
+      - "25672:25672"
     deploy:
       restart_policy:
         condition: on-failure
         delay: 5s
         window: 120s
     environment:
+      - RABBITMQ_NODENAME=public
+      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-setcookie secret # RABBITMQ_ERLANG_COOKIE doesn't work for some reason
       - CEGA_CONNECTION
     configs:
       - source: lega-public.defs.json
@@ -50,8 +53,9 @@ services:
         delay: 5s
         window: 120s
     depends_on:
-      - mq
+      - public-mq
     environment:
+      - BROKER_HOST=public-mq
       - CEGA_ENDPOINT
       - CEGA_ENDPOINT_CREDS
       - S3_ACCESS_KEY=${INBOX_S3_ACCESS_KEY}

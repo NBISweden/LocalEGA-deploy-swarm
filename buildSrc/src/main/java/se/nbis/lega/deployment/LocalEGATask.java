@@ -29,6 +29,8 @@ public abstract class LocalEGATask extends DefaultTask {
     public static final List<String> DOCKER_ENV_VARS =
                     Arrays.asList("DOCKER_TLS_VERIFY", "DOCKER_HOST", "DOCKER_CERT_PATH", "DOCKER_MACHINE_NAME");
 
+    public static final String PUBLIC_MQ_IP = "PUBLIC_MQ_IP";
+    public static final String PRIVATE_MQ_IP = "PRIVATE_MQ_IP";
     public static final String LEGA_INSTANCES = "LEGA_INSTANCES";
     public static final String LEGA_INSTANCE_NAME = "lega";
     public static final String INBOX_S3_ACCESS_KEY = "INBOX_S3_ACCESS_KEY";

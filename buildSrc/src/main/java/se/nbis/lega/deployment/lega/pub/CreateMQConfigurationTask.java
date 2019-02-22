@@ -14,14 +14,12 @@ public class CreateMQConfigurationTask extends LegaPublicTask {
         createConfig(Config.ENTRYPOINT_SH.getName(), getProject().file("mq/entrypoint.sh"));
         String cegaMQPassword =
             readTrace(getProject().getParent().file(CEGA_TMP_TRACE), "CEGA_MQ_PASSWORD");
-        if (cegaMQPassword != null) {
-            String host = getProperty("cegaIP");
-            if (host == null) {
-                host = getMachineIPAddress(Machine.CEGA.getName());
-            }
-            writeTrace(CEGA_CONNECTION,
-                String.format("amqp://lega:%s@%s:5672/lega", cegaMQPassword, host));
+        String host = getProperty("cegaIP");
+        if (host == null) {
+            host = getMachineIPAddress(Machine.CEGA.getName());
         }
+        writeTrace(CEGA_CONNECTION,
+            String.format("amqp://lega:%s@%s:5672/lega", cegaMQPassword, host));
     }
 
 }
