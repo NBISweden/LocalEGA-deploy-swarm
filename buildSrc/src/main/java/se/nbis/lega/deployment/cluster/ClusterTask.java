@@ -7,7 +7,6 @@ import se.nbis.lega.deployment.LocalEGATask;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -38,22 +37,18 @@ public abstract class ClusterTask extends LocalEGATask {
         return getMachines(name).get(name);
     }
 
-    protected Map<String, String> createMachineOpenStack(String name, String openStackConfig) throws IOException {
+    protected Map<String, String> createMachineOpenStack(String name, String openStackConfig)
+        throws IOException {
         return createMachineOpenStack(name, readFileAsMap(new File(openStackConfig)));
     }
 
-    protected Map<String, String> createMachineOpenStack(String name, Map<String, String> openStackEnvironment)
-                    throws IOException {
+    protected Map<String, String> createMachineOpenStack(String name,
+        Map<String, String> openStackEnvironment) throws IOException {
         log.info("createMachineOpenStack");
         try {
-            List<String> output =
-                            exec(true, openStackEnvironment, "docker-machine create", "--driver", "openstack", name);
-            for (String line : output) {
-                log.info(line);
-            }
-            if (output.get(0).startsWith("Error checking TLS connection")) {
-                regenerateCertificates(name, openStackEnvironment);
-            }
+            exec(true, openStackEnvironment, "docker-machine create", "--driver", "openstack",
+                name);
+            regenerateCertificates(name, openStackEnvironment);
         } catch (Exception e) {
             log.error("Error Creating openStack machine: " + e.getMessage());
             e.printStackTrace();
