@@ -2,6 +2,20 @@ version: '3.3'
 
 services:
 
+  logzio:
+    image: logzio/logzio-docker
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        window: 120s
+    environment:
+      - LOGZIO_TOKEN
+      - LOGZIO_ZONE=us
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: ["--no-stats", "--no-dockerEvents", "-a", "stack=private", "-a", "rev=${GIT_COMMIT_SHORT}", "-a", "build=${BUILD_NUMBER}"]
+
   mq:
     image: rabbitmq:3.7.8-management
     deploy:
@@ -208,23 +222,10 @@ services:
     environment:
       - BROKER_HOST=mq
 
-  portainer:
-    image: portainer/portainer:latest
-    ports:
-        - "30000:9000"
-    command: --no-auth
-    deploy:
-      placement:
-        constraints: [node.role == manager]
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - portainer:/data
-
 volumes:
   inbox_s3:
   vault_s3:
   db:
-  portainer:
 
 configs:
   lega-private.defs.json:
