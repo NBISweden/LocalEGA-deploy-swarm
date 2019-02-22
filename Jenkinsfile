@@ -39,17 +39,17 @@ pipeline {
       parallel(
             "CEGA": {
                       sh '''
-                        gradle :cluster:createCEGAMachine -Pmachine=CEGA-${ID} --stacktrace
+                        gradle :cluster:createCEGAMachine -Pmachine=CEGA-${ID} --stacktrace -i
                       '''
             },
             "LEGA Public": {
                       sh '''
-                        gradle :cluster:createLEGAPublicMachine -Pmachine=LEGA-public-${ID} --stacktrace
+                        gradle :cluster:createLEGAPublicMachine -Pmachine=LEGA-public-${ID} --stacktrace -i
                       '''
             },
             "LEGA Private": {
                       sh '''
-                        gradle :cluster:createLEGAPrivateMachine -Pmachine=LEGA-private-${ID} --stacktrace
+                        gradle :cluster:createLEGAPrivateMachine -Pmachine=LEGA-private-${ID} --stacktrace -i
                       '''
             }
           )
