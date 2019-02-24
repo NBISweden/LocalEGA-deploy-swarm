@@ -93,7 +93,6 @@ pipeline {
           sh '''
             gradle :lega-private:deployStack -Pmachine=LEGA-private-${ID} --stacktrace
           '''
-        }
       }
     }
 

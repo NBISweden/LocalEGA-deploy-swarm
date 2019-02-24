@@ -78,11 +78,11 @@ To make sure that the system is deployed you can execute `gradle ls`.
 `gradle :cega:removeStack`, `gradle :lega-private:removeStack`, `lega-public :cega:removeStack` will remove deployed stacks 
 (yet preserving bootstrapped configuration). To clean configurations and remove stack you can use script like this:
 ```
-gradle :cega:removeStack
-gradle :cega:clearConfiguration
-gradle :lega-private:removeStack
-gradle :lega-private:clearConfiguration
-gradle :lega-public:removeStack
+gradle :cega:removeStack && \
+gradle :cega:clearConfiguration && \
+gradle :lega-private:removeStack && \
+gradle :lega-private:clearConfiguration && \
+gradle :lega-public:removeStack && \
 gradle :lega-public:clearConfiguration
 ```
 
