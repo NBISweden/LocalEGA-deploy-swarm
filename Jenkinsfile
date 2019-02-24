@@ -90,6 +90,8 @@ pipeline {
             gradle :lega-public:deployStack -Pmachine=LEGA-public-${ID} --stacktrace
           '''
 
+          sleep 10
+
           sh '''
             gradle :lega-private:deployStack -Pmachine=LEGA-private-${ID} --stacktrace
           '''
@@ -180,6 +182,8 @@ pipeline {
                 sh '''
                   gradle :lega-public:deployStack -Pmachine=lega-public-staging --stacktrace
                 '''
+
+                sleep 10
 
                 sh '''
                   gradle :lega-private:deployStack -Pmachine=lega-private-staging --stacktrace
