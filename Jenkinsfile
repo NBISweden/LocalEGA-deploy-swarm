@@ -82,23 +82,18 @@ pipeline {
 
     stage('Deploy') {
       steps {
-      parallel(
-            "CEGA": {
-                      sh '''
-                        gradle :cega:deployStack -Pmachine=CEGA-${ID} --stacktrace
-                      '''
-            },
-            "LEGA Public": {
-                      sh '''
-                        gradle :lega-public:deployStack -Pmachine=LEGA-public-${ID} --stacktrace
-                      '''
-            },
-            "LEGA Private": {
-                      sh '''
-                        gradle :lega-private:deployStack -Pmachine=LEGA-private-${ID} --stacktrace
-                      '''
-            }
-          )
+          sh '''
+            gradle :cega:deployStack -Pmachine=CEGA-${ID} --stacktrace
+          '''
+
+          sh '''
+            gradle :lega-public:deployStack -Pmachine=LEGA-public-${ID} --stacktrace
+          '''
+
+          sh '''
+            gradle :lega-private:deployStack -Pmachine=LEGA-private-${ID} --stacktrace
+          '''
+        }
       }
     }
 
@@ -179,24 +174,18 @@ pipeline {
 
           stage('Deploy') {
             steps {
-            parallel(
-                  "CEGA": {
-                    sh '''
-                      gradle :cega:deployStack -Pmachine=cega-staging --stacktrace
-                    '''
-                  },
-                  "LEGA Public": {
-                    sh '''
-                      gradle :lega-public:deployStack -Pmachine=lega-public-staging --stacktrace
-                    '''
-                  },
-                  "LEGA Private": {
-                    sh '''
-                      gradle :lega-private:deployStack -Pmachine=lega-private-staging --stacktrace
-                    '''
-                  }
-                )
-            }
+                sh '''
+                  gradle :cega:deployStack -Pmachine=cega-staging --stacktrace
+                '''
+
+                sh '''
+                  gradle :lega-public:deployStack -Pmachine=lega-public-staging --stacktrace
+                '''
+
+                sh '''
+                  gradle :lega-private:deployStack -Pmachine=lega-private-staging --stacktrace
+                '''
+             }
           }
 
           stage('Initialization') {
