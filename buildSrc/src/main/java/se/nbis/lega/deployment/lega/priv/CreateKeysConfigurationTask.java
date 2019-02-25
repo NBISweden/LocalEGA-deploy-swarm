@@ -78,7 +78,7 @@ public class CreateKeysConfigurationTask extends LegaPrivateTask {
 
     private void generateSSLCertificate()
         throws IOException, GeneralSecurityException, OperatorCreationException {
-        KeyPair keyPair = KeyUtils.generateKeyPair("ssh-rsa", 4096);
+        KeyPair keyPair = KeyUtils.generateKeyPair("ssh-rsa", 2048);
 
         X500Name subject = new X500NameBuilder(BCStyle.INSTANCE).addRDN(BCStyle.C, "NO")
             .addRDN(BCStyle.ST, "Norway").addRDN(BCStyle.L, "Oslo").addRDN(BCStyle.O, "UiO")
@@ -140,7 +140,7 @@ public class CreateKeysConfigurationTask extends LegaPrivateTask {
         RSAKeyPairGenerator keyPairGenerator = new RSAKeyPairGenerator();
 
         keyPairGenerator.init(
-            new RSAKeyGenerationParameters(BigInteger.valueOf(0x10001), new SecureRandom(), 4096,
+            new RSAKeyGenerationParameters(BigInteger.valueOf(0x10001), new SecureRandom(), 2048,
                 12));
 
         PGPKeyPair rsaKeyPair =
