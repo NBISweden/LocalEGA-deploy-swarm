@@ -131,7 +131,7 @@ pipeline {
                 )
         }
         when {
-           branch "master"
+           branch "feature/use-test-cega"
         }
         stages{
           stage('Tear down') {
