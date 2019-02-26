@@ -218,7 +218,11 @@ pipeline {
 
   post('Remove VM') {
     cleanup {
-      sh 'docker-machine rm -y CEGA-${ID} LEGA-public-${ID} LEGA-private-${ID}'
+//      sh 'docker-machine rm -y CEGA-${ID} LEGA-public-${ID} LEGA-private-${ID}'
+//      sh 'gradle :cluster:removeMachine -Pmachine=CEGA-${ID} --stacktrace -i'
+//      sh 'gradle :cluster:removeMachine -Pmachine=LEGA-public-${ID} --stacktrace -i'
+//      sh 'gradle :cluster:removeMachine -Pmachine=LEGA-private-${ID} --stacktrace -i'
+      sh 'gradle :cluster:destroy  --stacktrace -i'
     }
   }
 

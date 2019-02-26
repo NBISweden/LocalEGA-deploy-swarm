@@ -28,6 +28,12 @@ task provision() {
     dependsOn ":cluster:createCEGAMachine", ":cluster:createLEGAPublicMachine", ":cluster:createLEGAPrivateMachine"
 }
 
+task removeMachine(type: RemoveMachineTask) {
+    setGroup Groups.CLUSTER.getName()
+    
+    setMachineName Machine.CEGA.getName()
+}
+
 task removeCEGAMachine(type: RemoveMachineTask) {
     setGroup Groups.CLUSTER.getName()
 
