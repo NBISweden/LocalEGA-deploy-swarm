@@ -28,7 +28,7 @@ services:
       - "public-mq:${PUBLIC_MQ_IP}"
     environment:
       - RABBITMQ_NODENAME=private
-      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-setcookie secret # RABBITMQ_ERLANG_COOKIE doesn't work for some reason
+      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-setcookie ${COOKIE} # RABBITMQ_ERLANG_COOKIE doesn't work for some reason
     configs:
       - source: lega-private.rabbitmq.config
         target: /etc/rabbitmq/rabbitmq.config

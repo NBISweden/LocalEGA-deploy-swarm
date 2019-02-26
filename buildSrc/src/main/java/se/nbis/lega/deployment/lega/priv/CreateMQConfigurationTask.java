@@ -4,6 +4,7 @@ import org.gradle.api.tasks.TaskAction;
 import se.nbis.lega.deployment.cluster.Machine;
 
 import java.io.IOException;
+import java.util.UUID;
 
 public class CreateMQConfigurationTask extends LegaPrivateTask {
 
@@ -15,6 +16,7 @@ public class CreateMQConfigurationTask extends LegaPrivateTask {
             host = getMachineIPAddress(Machine.LEGA_PUBLIC.getName());
         }
         writeTrace(PUBLIC_MQ_IP, host);
+        writeTrace(COOKIE, UUID.randomUUID().toString().replace("-", ""));
     }
 
 }

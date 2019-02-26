@@ -20,6 +20,8 @@ public class CreateMQConfigurationTask extends LegaPublicTask {
         }
         writeTrace(CEGA_CONNECTION,
             String.format("amqp://lega:%s@%s:5672/lega", cegaMQPassword, host));
+        String cookie = readTrace(getProject().getParent().file(LEGA_PRIVATE_TMP_TRACE), COOKIE);
+        writeTrace(COOKIE, cookie);
     }
 
 }

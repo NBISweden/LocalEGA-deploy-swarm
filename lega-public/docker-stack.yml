@@ -31,7 +31,7 @@ services:
         window: 120s
     environment:
       - RABBITMQ_NODENAME=public
-      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-setcookie secret # RABBITMQ_ERLANG_COOKIE doesn't work for some reason
+      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-setcookie ${COOKIE} # RABBITMQ_ERLANG_COOKIE doesn't work for some reason
       - CEGA_CONNECTION
     configs:
       - source: lega-public.defs.json
