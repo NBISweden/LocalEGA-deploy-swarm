@@ -37,14 +37,14 @@ pipeline {
     stage('Create VMs') {
       steps {
       parallel(
-            "CEGA": {
-                      sh '''
-                        gradle :cluster:createCEGAMachine -Pmachine=CEGA-${ID} --stacktrace -i
-                      '''
-            },
+//            "CEGA": {
+//                      sh '''
+//                        gradle :cluster:createCEGAMachine -Pmachine=CEGA-${ID} --stacktrace -i
+//                      '''
+//            },
             "LEGA Public": {
                       sh '''
-                        gradle :cluster:createLEGAPublicMachine -Pmachine=LEGA-public-${ID} --stacktrace -i
+                        gradle :cluster:createLEGAPublicMachine -Pmachine=LEGA-public-${ID} -PTEST_CEGA=yes --stacktrace -i
                       '''
             },
             "LEGA Private": {
@@ -59,13 +59,14 @@ pipeline {
     stage('Bootstrap') {
       steps {
           sh '''
-            gradle :cega:createConfiguration \
-                -Pmachine=CEGA-${ID} \
-                --stacktrace
+#            gradle :cega:createConfiguration \
+#                -Pmachine=CEGA-${ID} \
+#                --stacktrace
 
             gradle :lega-private:createConfiguration \
                 -Pmachine=LEGA-private-${ID} \
                 -PcegaIP=$(docker-machine ip LEGA-public-${ID}) \
+                -PTEST_CEGA=yes \
                 --stacktrace
 
             gradle :lega-public:createConfiguration \
@@ -80,11 +81,11 @@ pipeline {
     stage('Deploy') {
       steps {
       parallel(
-            "CEGA": {
-                      sh '''
-                        gradle :cega:deployStack -Pmachine=CEGA-${ID} --stacktrace
-                      '''
-            },
+//            "CEGA": {
+//                      sh '''
+//                        gradle :cega:deployStack -Pmachine=CEGA-${ID} --stacktrace
+//                      '''
+//            },
             "LEGA Public": {
                       sh '''
                         gradle :lega-public:deployStack -Pmachine=LEGA-public-${ID} --stacktrace
@@ -131,19 +132,19 @@ pipeline {
                 )
         }
         when {
-           branch "feature/use-test-cega"
+           branch "master"
         }
         stages{
           stage('Tear down') {
             steps {
                 sh '''
-                  gradle :cega:removeStack -Pmachine=cega-staging --stacktrace
+#                  gradle :cega:removeStack -Pmachine=cega-staging --stacktrace
                   gradle :lega-private:removeStack -Pmachine=lega-private-staging --stacktrace
                   gradle :lega-public:removeStack -Pmachine=lega-public-staging --stacktrace
 
                   sleep 10
 
-                  gradle prune -Pmachine=cega-staging --stacktrace
+#                  gradle prune -Pmachine=cega-staging --stacktrace
                   gradle prune -Pmachine=lega-private-staging --stacktrace
                   gradle prune -Pmachine=lega-public-staging --stacktrace
                 '''
@@ -153,9 +154,9 @@ pipeline {
           stage('Bootstrap') {
             steps {
                 sh '''
-                  gradle :cega:createConfiguration \
-                      -Pmachine=cega-staging \
-                      --stacktrace
+#                  gradle :cega:createConfiguration \
+#                      -Pmachine=cega-staging \
+#                      --stacktrace
 
                   gradle :lega-private:createConfiguration \
                       -Pmachine=lega-private-staging \
@@ -174,11 +175,11 @@ pipeline {
           stage('Deploy') {
             steps {
             parallel(
-                  "CEGA": {
-                    sh '''
-                      gradle :cega:deployStack -Pmachine=cega-staging --stacktrace
-                    '''
-                  },
+//                  "CEGA": {
+//                    sh '''
+//                      gradle :cega:deployStack -Pmachine=cega-staging --stacktrace
+//                    '''
+//                  },
                   "LEGA Public": {
                     sh '''
                       gradle :lega-public:deployStack -Pmachine=lega-public-staging --stacktrace
@@ -222,7 +223,6 @@ pipeline {
       sh 'gradle :cluster:removeMachine -Pmachine=CEGA-${ID} --stacktrace -i'
       sh 'gradle :cluster:removeMachine -Pmachine=LEGA-public-${ID} --stacktrace -i'
       sh 'gradle :cluster:removeMachine -Pmachine=LEGA-private-${ID} --stacktrace -i'
-//      sh 'gradle :cluster:destroy  --stacktrace -i'
     }
   }
 
