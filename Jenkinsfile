@@ -88,12 +88,12 @@ pipeline {
 //            },
             "LEGA Public": {
                       sh '''
-                        gradle :lega-public:deployStack -Pmachine=LEGA-public-${ID} --stacktrace
+                        gradle :lega-public:deployStack -Pmachine=LEGA-public-${ID} -PTEST_CEGA=yes --stacktrace
                       '''
             },
             "LEGA Private": {
                       sh '''
-                        gradle :lega-private:deployStack -Pmachine=LEGA-private-${ID} --stacktrace
+                        gradle :lega-private:deployStack -Pmachine=LEGA-private-${ID} -PTEST_CEGA=yes --stacktrace
                       '''
             }
           )
@@ -111,7 +111,11 @@ pipeline {
     stage('Test') {
       steps {
         sh '''
-          gradle ingest -PcegaIP=$(docker-machine ip CEGA-${ID}) -PlegaPublicIP=$(docker-machine ip LEGA-public-${ID}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${ID}) --stacktrace
+          gradle ingest \
+#          -PcegaIP=$(docker-machine ip CEGA-${ID}) \
+          -PlegaPublicIP=$(docker-machine ip LEGA-public-${ID}) \
+          -PlegaPrivateIP=$(docker-machine ip LEGA-private-${ID}) \
+          -PTEST_CEGA=yes --stacktrace -d
         '''
       }
     }
@@ -132,7 +136,7 @@ pipeline {
                 )
         }
         when {
-           branch "master"
+           branch "feature/use-test-cega"
         }
         stages{
           stage('Tear down') {
@@ -160,13 +164,13 @@ pipeline {
 
                   gradle :lega-private:createConfiguration \
                       -Pmachine=lega-private-staging \
-                      -PcegaIP=${LEGA_public_IP} \
+                      -PcegaIP=${LEGA_public_IP} -PTEST_CEGA=yes \
                       --stacktrace
 
                   gradle :lega-public:createConfiguration \
                       -Pmachine=lega-public-staging \
                       -PcegaIP=${CEGA_IP} \
-                      -PlegaPrivateIP=${LEGA_private_IP} \
+                      -PlegaPrivateIP=${LEGA_private_IP} -PTEST_CEGA=yes \
                       --stacktrace
                 '''
             }
@@ -182,12 +186,12 @@ pipeline {
 //                  },
                   "LEGA Public": {
                     sh '''
-                      gradle :lega-public:deployStack -Pmachine=lega-public-staging --stacktrace
+                      gradle :lega-public:deployStack -Pmachine=lega-public-staging -PTEST_CEGA=yes --stacktrace
                     '''
                   },
                   "LEGA Private": {
                     sh '''
-                      gradle :lega-private:deployStack -Pmachine=lega-private-staging --stacktrace
+                      gradle :lega-private:deployStack -Pmachine=lega-private-staging -PTEST_CEGA=yes --stacktrace
                     '''
                   }
                 )
@@ -206,10 +210,11 @@ pipeline {
             steps {
               sh '''
                 gradle ingest \
-                  -PcegaIP=${CEGA_IP} \
+#                  -PcegaIP=${CEGA_IP} \
                   -PlegaPublicIP=${LEGA_public_IP} \
                   -PlegaPrivateIP=${LEGA_private_IP} \
-                  --stacktrace
+                  -PTEST_CEGA=yes \
+                  --stacktrace -d
               '''
             }
           }
@@ -220,7 +225,7 @@ pipeline {
   post('Remove VM') {
     cleanup {
 //      sh 'docker-machine rm -y CEGA-${ID} LEGA-public-${ID} LEGA-private-${ID}'
-      sh 'gradle :cluster:removeMachine -Pmachine=CEGA-${ID} --stacktrace -i'
+//      sh 'gradle :cluster:removeMachine -Pmachine=CEGA-${ID} --stacktrace -i'
       sh 'gradle :cluster:removeMachine -Pmachine=LEGA-public-${ID} --stacktrace -i'
       sh 'gradle :cluster:removeMachine -Pmachine=LEGA-private-${ID} --stacktrace -i'
     }
