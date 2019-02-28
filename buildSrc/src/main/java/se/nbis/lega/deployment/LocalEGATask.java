@@ -143,6 +143,10 @@ public abstract class LocalEGATask extends DefaultTask {
         }
     }
 
+    protected void removeConfig(Set<String> names) throws IOException {
+        exec(true, getMachineEnvironment(machineName), "docker config rm " + String.join(" ", names));
+    }
+
     protected void removeVolume(String name) throws IOException {
         exec(true, getMachineEnvironment(machineName), "docker volume rm --force", name);
     }

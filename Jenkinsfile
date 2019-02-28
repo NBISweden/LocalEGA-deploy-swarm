@@ -31,6 +31,7 @@ pipeline {
                     returnStdout: true
             )
     LOGZIO_TOKEN=credentials('LOGZIO_TOKEN')
+    CEGA_HOST=egatest.crg.eu
   }
 
   stages {
@@ -44,12 +45,12 @@ pipeline {
 //            },
             "LEGA Public": {
                       sh '''
-                        gradle :cluster:createLEGAPublicMachine -Pmachine=LEGA-public-${ID} --stacktrace -i
+                        gradle :cluster:createLEGAPublicMachine -Pmachine=LEGA-public-${ID} -PTEST_CEGA=${CEGA_HOST} --stacktrace -i
                       '''
             },
             "LEGA Private": {
                       sh '''
-                        gradle :cluster:createLEGAPrivateMachine -Pmachine=LEGA-private-${ID} --stacktrace -i
+                        gradle :cluster:createLEGAPrivateMachine -Pmachine=LEGA-private-${ID} -PTEST_CEGA=${CEGA_HOST} --stacktrace -i
                       '''
             }
           )
@@ -65,14 +66,14 @@ pipeline {
 
             gradle :lega-private:createConfiguration \
                 -Pmachine=LEGA-private-${ID} \
-                -PTEST_CEGA=yes \
+                -PTEST_CEGA=${CEGA_HOST} \
                 --stacktrace -i
 #                -PcegaIP=$(docker-machine ip LEGA-public-${ID}) \
 
             gradle :lega-public:createConfiguration \
                 -Pmachine=LEGA-public-${ID} \
                 -PlegaPrivateIP=$(docker-machine ip LEGA-private-${ID}) \
-                -PTEST_CEGA=yes \
+                -PTEST_CEGA=${CEGA_HOST} \
                 --stacktrace -i
 #                -PcegaIP=$(docker-machine ip CEGA-${ID}) \
           '''
@@ -89,12 +90,12 @@ pipeline {
 //            },
             "LEGA Public": {
                       sh '''
-                        gradle :lega-public:deployStack -Pmachine=LEGA-public-${ID} -PTEST_CEGA=yes --stacktrace -i
+                        gradle :lega-public:deployStack -Pmachine=LEGA-public-${ID} -PTEST_CEGA=${CEGA_HOST} --stacktrace -i
                       '''
             },
             "LEGA Private": {
                       sh '''
-                        gradle :lega-private:deployStack -Pmachine=LEGA-private-${ID} -PTEST_CEGA=yes --stacktrace -i
+                        gradle :lega-private:deployStack -Pmachine=LEGA-private-${ID} -PTEST_CEGA=${CEGA_HOST} --stacktrace -i
                       '''
             }
           )
@@ -115,7 +116,7 @@ pipeline {
           gradle ingest \
           -PlegaPublicIP=$(docker-machine ip LEGA-public-${ID}) \
           -PlegaPrivateIP=$(docker-machine ip LEGA-private-${ID}) \
-          -PTEST_CEGA=yes --stacktrace -d
+          -PTEST_CEGA=${CEGA_HOST} --stacktrace -d
 #          -PcegaIP=$(docker-machine ip CEGA-${ID}) \
         '''
       }
@@ -165,13 +166,13 @@ pipeline {
 
                   gradle :lega-private:createConfiguration \
                       -Pmachine=lega-private-staging \
-                      -PcegaIP=${LEGA_public_IP} -PTEST_CEGA=yes \
+                      -PcegaIP=${LEGA_public_IP} -PTEST_CEGA=${CEGA_HOST} \
                       --stacktrace -i
 
                   gradle :lega-public:createConfiguration \
                       -Pmachine=lega-public-staging \
                       -PcegaIP=${CEGA_IP} \
-                      -PlegaPrivateIP=${LEGA_private_IP} -PTEST_CEGA=yes \
+                      -PlegaPrivateIP=${LEGA_private_IP} -PTEST_CEGA=${CEGA_HOST} \
                       --stacktrace -i
                 '''
             }
@@ -187,12 +188,12 @@ pipeline {
 //                  },
                   "LEGA Public": {
                     sh '''
-                      gradle :lega-public:deployStack -Pmachine=lega-public-staging -PTEST_CEGA=yes --stacktrace -i
+                      gradle :lega-public:deployStack -Pmachine=lega-public-staging -PTEST_CEGA=${CEGA_HOST} --stacktrace -i
                     '''
                   },
                   "LEGA Private": {
                     sh '''
-                      gradle :lega-private:deployStack -Pmachine=lega-private-staging -PTEST_CEGA=yes --stacktrace -i
+                      gradle :lega-private:deployStack -Pmachine=lega-private-staging -PTEST_CEGA=${CEGA_HOST} --stacktrace -i
                     '''
                   }
                 )
@@ -213,7 +214,7 @@ pipeline {
                 gradle ingest \
                   -PlegaPublicIP=${LEGA_public_IP} \
                   -PlegaPrivateIP=${LEGA_private_IP} \
-                  -PTEST_CEGA=yes \
+                  -PTEST_CEGA=${CEGA_HOST} \
                   --stacktrace -d
 #                  -PcegaIP=${CEGA_IP} \
               '''
