@@ -100,7 +100,7 @@ public abstract class LocalEGATask extends DefaultTask {
         String existingValue = readTrace(traceFile, key);
         if (existingValue == null) {
             FileUtils.writeLines(traceFile, Collections.singleton(String.format("%s=%s", key, value)), true);
-            log.info("wrinting in file %s %s=%s", traceFile, key, value);
+            log.info("writing in file %s %s=%s", traceFile.getAbsolutePath(), key, value);
         }
     }
 
@@ -135,7 +135,11 @@ public abstract class LocalEGATask extends DefaultTask {
     }
 
     protected void removeConfig(String name) throws IOException {
-        exec(true, getMachineEnvironment(machineName), "docker config rm", name);
+        boolean configExist =
+                        exec(true, getMachineEnvironment(machineName), "docker config ls -q -f NAME=", name).size() > 0;
+        if (configExist) {
+            exec(true, getMachineEnvironment(machineName), "docker config rm", name);
+        }
     }
 
     protected void removeVolume(String name) throws IOException {
