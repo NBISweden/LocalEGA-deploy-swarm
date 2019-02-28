@@ -116,7 +116,7 @@ pipeline {
           gradle ingest \
           -PlegaPublicIP=$(docker-machine ip LEGA-public-${ID}) \
           -PlegaPrivateIP=$(docker-machine ip LEGA-private-${ID}) \
-          -PTEST_CEGA=${CEGA_HOST} --stacktrace -d
+          -PTEST_CEGA=${CEGA_HOST} --stacktrace -i
 #          -PcegaIP=$(docker-machine ip CEGA-${ID}) \
         '''
       }
@@ -215,7 +215,7 @@ pipeline {
                   -PlegaPublicIP=${LEGA_public_IP} \
                   -PlegaPrivateIP=${LEGA_private_IP} \
                   -PTEST_CEGA=${CEGA_HOST} \
-                  --stacktrace -d
+                  --stacktrace -i
 #                  -PcegaIP=${CEGA_IP} \
               '''
             }
