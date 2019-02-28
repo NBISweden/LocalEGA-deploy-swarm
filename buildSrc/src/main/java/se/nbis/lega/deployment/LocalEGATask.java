@@ -1,5 +1,6 @@
 package se.nbis.lega.deployment;
 
+import static java.lang.String.format;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -99,8 +100,8 @@ public abstract class LocalEGATask extends DefaultTask {
     public void writeTrace(File traceFile, String key, String value) throws IOException {
         String existingValue = readTrace(traceFile, key);
         if (existingValue == null) {
-            FileUtils.writeLines(traceFile, Collections.singleton(String.format("%s=%s", key, value)), true);
-            log.info("writing in file %s %s=%s", traceFile.getAbsolutePath(), key, value);
+            FileUtils.writeLines(traceFile, Collections.singleton(format("%s=%s", key, value)), true);
+            log.info(format("writing in file %s %s=%s", traceFile.getAbsolutePath(), key, value));
         }
     }
 
@@ -135,8 +136,8 @@ public abstract class LocalEGATask extends DefaultTask {
     }
 
     protected void removeConfig(String name) throws IOException {
-        boolean configExist =
-                        exec(true, getMachineEnvironment(machineName), "docker config ls -q -f NAME=", name).size() > 0;
+        List<String> rs = exec(true, getMachineEnvironment(machineName), "docker config ls -q -f NAME=" + name);
+        boolean configExist = rs.get(0).length() > 0;
         if (configExist) {
             exec(true, getMachineEnvironment(machineName), "docker config rm", name);
         }
