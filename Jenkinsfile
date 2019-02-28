@@ -31,7 +31,7 @@ pipeline {
                     returnStdout: true
             )
     LOGZIO_TOKEN=credentials('LOGZIO_TOKEN')
-    CEGA_HOST=egatest.crg.eu
+    CEGA_HOST='egatest.crg.eu'
   }
 
   stages {
