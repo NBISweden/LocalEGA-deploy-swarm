@@ -100,6 +100,7 @@ public abstract class LocalEGATask extends DefaultTask {
         String existingValue = readTrace(traceFile, key);
         if (existingValue == null) {
             FileUtils.writeLines(traceFile, Collections.singleton(String.format("%s=%s", key, value)), true);
+            log.info("wrinting in file %s %s=%s", traceFile, key, value);
         }
     }
 
