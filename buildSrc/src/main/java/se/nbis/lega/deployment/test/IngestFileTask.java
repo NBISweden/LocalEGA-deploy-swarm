@@ -101,7 +101,7 @@ public class IngestFileTask extends TestTask {
             }
         } else {
             username = "norway1";
-            String password = "uaLu%H^R4qbF4QT_";
+            String password = System.getenv(CEGA_MQ_PASSWORD);
             String port = "5271";
             String vhost = "norway1";
             host = "hellgate.crg.eu";

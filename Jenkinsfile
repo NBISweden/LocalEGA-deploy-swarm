@@ -227,6 +227,13 @@ pipeline {
   }
 
   post('Remove VM') {
+    failure{
+      sh '''
+        gradle :cluster:serviceLogs -Pmachine=LEGA-public-${ID} -Pservice=inbox --stacktrace -i
+        gradle :cluster:serviceLogs -Pmachine=LEGA-public-${ID} -Pservice=mq --stacktrace -i
+      '''
+      }
+
     cleanup {
 //      sh 'docker-machine rm -y CEGA-${ID} LEGA-public-${ID} LEGA-private-${ID}'
 //      sh 'gradle :cluster:removeMachine -Pmachine=CEGA-${ID} --stacktrace -i'

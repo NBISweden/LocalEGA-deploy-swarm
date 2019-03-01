@@ -61,3 +61,4 @@ task destroy() {
 
 task list(type: ListTask)
 task listServices(type: ListServicesTask)
+task serviceLogs(type: ServiceLogsTask)

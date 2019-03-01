@@ -11,7 +11,7 @@ public class CreateMQConfigurationTask extends LegaPublicTask {
         createConfig(Config.DEFS_JSON.getName(), getProject().file("mq/defs.json"));
         createConfig(Config.RABBITMQ_CONFIG.getName(), getProject().file("mq/rabbitmq.config"));
         createConfig(Config.ENTRYPOINT_SH.getName(), getProject().file("mq/entrypoint.sh"));
-        String cegaMQPassword = readTrace(getProject().getParent().file(CEGA_TMP_TRACE), "CEGA_MQ_PASSWORD");
+        String cegaMQPassword = readTrace(getProject().getParent().file(CEGA_TMP_TRACE), CEGA_MQ_PASSWORD);
         String host = getProperty(CEGA_IP);
         if (cegaMQPassword != null) {
             if (host == null) {
@@ -20,7 +20,7 @@ public class CreateMQConfigurationTask extends LegaPublicTask {
             writeTrace(CEGA_CONNECTION, String.format("amqp://lega:%s@%s:5672/lega", cegaMQPassword, host));
         } else if (getProperty(TEST_CEGA) != null) {
             String user = "norway1";
-            String password = "uaLu%H^R4qbF4QT_";
+            String password = System.getenv(CEGA_MQ_PASSWORD);
             String port = "5271";
             String vhost = "norway1";
             host = "hellgate.crg.eu";

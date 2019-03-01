@@ -10,8 +10,10 @@ public class CreateInboxConfigurationTask extends LegaPublicTask {
     public void run() throws IOException {
         String cegaRESTPassword = readTrace(getProject().getParent().file(CEGA_TMP_TRACE), CEGA_REST_PASSWORD);
         String cegaHost = getProperty(TEST_CEGA);
+        String user = "lega";
         if (cegaHost != null) {
-            cegaRESTPassword = "pqax576fbsfe";
+            cegaRESTPassword = System.getenv(CEGA_REST_PASSWORD);
+            user = "norway1";
         } else if (cegaRESTPassword != null) {
             cegaHost = getProperty(CEGA_IP);
             if (cegaHost == null) {
@@ -19,7 +21,7 @@ public class CreateInboxConfigurationTask extends LegaPublicTask {
             }
         }
         writeTrace(CEGA_ENDPOINT, String.format("http://%s/lega/v1/legas/users/%%s?idType=username", cegaHost));
-        writeTrace(CEGA_ENDPOINT_CREDS, "lega:" + cegaRESTPassword);
+        writeTrace(CEGA_ENDPOINT_CREDS, user + ":" + cegaRESTPassword);
         String inboxAccessKey = readTrace(getProject().getParent().file(LEGA_PRIVATE_TMP_TRACE), INBOX_S3_ACCESS_KEY);
         String inboxSecretKey = readTrace(getProject().getParent().file(LEGA_PRIVATE_TMP_TRACE), INBOX_S3_SECRET_KEY);
         writeTrace(INBOX_S3_ACCESS_KEY, inboxAccessKey);
