@@ -106,6 +106,8 @@ pipeline {
       steps {
         sh '''
           sleep 180
+          gradle :cluster:listServices -Pmachine=LEGA-private-${ID} --stacktrace -i
+          gradle :cluster:listServices -Pmachine=LEGA-public-${ID} --stacktrace -i
         '''
       }
     }

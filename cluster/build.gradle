@@ -3,6 +3,7 @@ import se.nbis.lega.deployment.cluster.CreateMachineTask
 import se.nbis.lega.deployment.cluster.ListTask
 import se.nbis.lega.deployment.cluster.Machine
 import se.nbis.lega.deployment.cluster.RemoveMachineTask
+import se.nbis.lega.deployment.cluster.ListServicesTask
 
 task createCEGAMachine(type: CreateMachineTask) {
     setGroup Groups.CLUSTER.getName()
@@ -59,3 +60,4 @@ task destroy() {
 }
 
 task list(type: ListTask)
+task listServices(type: ListServicesTask)
