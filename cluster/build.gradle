@@ -4,6 +4,7 @@ import se.nbis.lega.deployment.cluster.ListTask
 import se.nbis.lega.deployment.cluster.Machine
 import se.nbis.lega.deployment.cluster.RemoveMachineTask
 import se.nbis.lega.deployment.cluster.ListServicesTask
+import se.nbis.lega.deployment.cluster.ServiceLogsTask
 
 task createCEGAMachine(type: CreateMachineTask) {
     setGroup Groups.CLUSTER.getName()
