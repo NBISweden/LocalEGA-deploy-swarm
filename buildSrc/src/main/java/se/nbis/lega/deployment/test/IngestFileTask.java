@@ -32,8 +32,10 @@ import io.minio.errors.InvalidBucketNameException;
 import io.minio.errors.InvalidEndpointException;
 import io.minio.errors.InvalidPortException;
 import io.minio.errors.NoResponseException;
+import lombok.extern.slf4j.Slf4j;
 import se.nbis.lega.deployment.cluster.Machine;
 
+@Slf4j
 public class IngestFileTask extends TestTask {
 
     public IngestFileTask() {
@@ -80,49 +82,55 @@ public class IngestFileTask extends TestTask {
 
     private void ingest() throws IOException, URISyntaxException, NoSuchAlgorithmException, KeyManagementException,
                     TimeoutException {
-        String host = getProperty(CEGA_IP);
-        if (host == null) {
-            host = getMachineIPAddress(Machine.CEGA.getName());
-        }
-        String mqPassword = readTrace(getProject().file(CEGA_TMP_TRACE), CEGA_MQ_PASSWORD);
-        String mqConnectionString;
-        String username;
+        try {
+            String host = getProperty(CEGA_IP);
+            String mqPassword = readTrace(getProject().file(CEGA_TMP_TRACE), CEGA_MQ_PASSWORD);
+            String mqConnectionString;
+            String username;
 
-        if (getProperty(TEST_CEGA) == null) {
-            if (mqPassword != null) {
-                mqConnectionString = String.format("amqp://lega:%s@%s:5672/lega", mqPassword, host);
-                username = "john";
+            if (getProperty(TEST_CEGA) == null) {
+                if (host == null) {
+                    host = getMachineIPAddress(Machine.CEGA.getName());
+                }
+                if (mqPassword != null) {
+                    mqConnectionString = String.format("amqp://lega:%s@%s:5672/lega", mqPassword, host);
+                    username = "john";
+                } else {
+                    mqConnectionString = System.getenv(CEGA_CONNECTION);
+                    String password = mqConnectionString.split(":")[2].split("@")[0];
+                    mqConnectionString = mqConnectionString.replace(password,
+                                    URLEncoder.encode(password, Charset.defaultCharset().displayName()));
+                    username = "dummy";
+                }
             } else {
-                mqConnectionString = System.getenv(CEGA_CONNECTION);
-                String password = mqConnectionString.split(":")[2].split("@")[0];
-                mqConnectionString = mqConnectionString.replace(password,
-                                URLEncoder.encode(password, Charset.defaultCharset().displayName()));
-                username = "dummy";
+                username = "norway1";
+                String password = System.getenv(CEGA_MQ_PASSWORD);
+                String port = "5271";
+                String vhost = "norway1";
+                host = "hellgate.crg.eu";
+                mqConnectionString = String.format("amqp://%s:%s@%s:%s/%s", username, password, host, port, vhost);
+                writeTrace(CEGA_CONNECTION, mqConnectionString);
             }
-        } else {
-            username = "norway1";
-            String password = System.getenv(CEGA_MQ_PASSWORD);
-            String port = "5271";
-            String vhost = "norway1";
-            host = "hellgate.crg.eu";
-            mqConnectionString = String.format("amqp://%s:%s@%s:%s/%s", username, password, host, port, vhost);
-            writeTrace(CEGA_CONNECTION, mqConnectionString);
+            ConnectionFactory factory = new ConnectionFactory();
+            factory.setUri(mqConnectionString);
+            Connection connectionFactory = factory.newConnection();
+            Channel channel = connectionFactory.createChannel();
+            AMQP.BasicProperties properties =
+                            new AMQP.BasicProperties().builder().deliveryMode(2).contentType("application/json")
+                                            .contentEncoding(StandardCharsets.UTF_8.displayName()).build();
+
+
+            String stableId = "EGAF" + UUID.randomUUID().toString().replace("-", "");
+            channel.basicPublish("localega.v1", "files", properties,
+                            String.format("{\"user\":\"%s\",\"filepath\":\"data.raw.enc\",\"stable_id\":\"%s\"}",
+                                            username, stableId).getBytes());
+
+            channel.close();
+            connectionFactory.close();
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw e;
         }
-        ConnectionFactory factory = new ConnectionFactory();
-        factory.setUri(mqConnectionString);
-        Connection connectionFactory = factory.newConnection();
-        Channel channel = connectionFactory.createChannel();
-        AMQP.BasicProperties properties = new AMQP.BasicProperties().builder().deliveryMode(2)
-                        .contentType("application/json").contentEncoding(StandardCharsets.UTF_8.displayName()).build();
-
-
-        String stableId = "EGAF" + UUID.randomUUID().toString().replace("-", "");
-        channel.basicPublish("localega.v1", "files", properties,
-                        String.format("{\"user\":\"%s\",\"filepath\":\"data.raw.enc\",\"stable_id\":\"%s\"}", username,
-                                        stableId).getBytes());
-
-        channel.close();
-        connectionFactory.close();
     }
 
     private int getFilesAmount(String host) throws XmlPullParserException, IOException, InvalidPortException,
