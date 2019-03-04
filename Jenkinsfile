@@ -22,6 +22,8 @@ pipeline {
     OS_SSH_USER=credentials('OS_SSH_USER')
     OS_FLAVOR_NAME=credentials('OS_FLAVOR_NAME')
     OS_IMAGE_ID=credentials('OS_IMAGE_ID')
+    CEGA_MQ_PASSWORD=credentials('CEGA_MQ_PASSWORD')
+    CEGA_REST_PASSWORD=credentials('CEGA_REST_PASSWORD')
     GIT_COMMIT_SHORT = sh(
                     script: "printf \$(git rev-parse --short ${GIT_COMMIT})",
                     returnStdout: true
