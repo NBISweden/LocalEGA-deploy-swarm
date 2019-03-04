@@ -108,7 +108,8 @@ public class IngestFileTask extends TestTask {
                 String port = "5271";
                 String vhost = "norway1";
                 host = "hellgate.crg.eu";
-                mqConnectionString = String.format("amqp://%s:%s@%s:%s/%s", username, password, host, port, vhost);
+                mqConnectionString = String.format("amqp://%s:%s@%s:%s/%s", username,
+                                URLEncoder.encode(password, "UTF-8"), host, port, vhost);
                 writeTrace(CEGA_CONNECTION, mqConnectionString);
             }
             ConnectionFactory factory = new ConnectionFactory();
