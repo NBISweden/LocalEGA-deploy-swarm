@@ -236,6 +236,7 @@ pipeline {
         gradle :cluster:serviceLogs -Pmachine=LEGA-private-${ID} -Pservice=ingest --stacktrace -i
         gradle :cluster:serviceLogs -Pmachine=LEGA-private-${ID} -Pservice=inbox-s3 --stacktrace -i
         gradle :cluster:serviceLogs -Pmachine=LEGA-private-${ID} -Pservice=vault-s3 --stacktrace -i
+        gradle :cluster:serviceLogs -Pmachine=LEGA-private-${ID} -Pservice=db --stacktrace -i
       '''
       }
 
