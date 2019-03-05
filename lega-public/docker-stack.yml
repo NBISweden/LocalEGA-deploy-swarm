@@ -17,12 +17,10 @@ services:
     command: ["--no-stats", "--no-dockerEvents", "-a", "stack=public", "-a", "rev=${GIT_COMMIT_SHORT}", "-a", "build=${BUILD_NUMBER}"]
 
   mq:
-    image: rabbitmq:3.7.8-management
+    image: uio-bmi/localega-broker
     ports:
-      - "4369:4369"
       - "5672:5672"
       - "15672:15672"
-      - "35672-35682:35672-35682"
     deploy:
       restart_policy:
         condition: on-failure
@@ -30,15 +28,8 @@ services:
         window: 120s
     environment:
       - CEGA_CONNECTION
-    configs:
-      - source: lega-public.defs.json
-        target: /etc/rabbitmq/defs.json
-      - source: lega-public.rabbitmq.config
-        target: /etc/rabbitmq/rabbitmq.config
-      - source: lega-public.entrypoint.sh
-        target: /usr/bin/ega-entrypoint.sh
-    entrypoint: ["/bin/bash", "/usr/bin/ega-entrypoint.sh"]
-    command: ["rabbitmq-server"]
+      - USER_NAME=guest
+      - PASSWORD_HASH=4tHURqDiZzypw0NTvoHhpn8/MMgONWonWxgRZ4NXgR8nZRBz
 
   inbox:
     image: nbisweden/ega-mina-inbox:latest
