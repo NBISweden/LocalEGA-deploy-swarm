@@ -26,21 +26,21 @@ public class UploadFileTask extends TestTask {
             host = getMachineIPAddress(Machine.LEGA_PUBLIC.getName());
         }
         log.info("Connecting to " + host);
-        SSHClient ssh;
+        SSHClient ssh = new SSHClient();
         try {
-            ssh = new SSHClient();
             ssh.addHostKeyVerifier(new PromiscuousVerifier());
             ssh.connect(host, 2222);
-            ssh.authPassword("dummy", "dummy");
+            if (getProperty(TEST_CEGA) == null) {
+                ssh.authPublickey("john", getProject().file("cega/.tmp/users/john.sec").getAbsolutePath());
+            } else {
+                ssh.authPassword("dummy", "dummy.sec");
+            }
 
-            // ssh.authPublickey("john",
-            // getProject().file("cega/.tmp/users/john.sec").getAbsolutePath());
         } catch (UserAuthException e) {
             log.error("UserAuthException");
-            ssh = new SSHClient();
             ssh.addHostKeyVerifier(new PromiscuousVerifier());
             ssh.connect(host, 2222);
-            ssh.authPublickey("dummy", "dummy.sec");
+            ssh.authPublickey("dummy", "dummy");
         }
         log.info("Uploading a file...");
         SFTPClient client = ssh.newSFTPClient();
