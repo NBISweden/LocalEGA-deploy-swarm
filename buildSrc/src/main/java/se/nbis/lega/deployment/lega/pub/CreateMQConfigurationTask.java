@@ -24,7 +24,7 @@ public class CreateMQConfigurationTask extends LegaPublicTask {
             String port = "5271";
             String vhost = "norway1";
             host = "hellgate.crg.eu";
-            writeTrace(CEGA_CONNECTION, String.format("amqp://%s:%s@%s:%s/%s", user, password, host, port, vhost));
+            writeTrace(CEGA_CONNECTION, String.format("amqps://%s:%s@%s:%s/%s", user, password, host, port, vhost));
         }
     }
 
