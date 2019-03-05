@@ -21,31 +21,36 @@ public class UploadFileTask extends TestTask {
 
     @TaskAction
     public void run() throws IOException {
-        String host = getProperty("legaPublicIP");
-        if (host == null) {
-            host = getMachineIPAddress(Machine.LEGA_PUBLIC.getName());
-        }
-        log.info("Connecting to " + host);
-        SSHClient ssh = new SSHClient();
         try {
-            ssh.addHostKeyVerifier(new PromiscuousVerifier());
-            ssh.connect(host, 2222);
-            if (getProperty(TEST_CEGA) == null) {
-                ssh.authPublickey("john", getProject().file("cega/.tmp/users/john.sec").getAbsolutePath());
-            } else {
-                ssh.authPassword("dummy", "dummy.sec");
+            String host = getProperty("legaPublicIP");
+            if (host == null) {
+                host = getMachineIPAddress(Machine.LEGA_PUBLIC.getName());
             }
+            log.info("Connecting to " + host);
+            SSHClient ssh = new SSHClient();
+            try {
+                ssh.addHostKeyVerifier(new PromiscuousVerifier());
+                ssh.connect(host, 2222);
+                if (getProperty(TEST_CEGA) == null) {
+                    ssh.authPublickey("john", getProject().file("cega/.tmp/users/john.sec").getAbsolutePath());
+                } else {
+                    ssh.authPassword("dummy", "dummy.sec");
+                }
 
-        } catch (UserAuthException e) {
-            log.error("UserAuthException");
-            ssh.addHostKeyVerifier(new PromiscuousVerifier());
-            ssh.connect(host, 2222);
-            ssh.authPublickey("dummy", "dummy");
+            } catch (UserAuthException e) {
+                log.error("UserAuthException");
+                ssh.addHostKeyVerifier(new PromiscuousVerifier());
+                ssh.connect(host, 2222);
+                ssh.authPublickey("dummy", "dummy");
+            }
+            log.info("Uploading a file...");
+            SFTPClient client = ssh.newSFTPClient();
+            client.put(getEncFile().getAbsolutePath(), "data.raw.enc");
+            ssh.close();
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw e;
         }
-        log.info("Uploading a file...");
-        SFTPClient client = ssh.newSFTPClient();
-        client.put(getEncFile().getAbsolutePath(), "data.raw.enc");
-        ssh.close();
     }
 
     @InputFile
