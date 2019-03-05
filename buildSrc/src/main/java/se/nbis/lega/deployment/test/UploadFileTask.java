@@ -34,14 +34,14 @@ public class UploadFileTask extends TestTask {
                 if (getProperty(TEST_CEGA) == null) {
                     ssh.authPublickey("john", getProject().file("cega/.tmp/users/john.sec").getAbsolutePath());
                 } else {
-                    ssh.authPassword("dummy", "dummy.sec");
+                    ssh.authPublickey("dummy", "dummy.sec");
                 }
 
             } catch (UserAuthException e) {
                 log.error("UserAuthException");
                 ssh.addHostKeyVerifier(new PromiscuousVerifier());
                 ssh.connect(host, 2222);
-                ssh.authPublickey("dummy", "dummy");
+                ssh.authPassword("dummy", "dummy");
             }
             log.info("Uploading a file...");
             SFTPClient client = ssh.newSFTPClient();
