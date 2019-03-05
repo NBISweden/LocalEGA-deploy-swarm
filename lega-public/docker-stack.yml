@@ -17,7 +17,7 @@ services:
     command: ["--no-stats", "--no-dockerEvents", "-a", "stack=public", "-a", "rev=${GIT_COMMIT_SHORT}", "-a", "build=${BUILD_NUMBER}"]
 
   mq:
-    image: uio-bmi/localega-broker
+    image: uiobmi/localega-broker
     ports:
       - "5672:5672"
       - "15672:15672"
