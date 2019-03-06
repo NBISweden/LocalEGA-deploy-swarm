@@ -132,7 +132,7 @@ services:
     depends_on:
       - db
       - keys
-      - s3
+      - vault-s3
       - mq
     environment:
       - LEGA_PASSWORD
