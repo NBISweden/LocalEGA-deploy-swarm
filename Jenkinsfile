@@ -65,12 +65,15 @@ pipeline {
 
             gradle :lega-private:createConfiguration \
                 -Pmachine=LEGA-private-${ID} \
-                -PcegaIP=$(docker-machine ip LEGA-public-${ID}) \
+                -PcegaIP=$(docker-machine ip CEGA-${ID}) \
+                -PlegaPublicIP=$(docker-machine ip LEGA-public-${ID}) \
+                -PlegaPrivateIP=$(docker-machine ip LEGA-private-${ID}) \
                 --stacktrace
 
             gradle :lega-public:createConfiguration \
                 -Pmachine=LEGA-public-${ID} \
                 -PcegaIP=$(docker-machine ip CEGA-${ID}) \
+                -PlegaPublicIP=$(docker-machine ip LEGA-public-${ID}) \
                 -PlegaPrivateIP=$(docker-machine ip LEGA-private-${ID}) \
                 --stacktrace
           '''
@@ -159,12 +162,15 @@ pipeline {
 
                   gradle :lega-private:createConfiguration \
                       -Pmachine=lega-private-staging \
-                      -PcegaIP=${LEGA_public_IP} \
+                      -PcegaIP=${CEGA_IP} \
+                      -PlegaPublicIP=${LEGA_private_IP} \
+                      -PlegaPrivateIP=${LEGA_private_IP} \
                       --stacktrace
 
                   gradle :lega-public:createConfiguration \
                       -Pmachine=lega-public-staging \
                       -PcegaIP=${CEGA_IP} \
+                      -PlegaPublicIP=${LEGA_private_IP} \
                       -PlegaPrivateIP=${LEGA_private_IP} \
                       --stacktrace
                 '''
