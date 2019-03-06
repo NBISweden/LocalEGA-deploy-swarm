@@ -232,13 +232,13 @@ pipeline {
   post('Remove VM') {
     failure{
       sh '''
-        gradle :cluster:serviceLogs -Pmachine=LEGA-public-${ID} -Pservice=inbox --stacktrace -i
-        gradle :cluster:serviceLogs -Pmachine=LEGA-public-${ID} -Pservice=mq --stacktrace -i
-        gradle :cluster:serviceLogs -Pmachine=LEGA-private-${ID} -Pservice=mq --stacktrace -i
-        gradle :cluster:serviceLogs -Pmachine=LEGA-private-${ID} -Pservice=ingest --stacktrace -i
-        gradle :cluster:serviceLogs -Pmachine=LEGA-private-${ID} -Pservice=db --stacktrace -i
-        gradle :cluster:serviceLogs -Pmachine=LEGA-private-${ID} -Pservice=vault-s3 --stacktrace -i
-        gradle :cluster:serviceLogs -Pmachine=LEGA-private-${ID} -Pservice=verify --stacktrace -i
+        gradle :cluster:serviceLogs -Pmachine=lega-public-staging -Pservice=inbox --stacktrace -i
+        gradle :cluster:serviceLogs -Pmachine=lega-public-staging -Pservice=mq --stacktrace -i
+        gradle :cluster:serviceLogs -Pmachine=lega-private-staging -Pservice=mq --stacktrace -i
+        gradle :cluster:serviceLogs -Pmachine=lega-private-staging -Pservice=ingest --stacktrace -i
+        gradle :cluster:serviceLogs -Pmachine=lega-private-staging -Pservice=db --stacktrace -i
+        gradle :cluster:serviceLogs -Pmachine=lega-private-staging -Pservice=vault-s3 --stacktrace -i
+        gradle :cluster:serviceLogs -Pmachine=lega-private-staging -Pservice=verify --stacktrace -i
       '''
       }
 
