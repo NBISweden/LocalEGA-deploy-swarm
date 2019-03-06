@@ -27,7 +27,7 @@ services:
         delay: 5s
         window: 120s
     environment:
-      - USER_NAME=guest
+      - USER_NAME=admin
       - PASSWORD_HASH=4tHURqDiZzypw0NTvoHhpn8/MMgONWonWxgRZ4NXgR8nZRBz
       - PRIVATE_CONNECTION
       - CEGA_CONNECTION
@@ -49,6 +49,7 @@ services:
       - S3_ACCESS_KEY=${INBOX_S3_ACCESS_KEY}
       - S3_SECRET_KEY=${INBOX_S3_SECRET_KEY}
       - S3_ENDPOINT
+      - BROKER_USERNAME=admin
       - USE_SSL=false
     volumes:
       - inbox:/ega/inbox

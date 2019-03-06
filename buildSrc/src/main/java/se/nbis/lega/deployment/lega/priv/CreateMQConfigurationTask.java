@@ -13,7 +13,7 @@ public class CreateMQConfigurationTask extends LegaPrivateTask {
         if (host == null) {
             host = getMachineIPAddress(Machine.LEGA_PUBLIC.getName());
         }
-        writeTrace(PUBLIC_CONNECTION, String.format("amqp://guest:guest@%s:5672", host));
+        writeTrace(PUBLIC_CONNECTION, String.format("amqp://admin:guest@%s:5672", host));
     }
 
 }

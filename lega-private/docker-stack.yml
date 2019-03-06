@@ -27,7 +27,7 @@ services:
         delay: 5s
         window: 120s
     environment:
-      - USER_NAME=guest
+      - USER_NAME=admin
       - PASSWORD_HASH=4tHURqDiZzypw0NTvoHhpn8/MMgONWonWxgRZ4NXgR8nZRBz
       - PUBLIC_CONNECTION
 

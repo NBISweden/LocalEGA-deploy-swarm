@@ -33,12 +33,12 @@ public class CreateConfIniConfigurationTask extends LegaPrivateTask {
                 + "[outgestion]\n" + "# Just for test\n"
                 + "keyserver_endpoint = http://keys:8080/keys/retrieve/%%s/private/bin?idFormat=hex\n"
                 + "\n" + "## Connecting to Local EGA\n" + "[broker]\n" + "host = mq\n"
-                + "connection_attempts = 30\n" + "# delay in seconds\n" + "retry_delay = 10\n"
-                + "\n" + "[postgres]\n" + "host = db\n" + "port = 5432\n" + "user = lega_in\n"
-                + "password = %s\n" + "database = lega\n" + "try = 30\n" + "sslmode = require\n"
-                + "\n" + "[eureka]\n" + "endpoint = http://cega-eureka:8761", inboxS3AccessKey,
-            inboxS3SecretKey, vaultS3AccessKey, vaultS3SecretKey, postgresPassword),
-            Charset.defaultCharset());
+                + "username = admin\n" + "connection_attempts = 30\n" + "# delay in seconds\n"
+                + "retry_delay = 10\n" + "\n" + "[postgres]\n" + "host = db\n" + "port = 5432\n"
+                + "user = lega_in\n" + "password = %s\n" + "database = lega\n" + "try = 30\n"
+                + "sslmode = require\n" + "\n" + "[eureka]\n"
+                + "endpoint = http://cega-eureka:8761", inboxS3AccessKey, inboxS3SecretKey,
+            vaultS3AccessKey, vaultS3SecretKey, postgresPassword), Charset.defaultCharset());
     }
 
 }
