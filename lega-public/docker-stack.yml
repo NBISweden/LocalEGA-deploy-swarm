@@ -17,7 +17,7 @@ services:
     command: ["--no-stats", "--no-dockerEvents", "-a", "stack=public", "-a", "rev=${GIT_COMMIT_SHORT}", "-a", "build=${BUILD_NUMBER}"]
 
   mq:
-    image: uiobmi/localega-broker
+    image: uiobmi/localega-broker:public
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -27,9 +27,10 @@ services:
         delay: 5s
         window: 120s
     environment:
-      - CEGA_CONNECTION
       - USER_NAME=guest
       - PASSWORD_HASH=4tHURqDiZzypw0NTvoHhpn8/MMgONWonWxgRZ4NXgR8nZRBz
+      - PRIVATE_CONNECTION
+      - CEGA_CONNECTION
 
   inbox:
     image: nbisweden/ega-mina-inbox:latest
@@ -52,27 +53,5 @@ services:
     volumes:
       - inbox:/ega/inbox
 
-  mediator-client:
-    image: uiobmi/mediator.client:latest
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        window: 120s
-    depends_on:
-      - mq
-    environment:
-      - BROKER_HOST=mq
-      - QUEUES=files,stableIDs
-      - MEDIATOR_SERVER
-
 volumes:
   inbox:
-
-configs:
-  lega-public.defs.json:
-    external: true
-  lega-public.rabbitmq.config:
-    external: true
-  lega-public.entrypoint.sh:
-    external: true
