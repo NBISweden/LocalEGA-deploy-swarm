@@ -40,19 +40,19 @@ pipeline {
     stage('Create VMs') {
       steps {
       parallel(
-//            "CEGA": {
-//                      sh '''
-//                        gradle :cluster:createCEGAMachine -Pmachine=CEGA-${ID} --stacktrace -i
-//                      '''
-//            },
+            "CEGA": {
+                      sh '''
+                        gradle :cluster:createCEGAMachine -Pmachine=CEGA-${ID} --stacktrace -i
+                      '''
+            },
             "LEGA Public": {
                       sh '''
-                        gradle :cluster:createLEGAPublicMachine -Pmachine=LEGA-public-${ID} -PTEST_CEGA=${CEGA_HOST} --stacktrace -i
+                        gradle :cluster:createLEGAPublicMachine -Pmachine=LEGA-public-${ID}  --stacktrace -i
                       '''
             },
             "LEGA Private": {
                       sh '''
-                        gradle :cluster:createLEGAPrivateMachine -Pmachine=LEGA-private-${ID} -PTEST_CEGA=${CEGA_HOST} --stacktrace -i
+                        gradle :cluster:createLEGAPrivateMachine -Pmachine=LEGA-private-${ID}  --stacktrace -i
                       '''
             }
           )
@@ -62,22 +62,21 @@ pipeline {
     stage('Bootstrap') {
       steps {
           sh '''
-#            gradle :cega:createConfiguration \
-#                -Pmachine=CEGA-${ID} \
-#                --stacktrace
+            gradle :cega:createConfiguration \
+                -Pmachine=CEGA-${ID} \
+                --stacktrace
 
             gradle :lega-private:createConfiguration \
                 -Pmachine=LEGA-private-${ID} \
-                -PTEST_CEGA=${CEGA_HOST} \
                 --stacktrace -i
-#                -PcegaIP=$(docker-machine ip LEGA-public-${ID}) \
+#                -PTEST_CEGA=${CEGA_HOST} \
 
             gradle :lega-public:createConfiguration \
                 -Pmachine=LEGA-public-${ID} \
+                -PcegaIP=$(docker-machine ip CEGA-${ID}) \
                 -PlegaPrivateIP=$(docker-machine ip LEGA-private-${ID}) \
-                -PTEST_CEGA=${CEGA_HOST} \
                 --stacktrace -i
-#                -PcegaIP=$(docker-machine ip CEGA-${ID}) \
+#                -PTEST_CEGA=${CEGA_HOST} \
           '''
       }
     }
@@ -85,19 +84,19 @@ pipeline {
     stage('Deploy') {
       steps {
       parallel(
-//            "CEGA": {
-//                      sh '''
-//                        gradle :cega:deployStack -Pmachine=CEGA-${ID} --stacktrace
-//                      '''
-//            },
+            "CEGA": {
+                      sh '''
+                        gradle :cega:deployStack -Pmachine=CEGA-${ID} --stacktrace
+                      '''
+            },
             "LEGA Public": {
                       sh '''
-                        gradle :lega-public:deployStack -Pmachine=LEGA-public-${ID} -PTEST_CEGA=${CEGA_HOST} --stacktrace -i
+                        gradle :lega-public:deployStack -Pmachine=LEGA-public-${ID} --stacktrace -i
                       '''
             },
             "LEGA Private": {
                       sh '''
-                        gradle :lega-private:deployStack -Pmachine=LEGA-private-${ID} -PTEST_CEGA=${CEGA_HOST} --stacktrace -i
+                        gradle :lega-private:deployStack -Pmachine=LEGA-private-${ID} --stacktrace -i
                       '''
             }
           )
@@ -108,6 +107,7 @@ pipeline {
       steps {
         sh '''
           sleep 180
+          gradle :cluster:listServices -Pmachine=CEGA-${ID} --stacktrace -i
           gradle :cluster:listServices -Pmachine=LEGA-private-${ID} --stacktrace -i
           gradle :cluster:listServices -Pmachine=LEGA-public-${ID} --stacktrace -i
         '''
@@ -120,8 +120,9 @@ pipeline {
           gradle ingest \
           -PlegaPublicIP=$(docker-machine ip LEGA-public-${ID}) \
           -PlegaPrivateIP=$(docker-machine ip LEGA-private-${ID}) \
-          -PTEST_CEGA=${CEGA_HOST} --stacktrace -i
-#          -PcegaIP=$(docker-machine ip CEGA-${ID}) \
+          -PcegaIP=$(docker-machine ip CEGA-${ID}) \
+          --stacktrace -i
+#          -PTEST_CEGA=${CEGA_HOST} 
         '''
       }
     }
