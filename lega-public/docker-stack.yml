@@ -17,28 +17,20 @@ services:
     command: ["--no-stats", "--no-dockerEvents", "-a", "stack=public", "-a", "rev=${GIT_COMMIT_SHORT}", "-a", "build=${BUILD_NUMBER}"]
 
   mq:
-    image: rabbitmq:3.7.8-management
+    image: uiobmi/localega-broker:public
     ports:
-      - "4369:4369"
       - "5672:5672"
       - "15672:15672"
-      - "35672-35682:35672-35682"
     deploy:
       restart_policy:
         condition: on-failure
         delay: 5s
         window: 120s
     environment:
+      - USER_NAME=admin
+      - PASSWORD_HASH=4tHURqDiZzypw0NTvoHhpn8/MMgONWonWxgRZ4NXgR8nZRBz
+      - PRIVATE_CONNECTION
       - CEGA_CONNECTION
-    configs:
-      - source: lega-public.defs.json
-        target: /etc/rabbitmq/defs.json
-      - source: lega-public.rabbitmq.config
-        target: /etc/rabbitmq/rabbitmq.config
-      - source: lega-public.entrypoint.sh
-        target: /usr/bin/ega-entrypoint.sh
-    entrypoint: ["/bin/bash", "/usr/bin/ega-entrypoint.sh"]
-    command: ["rabbitmq-server"]
 
   inbox:
     image: nbisweden/ega-mina-inbox:latest
@@ -57,31 +49,10 @@ services:
       - S3_ACCESS_KEY=${INBOX_S3_ACCESS_KEY}
       - S3_SECRET_KEY=${INBOX_S3_SECRET_KEY}
       - S3_ENDPOINT
+      - BROKER_USERNAME=admin
       - USE_SSL=false
     volumes:
       - inbox:/ega/inbox
 
-  mediator-client:
-    image: uiobmi/mediator.client:latest
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        window: 120s
-    depends_on:
-      - mq
-    environment:
-      - BROKER_HOST=mq
-      - QUEUES=files,stableIDs
-      - MEDIATOR_SERVER
-
 volumes:
   inbox:
-
-configs:
-  lega-public.defs.json:
-    external: true
-  lega-public.rabbitmq.config:
-    external: true
-  lega-public.entrypoint.sh:
-    external: true

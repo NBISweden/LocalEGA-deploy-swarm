@@ -65,7 +65,6 @@ pipeline {
 
             gradle :lega-private:createConfiguration \
                 -Pmachine=LEGA-private-${ID} \
-                -PcegaIP=$(docker-machine ip LEGA-public-${ID}) \
                 --stacktrace
 
             gradle :lega-public:createConfiguration \
@@ -159,7 +158,6 @@ pipeline {
 
                   gradle :lega-private:createConfiguration \
                       -Pmachine=lega-private-staging \
-                      -PcegaIP=${LEGA_public_IP} \
                       --stacktrace
 
                   gradle :lega-public:createConfiguration \

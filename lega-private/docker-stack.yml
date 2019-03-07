@@ -17,18 +17,18 @@ services:
     command: ["--no-stats", "--no-dockerEvents", "-a", "stack=private", "-a", "rev=${GIT_COMMIT_SHORT}", "-a", "build=${BUILD_NUMBER}"]
 
   mq:
-    image: rabbitmq:3.7.8-management
+    image: uiobmi/localega-broker:private
+    ports:
+      - "5672:5672"
+      - "15672:15672"
     deploy:
       restart_policy:
         condition: on-failure
         delay: 5s
         window: 120s
-    configs:
-      - source: lega-private.defs.json
-        target: /etc/rabbitmq/defs.json
-      - source: lega-private.rabbitmq.config
-        target: /etc/rabbitmq/rabbitmq.config
-    command: ["rabbitmq-server"]
+    environment:
+      - USER_NAME=admin
+      - PASSWORD_HASH=4tHURqDiZzypw0NTvoHhpn8/MMgONWonWxgRZ4NXgR8nZRBz
 
   db:
     image: postgres:10
@@ -208,30 +208,12 @@ services:
         target: /etc/ega/conf.ini
     entrypoint: ["gosu", "lega", "ega-ingest"]
 
-  mediator-server:
-    image: uiobmi/mediator.server:latest
-    ports:
-      - "8080:8080"
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        window: 120s
-    depends_on:
-      - mq
-    environment:
-      - BROKER_HOST=mq
-
 volumes:
   inbox_s3:
   vault_s3:
   db:
 
 configs:
-  lega-private.defs.json:
-    external: true
-  lega-private.rabbitmq.config:
-    external: true
   postgresql.conf:
     external: true
   main.sql:
