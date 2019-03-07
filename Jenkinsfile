@@ -124,10 +124,9 @@ pipeline {
                         script: "printf \$(docker-machine ip lega-public-staging)",
                         returnStdout: true
                 )
-        CEGA_IP = sh(
-                        script: "printf \$(docker-machine ip cega-staging)",
-                        returnStdout: true
-                )
+        CEGA_MQ_CONNECTION=credentials('CEGA_MQ_CONNECTION')
+        CEGA_USERS_CONNECTION=credentials('CEGA_USERS_CONNECTION')
+        CEGA_USERS_CREDENTIALS=credentials('CEGA_USERS_CREDENTIALS')
         }
         when {
            branch "master"
@@ -136,13 +135,13 @@ pipeline {
           stage('Tear down') {
             steps {
                 sh '''
-                  gradle :cega:removeStack -Pmachine=cega-staging --stacktrace
+                  gradle removeCEGATmpTask
+
                   gradle :lega-private:removeStack -Pmachine=lega-private-staging --stacktrace
                   gradle :lega-public:removeStack -Pmachine=lega-public-staging --stacktrace
 
                   sleep 10
 
-                  gradle prune -Pmachine=cega-staging --stacktrace
                   gradle prune -Pmachine=lega-private-staging --stacktrace
                   gradle prune -Pmachine=lega-public-staging --stacktrace
                 '''
@@ -152,10 +151,6 @@ pipeline {
           stage('Bootstrap') {
             steps {
                 sh '''
-                  gradle :cega:createConfiguration \
-                      -Pmachine=cega-staging \
-                      --stacktrace
-
                   gradle :lega-private:createConfiguration \
                       -Pmachine=lega-private-staging \
                       --stacktrace
@@ -172,11 +167,6 @@ pipeline {
           stage('Deploy') {
             steps {
             parallel(
-                  "CEGA": {
-                    sh '''
-                      gradle :cega:deployStack -Pmachine=cega-staging --stacktrace
-                    '''
-                  },
                   "LEGA Public": {
                     sh '''
                       gradle :lega-public:deployStack -Pmachine=lega-public-staging --stacktrace
@@ -203,7 +193,6 @@ pipeline {
             steps {
               sh '''
                 gradle ingest \
-                  -PcegaIP=${CEGA_IP} \
                   -PlegaPublicIP=${LEGA_public_IP} \
                   -PlegaPrivateIP=${LEGA_private_IP} \
                   --stacktrace

@@ -78,21 +78,18 @@ public class IngestFileTask extends TestTask {
     private void ingest()
         throws IOException, URISyntaxException, NoSuchAlgorithmException, KeyManagementException,
         TimeoutException {
-        String host = getProperty("cegaIP");
-        if (host == null) {
-            host = getMachineIPAddress(Machine.CEGA.getName());
-        }
         String mqPassword = readTrace(getProject().file(CEGA_TMP_TRACE), CEGA_MQ_PASSWORD);
         String mqConnectionString;
         String username;
-        if (mqPassword != null) {
+        if (mqPassword != null) { // test pipeline
+            String host = getProperty("cegaIP");
+            if (host == null) {
+                host = getMachineIPAddress(Machine.CEGA.getName());
+            }
             mqConnectionString = String.format("amqp://lega:%s@%s:5672/lega", mqPassword, host);
             username = "john";
-        } else {
-            mqConnectionString = System.getenv(CEGA_CONNECTION);
-            String password = mqConnectionString.split(":")[2].split("@")[0];
-            mqConnectionString = mqConnectionString.replace(password,
-                URLEncoder.encode(password, Charset.defaultCharset().displayName()));
+        } else { // staging pipeline
+            mqConnectionString = System.getenv(CEGA_MQ_CONNECTION);
             username = "dummy";
         }
         ConnectionFactory factory = new ConnectionFactory();
