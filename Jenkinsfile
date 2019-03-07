@@ -5,7 +5,7 @@ pipeline {
   options { disableConcurrentBuilds() }
   
   triggers {
-    cron('0 0 * * *')
+    cron(env.BRANCH_NAME == 'master' ? '0 0 * * *' : '')
     upstream(upstreamProjects: 'LocalEGA Build Trigger')
   }
   
