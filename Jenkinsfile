@@ -129,7 +129,7 @@ pipeline {
         CEGA_USERS_CREDENTIALS=credentials('CEGA_USERS_CREDENTIALS')
         }
         when {
-           branch "feature/cega-in-staging"
+           branch "master"
         }
         stages{
           stage('Tear down') {
