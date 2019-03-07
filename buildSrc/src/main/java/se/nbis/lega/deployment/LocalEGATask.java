@@ -39,7 +39,9 @@ public abstract class LocalEGATask extends DefaultTask {
     public static final String CEGA_MQ_PASSWORD = "CEGA_MQ_PASSWORD";
     public static final String CEGA_REST_PASSWORD = "CEGA_REST_PASSWORD";
     public static final String CEGA_CONNECTION = "CEGA_CONNECTION";
-    public static final String PUBLIC_CONNECTION = "PUBLIC_CONNECTION";
+    public static final String CEGA_MQ_CONNECTION = "CEGA_MQ_CONNECTION";
+    public static final String CEGA_USERS_CONNECTION = "CEGA_USERS_CONNECTION";
+    public static final String CEGA_USERS_CREDENTIALS = "CEGA_USERS_CREDENTIALS";
     public static final String PRIVATE_CONNECTION = "PRIVATE_CONNECTION";
     public static final String CEGA_ENDPOINT = "CEGA_ENDPOINT";
     public static final String CEGA_ENDPOINT_CREDS = "CEGA_ENDPOINT_CREDS";

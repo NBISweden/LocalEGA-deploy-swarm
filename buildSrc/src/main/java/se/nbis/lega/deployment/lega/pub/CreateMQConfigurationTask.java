@@ -11,17 +11,23 @@ public class CreateMQConfigurationTask extends LegaPublicTask {
     public void run() throws IOException {
         String cegaMQPassword =
             readTrace(getProject().getParent().file(CEGA_TMP_TRACE), "CEGA_MQ_PASSWORD");
-        String host = getProperty("cegaIP");
-        if (host == null) {
-            host = getMachineIPAddress(Machine.CEGA.getName());
+        if (cegaMQPassword != null) { // test pipeline
+            String cegaHost = getProperty("cegaIP");
+            if (cegaHost == null) {
+                cegaHost = getMachineIPAddress(Machine.CEGA.getName());
+            }
+            writeTrace(CEGA_CONNECTION,
+                String.format("amqp://lega:%s@%s:5672/lega", cegaMQPassword, cegaHost));
+        } else { // staging pipeline
+            writeTrace(CEGA_CONNECTION, System.getenv(CEGA_MQ_CONNECTION));
         }
-        writeTrace(CEGA_CONNECTION,
-            String.format("amqp://lega:%s@%s:5672/lega", cegaMQPassword, host));
-        host = getProperty("legaPrivateIP");
-        if (host == null) {
-            host = getMachineIPAddress(Machine.LEGA_PRIVATE.getName());
+
+        // any pipeline
+        String privateHost = getProperty("legaPrivateIP");
+        if (privateHost == null) {
+            privateHost = getMachineIPAddress(Machine.LEGA_PRIVATE.getName());
         }
-        writeTrace(PRIVATE_CONNECTION, String.format("amqp://admin:guest@%s:5672", host));
+        writeTrace(PRIVATE_CONNECTION, String.format("amqp://admin:guest@%s:5672", privateHost));
     }
 
 }
