@@ -20,11 +20,6 @@ task purge() {
     dependsOn ":lega-public:removeVolumes", ":lega-private:removeVolumes"
 }
 
-task removeCEGATmpTask(type: RemoveCEGATmpTask) {
-    setGroup "swarm"
-    setMachineName("")
-}
-
 task prune(type: PruneTask) {
     setGroup "swarm"
     setMachineName("")

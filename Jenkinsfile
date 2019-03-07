@@ -135,7 +135,7 @@ pipeline {
           stage('Tear down') {
             steps {
                 sh '''
-                  gradle removeCEGATmpTask
+                  gradle :cega:removeCEGATmpTask
 
                   gradle :lega-private:removeStack -Pmachine=lega-private-staging --stacktrace
                   gradle :lega-public:removeStack -Pmachine=lega-public-staging --stacktrace
