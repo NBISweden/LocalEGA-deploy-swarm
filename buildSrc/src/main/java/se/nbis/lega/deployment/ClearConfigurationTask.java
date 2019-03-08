@@ -11,7 +11,7 @@ public class ClearConfigurationTask extends LocalEGATask {
 
     @TaskAction
     public void run() throws IOException {
-        removeConfig(configs);
+        removeConfigs(configs);
         FileUtils.deleteDirectory(getProject().file(".tmp/"));
     }
 
