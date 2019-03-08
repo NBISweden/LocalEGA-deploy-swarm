@@ -14,7 +14,7 @@ services:
       - LOGZIO_ZONE=us
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    command: ["--no-stats", "--no-dockerEvents", "-a", "stack=private", "-a", "rev=${GIT_COMMIT_SHORT}", "-a", "build=${BUILD_NUMBER}"]
+    command: ["--no-stats", "--no-dockerEvents", "-a", "stack=private", "-a", "rev=${GIT_COMMIT_SHORT}", "-a", "build=${BUILD_NUMBER}", "-a", "env=${ENV}"]
 
   mq:
     image: uiobmi/localega-broker:private

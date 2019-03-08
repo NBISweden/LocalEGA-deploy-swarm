@@ -30,6 +30,7 @@ pipeline {
                     script: "printf \$(git rev-parse --short ${GIT_COMMIT})${BUILD_NUMBER}",
                     returnStdout: true
             )
+    ENV='test'
     LOGZIO_TOKEN=credentials('LOGZIO_TOKEN')
   }
 
@@ -116,6 +117,7 @@ pipeline {
 
     stage('master'){
       environment {
+        ENV='staging'
         LEGA_private_IP = sh(
                         script: "printf \$(docker-machine ip lega-private-staging)",
                         returnStdout: true
