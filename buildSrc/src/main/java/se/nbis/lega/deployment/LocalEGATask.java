@@ -126,7 +126,23 @@ public abstract class LocalEGATask extends DefaultTask {
     }
 
     protected void removeConfig(String name) throws IOException {
-        exec(true, getMachineEnvironment(machineName), "docker config rm", name);
+        List<String> rs = exec(true, getMachineEnvironment(machineName), "docker config ls -q -f NAME=" + name);
+        boolean configExist = rs.get(0).length() > 0;
+        if (configExist) {
+            exec(true, getMachineEnvironment(machineName), "docker config rm", name);
+        }
+    }
+
+    protected void removeConfigs(Set<String> names) throws IOException {
+        exec(true, getMachineEnvironment(machineName), "docker config rm " + String.join(" ", names));
+    }
+
+    protected void listServices() throws IOException {
+        exec(true, getMachineEnvironment(machineName), "docker service ls");
+    }
+
+    protected void serviceLogs(String service) throws IOException {
+        exec(true, getMachineEnvironment(machineName), "docker service logs ", machineName + "_" + service);
     }
 
     protected void removeVolume(String name) throws IOException {
