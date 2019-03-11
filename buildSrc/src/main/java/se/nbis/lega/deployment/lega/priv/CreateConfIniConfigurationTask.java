@@ -23,13 +23,14 @@ public class CreateConfIniConfigurationTask extends LegaPrivateTask {
         String postgresPassword = readTrace(DB_LEGA_IN_PASSWORD);
         File confIni = getProject().file(".tmp/conf.ini");
         FileUtils.write(confIni, String.format(
-            "[DEFAULT]\n" + "log = console\n" + "\n" + "[keyserver]\n" + "port = 8080\n" + "\n"
+            "[DEFAULT]\n" + "log = debug\n" + "\n" + "[keyserver]\n" + "port = 8080\n" + "\n"
                 + "[quality_control]\n"
                 + "keyserver_endpoint = http://keys:8080/keys/retrieve/%%s/private/bin?idFormat=hex\n"
-                + "\n" + "[inbox]\n" + "driver = S3Storage\n" + "url = http://inbox-s3:9000\n"
-                + "access_key = %s\n" + "secret_key = %s\n" + "#region = lega\n" + "\n"
-                + "[vault]\n" + "driver = S3Storage\n" + "url = http://vault-s3:9000\n"
-                + "access_key = %s\n" + "secret_key = %s\n" + "#region = lega\n" + "\n"
+                + "\n" + "[inbox]\n" + "storage_driver = S3Storage\n"
+                + "s3_url = http://inbox-s3:9000\n" + "s3_access_key = %s\n"
+                + "s3_secret_key = %s\n" + "#region = lega\n" + "\n" + "[archive]\n"
+                + "storage_driver = S3Storage\n" + "s3_url = http://vault-s3:9000\n"
+                + "s3_access_key = %s\n" + "s3_secret_key = %s\n" + "#region = lega\n" + "\n"
                 + "[outgestion]\n" + "# Just for test\n"
                 + "keyserver_endpoint = http://keys:8080/keys/retrieve/%%s/private/bin?idFormat=hex\n"
                 + "\n" + "## Connecting to Local EGA\n" + "[broker]\n" + "host = mq\n"

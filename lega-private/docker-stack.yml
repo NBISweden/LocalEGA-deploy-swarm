@@ -123,7 +123,7 @@ services:
         target: /etc/ega/pgp/ega.shared.pass
 
   verify:
-    image: nbisweden/ega-base:latest
+    image: egarchive/lega-base:latest
     deploy:
       restart_policy:
         condition: on-failure
@@ -141,7 +141,8 @@ services:
     configs:
       - source: conf.ini
         target: /etc/ega/conf.ini
-    entrypoint: ["gosu", "lega", "ega-verify"]
+    user: lega
+    entrypoint: ["ega-verify"]
 
   res:
     image: cscfi/ega-res:latest
@@ -174,7 +175,7 @@ services:
         target: /etc/ega/pgp/ega.shared.pass
 
   id-mapper:
-    image: nbisweden/ega-base:latest
+    image: egarchive/lega-base:latest
     deploy:
       restart_policy:
         condition: on-failure
@@ -186,10 +187,11 @@ services:
     configs:
       - source: conf.ini
         target: /etc/ega/conf.ini
-    entrypoint: ["gosu", "lega", "ega-id-mapper"]
+    user: lega
+    entrypoint: ["ega-finalize"]
 
   ingest:
-    image: nbisweden/ega-base:s3
+    image: egarchive/lega-base:latest
     deploy:
       restart_policy:
         condition: on-failure
@@ -206,7 +208,8 @@ services:
     configs:
       - source: conf.ini
         target: /etc/ega/conf.ini
-    entrypoint: ["gosu", "lega", "ega-ingest"]
+    user: lega
+    entrypoint: ["ega-ingest"]
 
 volumes:
   inbox_s3:
