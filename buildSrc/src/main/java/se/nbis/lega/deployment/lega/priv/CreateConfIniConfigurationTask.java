@@ -23,7 +23,7 @@ public class CreateConfIniConfigurationTask extends LegaPrivateTask {
         String postgresPassword = readTrace(DB_LEGA_IN_PASSWORD);
         File confIni = getProject().file(".tmp/conf.ini");
         FileUtils.write(confIni, String.format(
-            "[DEFAULT]\n" + "log = console\n" + "\n" + "[keyserver]\n" + "port = 8080\n" + "\n"
+            "[DEFAULT]\n" + "log = debug\n" + "\n" + "[keyserver]\n" + "port = 8080\n" + "\n"
                 + "[quality_control]\n"
                 + "keyserver_endpoint = http://keys:8080/keys/retrieve/%%s/private/bin?idFormat=hex\n"
                 + "\n" + "[inbox]\n" + "driver = S3Storage\n" + "url = http://inbox-s3:9000\n"
