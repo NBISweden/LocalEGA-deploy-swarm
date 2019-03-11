@@ -141,6 +141,7 @@ services:
     configs:
       - source: conf.ini
         target: /etc/ega/conf.ini
+    user: lega
     entrypoint: ["ega-verify"]
 
   res:
@@ -186,6 +187,7 @@ services:
     configs:
       - source: conf.ini
         target: /etc/ega/conf.ini
+    user: lega
     entrypoint: ["ega-finalize"]
 
   ingest:
@@ -206,6 +208,7 @@ services:
     configs:
       - source: conf.ini
         target: /etc/ega/conf.ini
+    user: lega
     entrypoint: ["ega-ingest"]
 
 volumes:
