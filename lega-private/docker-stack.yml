@@ -97,7 +97,7 @@ services:
     command: server /data
 
   keys:
-    image: cscfi/ega-keyserver:latest
+    image: cscfi/ega-keyserver:m4
     deploy:
       restart_policy:
         condition: on-failure
