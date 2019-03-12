@@ -121,14 +121,6 @@ pipeline {
             '''
           }
         }
-
-        stage('Verify') {
-          steps {
-            sh '''
-              gradle verify -PcegaIP=$(docker-machine ip CEGA-${ID}) -PlegaPublicIP=$(docker-machine ip LEGA-public-${ID}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${ID}) --stacktrace
-            '''
-          }
-        }
       }
     }
 
@@ -215,14 +207,6 @@ pipeline {
                 -PlegaPublicIP=${LEGA_public_IP} \
                 -PlegaPrivateIP=${LEGA_private_IP} \
                 --stacktrace
-            '''
-          }
-        }
-
-        stage('Verify') {
-          steps {
-            sh '''
-              gradle verify -PlegaPublicIP=${LEGA_public_IP} -PlegaPrivateIP=${LEGA_private_IP} --stacktrace
             '''
           }
         }
