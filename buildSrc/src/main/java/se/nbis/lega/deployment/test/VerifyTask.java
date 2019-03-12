@@ -22,12 +22,12 @@ public class VerifyTask extends TestTask {
     @TaskAction
     public void run() throws IOException, SQLException {
         log.info("Starting Verification...");
-        String host = getProperty(LEGA_PUBLIC_IP);
+        String host = getProperty(LEGA_PRIVATE_IP);
         if (host == null) {
             host = getMachineIPAddress(Machine.LEGA_PRIVATE.getName());
         }
-        String port = "5740";
-        String db = "local_ega";
+        String port = "5432";
+        String db = "lega";
         String url = String.format("jdbc:postgresql://%s:%s/%s", host, port, db);
         Properties props = new Properties();
         props.setProperty("user", "lega_in");

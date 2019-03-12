@@ -1,6 +1,22 @@
 package se.nbis.lega.deployment;
 
-import lombok.extern.slf4j.Slf4j;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.attribute.PosixFilePermission;
+import java.security.KeyPair;
+import java.security.Security;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
@@ -9,14 +25,7 @@ import org.apache.commons.io.FileUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.gradle.api.DefaultTask;
-
-import java.io.*;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.attribute.PosixFilePermission;
-import java.security.KeyPair;
-import java.security.Security;
-import java.util.*;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public abstract class LocalEGATask extends DefaultTask {
@@ -54,6 +63,7 @@ public abstract class LocalEGATask extends DefaultTask {
     public static final String EGA_USER_PASSWORD_JANE = "EGA_USER_PASSWORD_JANE";
     public static final String VAULT_S3_BUCKET_NAME = "lega";
     public static final String LEGA_PUBLIC_IP = "legaPublicIP";
+    public static final String LEGA_PRIVATE_IP = "LEGA_private_IP";
 
     static {
         Security.addProvider(new BouncyCastleProvider());
