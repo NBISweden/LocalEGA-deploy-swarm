@@ -63,7 +63,7 @@ public abstract class LocalEGATask extends DefaultTask {
     public static final String EGA_USER_PASSWORD_JANE = "EGA_USER_PASSWORD_JANE";
     public static final String VAULT_S3_BUCKET_NAME = "lega";
     public static final String LEGA_PUBLIC_IP = "legaPublicIP";
-    public static final String LEGA_PRIVATE_IP = "LEGA_private_IP";
+    public static final String LEGA_PRIVATE_IP = "legaPrivateIP";
 
     static {
         Security.addProvider(new BouncyCastleProvider());
