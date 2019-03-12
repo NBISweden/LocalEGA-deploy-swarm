@@ -59,12 +59,6 @@ public class CreateKeysConfigurationTask extends LegaPrivateTask {
         createConfig(Config.SSL_KEY.getName(), getProject().file(".tmp/ssl/ssl.key"));
         String pgpPassphrase = UUID.randomUUID().toString().replace("-", "");
         writeTrace(PGP_PASSPHRASE, pgpPassphrase);
-        File egaSecPass = getProject().file(".tmp/pgp/ega.pass.sec");
-        FileUtils.write(egaSecPass, pgpPassphrase, Charset.defaultCharset());
-        createConfig(Config.EGA_SEC_PASS.getName(), egaSecPass);
-        File ega2SecPass = getProject().file(".tmp/pgp/ega2.pass.sec");
-        FileUtils.write(ega2SecPass, pgpPassphrase, Charset.defaultCharset());
-        createConfig(Config.EGA2_SEC_PASS.getName(), ega2SecPass);
         generatePGPKeyPair("ega", pgpPassphrase);
         createConfig(Config.EGA_SEC.getName(), getProject().file(".tmp/pgp/ega.sec"));
         generatePGPKeyPair("ega2", pgpPassphrase);
