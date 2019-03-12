@@ -35,91 +35,100 @@ pipeline {
   }
 
   stages {
-    stage('Create VMs') {
-      steps {
-      parallel(
-            "CEGA": {
-                      sh '''
-                        gradle :cluster:createCEGAMachine -Pmachine=CEGA-${ID} --stacktrace -i
-                      '''
-            },
-            "LEGA Public": {
-                      sh '''
-                        gradle :cluster:createLEGAPublicMachine -Pmachine=LEGA-public-${ID} --stacktrace -i
-                      '''
-            },
-            "LEGA Private": {
-                      sh '''
-                        gradle :cluster:createLEGAPrivateMachine -Pmachine=LEGA-private-${ID} --stacktrace -i
-                      '''
-            }
-          )
+    stage('branch'){
+      when {
+        not{
+         branch "master"
+        }
       }
-    }
-
-    stage('Bootstrap') {
-      steps {
-          sh '''
-            gradle :cega:createConfiguration \
-                -Pmachine=CEGA-${ID} \
-                --stacktrace
-
-            gradle :lega-private:createConfiguration \
-                -Pmachine=LEGA-private-${ID} \
-                --stacktrace
-
-            gradle :lega-public:createConfiguration \
-                -Pmachine=LEGA-public-${ID} \
-                -PcegaIP=$(docker-machine ip CEGA-${ID}) \
-                -PlegaPrivateIP=$(docker-machine ip LEGA-private-${ID}) \
-                --stacktrace
-          '''
-      }
-    }
-
-    stage('Deploy') {
-      steps {
-      parallel(
-            "CEGA": {
-                      sh '''
-                        gradle :cega:deployStack -Pmachine=CEGA-${ID} --stacktrace
-                      '''
-            },
-            "LEGA Public": {
-                      sh '''
-                        gradle :lega-public:deployStack -Pmachine=LEGA-public-${ID} --stacktrace
-                      '''
-            },
-            "LEGA Private": {
-                      sh '''
-                        gradle :lega-private:deployStack -Pmachine=LEGA-private-${ID} --stacktrace
-                      '''
-            }
-          )
-      }
-    }
-
-    stage('Initialization') {
-      steps {
-        sh '''
-          sleep 180
-        '''
-      }
-    }
-
-    stage('Test') {
-      steps {
-        sh '''
-          gradle ingest -PcegaIP=$(docker-machine ip CEGA-${ID}) -PlegaPublicIP=$(docker-machine ip LEGA-public-${ID}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${ID}) --stacktrace
-        '''
-      }
-    }
+      stages{
+        stage('Create VMs') {
+          steps {
+          parallel(
+                "CEGA": {
+                          sh '''
+                            gradle :cluster:createCEGAMachine -Pmachine=CEGA-${ID} --stacktrace -i
+                          '''
+                },
+                "LEGA Public": {
+                          sh '''
+                            gradle :cluster:createLEGAPublicMachine -Pmachine=LEGA-public-${ID} --stacktrace -i
+                          '''
+                },
+                "LEGA Private": {
+                          sh '''
+                            gradle :cluster:createLEGAPrivateMachine -Pmachine=LEGA-private-${ID} --stacktrace -i
+                          '''
+                }
+              )
+          }
+        }
     
-    stage('Verify') {
-      steps {
-        sh '''
-          gradle verify -PcegaIP=$(docker-machine ip CEGA-${ID}) -PlegaPublicIP=$(docker-machine ip LEGA-public-${ID}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${ID}) --stacktrace
-        '''
+        stage('Bootstrap') {
+          steps {
+              sh '''
+                gradle :cega:createConfiguration \
+                    -Pmachine=CEGA-${ID} \
+                    --stacktrace
+    
+                gradle :lega-private:createConfiguration \
+                    -Pmachine=LEGA-private-${ID} \
+                    --stacktrace
+    
+                gradle :lega-public:createConfiguration \
+                    -Pmachine=LEGA-public-${ID} \
+                    -PcegaIP=$(docker-machine ip CEGA-${ID}) \
+                    -PlegaPrivateIP=$(docker-machine ip LEGA-private-${ID}) \
+                    --stacktrace
+              '''
+          }
+        }
+    
+        stage('Deploy') {
+          steps {
+          parallel(
+                "CEGA": {
+                          sh '''
+                            gradle :cega:deployStack -Pmachine=CEGA-${ID} --stacktrace
+                          '''
+                },
+                "LEGA Public": {
+                          sh '''
+                            gradle :lega-public:deployStack -Pmachine=LEGA-public-${ID} --stacktrace
+                          '''
+                },
+                "LEGA Private": {
+                          sh '''
+                            gradle :lega-private:deployStack -Pmachine=LEGA-private-${ID} --stacktrace
+                          '''
+                }
+              )
+          }
+        }
+    
+        stage('Initialization') {
+          steps {
+            sh '''
+              sleep 180
+            '''
+          }
+        }
+    
+        stage('Ingest') {
+          steps {
+            sh '''
+              gradle ingest -PcegaIP=$(docker-machine ip CEGA-${ID}) -PlegaPublicIP=$(docker-machine ip LEGA-public-${ID}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${ID}) --stacktrace
+            '''
+          }
+        }
+        
+        stage('Verify') {
+          steps {
+            sh '''
+              gradle verify -PcegaIP=$(docker-machine ip CEGA-${ID}) -PlegaPublicIP=$(docker-machine ip LEGA-public-${ID}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${ID}) --stacktrace
+            '''
+          }
+        }
       }
     }
 
@@ -201,7 +210,7 @@ pipeline {
           }
         }
 
-        stage('Test') {
+        stage('Ingest') {
           steps {
             sh '''
               gradle ingest \

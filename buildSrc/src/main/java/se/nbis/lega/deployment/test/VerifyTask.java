@@ -17,7 +17,6 @@ public class VerifyTask extends TestTask {
 
     public VerifyTask() {
         super();
-        this.dependsOn("upload");
     }
 
     @TaskAction
@@ -31,8 +30,8 @@ public class VerifyTask extends TestTask {
         String db = "local_ega";
         String url = String.format("jdbc:postgresql://%s:%s/%s", host, port, db);
         Properties props = new Properties();
-        props.setProperty("user", "fred");
-        props.setProperty("password", "secret");
+        props.setProperty("user", "lega_in");
+        props.setProperty("password", readTrace(DB_LEGA_IN_PASSWORD));
         props.setProperty("ssl", "true");
         try {
             Connection conn = DriverManager.getConnection(url, props);
