@@ -1,14 +1,14 @@
 pipeline {
-  
+
   agent any
-  
+
   options { disableConcurrentBuilds() }
-  
+
   triggers {
     cron(env.BRANCH_NAME == 'master' ? '0 0 * * *' : '')
     upstream(upstreamProjects: 'LocalEGA Build Trigger')
   }
-  
+
   environment {
     OS_USERNAME=credentials('OS_USERNAME')
     OS_PASSWORD=credentials('OS_PASSWORD')
@@ -63,18 +63,18 @@ pipeline {
               )
           }
         }
-    
+
         stage('Bootstrap') {
           steps {
               sh '''
                 gradle :cega:createConfiguration \
                     -Pmachine=CEGA-${ID} \
                     --stacktrace
-    
+
                 gradle :lega-private:createConfiguration \
                     -Pmachine=LEGA-private-${ID} \
                     --stacktrace
-    
+
                 gradle :lega-public:createConfiguration \
                     -Pmachine=LEGA-public-${ID} \
                     -PcegaIP=$(docker-machine ip CEGA-${ID}) \
@@ -83,7 +83,7 @@ pipeline {
               '''
           }
         }
-    
+
         stage('Deploy') {
           steps {
           parallel(
@@ -105,7 +105,7 @@ pipeline {
               )
           }
         }
-    
+
         stage('Initialization') {
           steps {
             sh '''
@@ -113,7 +113,7 @@ pipeline {
             '''
           }
         }
-    
+
         stage('Ingest') {
           steps {
             sh '''
@@ -121,7 +121,7 @@ pipeline {
             '''
           }
         }
-        
+
         stage('Verify') {
           steps {
             sh '''
