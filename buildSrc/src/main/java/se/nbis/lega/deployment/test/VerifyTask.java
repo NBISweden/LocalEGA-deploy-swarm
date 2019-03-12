@@ -1,5 +1,8 @@
 package se.nbis.lega.deployment.test;
 
+import static se.nbis.lega.deployment.cluster.Machine.LEGA_PRIVATE;
+import static se.nbis.lega.deployment.lega.priv.Config.SSL_CERT;
+import static se.nbis.lega.deployment.lega.priv.Config.SSL_KEY;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -10,11 +13,11 @@ import java.util.Properties;
 import org.gradle.api.GradleException;
 import org.gradle.api.tasks.TaskAction;
 import lombok.extern.slf4j.Slf4j;
-import se.nbis.lega.deployment.cluster.Machine;
-import se.nbis.lega.deployment.lega.priv.Config;
 
 @Slf4j
 public class VerifyTask extends TestTask {
+
+    private static final String LEGA_PRIVATE_SSL = LEGA_PRIVATE_TMP + "/ssl/";
 
     public VerifyTask() {
         super();
@@ -25,7 +28,7 @@ public class VerifyTask extends TestTask {
         log.info("Starting Verification...");
         String host = getProperty(LEGA_PRIVATE_IP);
         if (host == null) {
-            host = getMachineIPAddress(Machine.LEGA_PRIVATE.getName());
+            host = getMachineIPAddress(LEGA_PRIVATE.getName());
         }
         String port = "5432";
         String db = "lega";
@@ -34,12 +37,9 @@ public class VerifyTask extends TestTask {
         props.setProperty("user", "lega_in");
         props.setProperty("password", readTrace(getProject().file(LEGA_PRIVATE_TMP_TRACE), DB_LEGA_IN_PASSWORD));
         props.setProperty("ssl", "true");
-        props.setProperty("sslrootcert",
-                        getProject().file(LEGA_PRIVATE_TMP_TRACE + "/ssl/" + Config.SSL_CERT).getAbsolutePath());
-        props.setProperty("sslcert",
-                        getProject().file(LEGA_PRIVATE_TMP_TRACE + "/ssl/" + Config.SSL_CERT).getAbsolutePath());
-        props.setProperty("sslkey",
-                        getProject().file(LEGA_PRIVATE_TMP_TRACE + "/ssl/" + Config.SSL_KEY).getAbsolutePath());
+        props.setProperty("sslrootcert", getProject().file(LEGA_PRIVATE_SSL + SSL_CERT.getName()).getAbsolutePath());
+        props.setProperty("sslcert", getProject().file(LEGA_PRIVATE_SSL + SSL_CERT.getName()).getAbsolutePath());
+        props.setProperty("sslkey", getProject().file(LEGA_PRIVATE_SSL + SSL_KEY.getName()).getAbsolutePath());
         try {
             Connection conn = DriverManager.getConnection(url, props);
             String sql = "select status from local_ega.files where id = ?";
