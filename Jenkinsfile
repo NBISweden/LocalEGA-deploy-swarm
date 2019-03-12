@@ -30,7 +30,7 @@ pipeline {
                     script: "printf \$(git rev-parse --short ${GIT_COMMIT})${BUILD_NUMBER}",
                     returnStdout: true
             )
-    ENV='test'
+    ENV = 'test'
     LOGZIO_TOKEN=credentials('LOGZIO_TOKEN')
   }
 
@@ -114,10 +114,19 @@ pipeline {
         '''
       }
     }
+    
+    stage('Verify') {
+      steps {
+        sh '''
+          gradle verify -PcegaIP=$(docker-machine ip CEGA-${ID}) -PlegaPublicIP=$(docker-machine ip LEGA-public-${ID}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${ID}) --stacktrace
+        '''
+      }
+    }
+  }
 
     stage('master'){
       environment {
-        ENV='staging'
+        ENV = 'staging'
         LEGA_private_IP = sh(
                         script: "printf \$(docker-machine ip lega-private-staging)",
                         returnStdout: true
@@ -201,14 +210,22 @@ pipeline {
               '''
             }
           }
+          stage('Verify') {
+            steps {
+              sh '''
+                gradle verify \
+                  -PlegaPublicIP=${LEGA_public_IP} \
+                  -PlegaPrivateIP=${LEGA_private_IP} \
+                  --stacktrace
+              '''
+            }
+          }
         }
     }
   }
 
-  post('Remove VM') {
-    cleanup {
-      sh 'docker-machine rm -y CEGA-${ID} LEGA-public-${ID} LEGA-private-${ID}'
-    }
+post('Remove VM') {
+  cleanup {
+    sh 'docker-machine rm -y CEGA-${ID} LEGA-public-${ID} LEGA-private-${ID}'
   }
-
 }

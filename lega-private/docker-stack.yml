@@ -32,6 +32,8 @@ services:
 
   db:
     image: postgres:10
+    ports:
+      - "5740:5740"
     deploy:
       restart_policy:
         condition: on-failure

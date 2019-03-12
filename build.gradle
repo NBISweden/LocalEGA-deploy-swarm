@@ -4,6 +4,7 @@ import se.nbis.lega.deployment.test.EncryptFileTask
 import se.nbis.lega.deployment.test.GenerateFileTask
 import se.nbis.lega.deployment.test.IngestFileTask
 import se.nbis.lega.deployment.test.UploadFileTask
+import se.nbis.lega.deployment.test.VerifyTask
 
 plugins {
     id 'com.gradle.build-scan' version '2.0.2'
@@ -80,3 +81,5 @@ task encrypt(type: EncryptFileTask)
 task upload(type: UploadFileTask)
 
 task ingest(type: IngestFileTask)
+
+task verify(type: VerifyTask)
