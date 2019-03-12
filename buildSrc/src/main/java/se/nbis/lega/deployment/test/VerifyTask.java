@@ -31,7 +31,7 @@ public class VerifyTask extends TestTask {
         String url = String.format("jdbc:postgresql://%s:%s/%s", host, port, db);
         Properties props = new Properties();
         props.setProperty("user", "lega_in");
-        props.setProperty("password", readTrace(DB_LEGA_IN_PASSWORD));
+        props.setProperty("password", readTrace(getProject().file(LEGA_PRIVATE_TMP_TRACE), DB_LEGA_IN_PASSWORD));
         props.setProperty("ssl", "true");
         try {
             Connection conn = DriverManager.getConnection(url, props);
