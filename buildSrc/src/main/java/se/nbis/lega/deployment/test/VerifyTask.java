@@ -11,6 +11,7 @@ import org.gradle.api.GradleException;
 import org.gradle.api.tasks.TaskAction;
 import lombok.extern.slf4j.Slf4j;
 import se.nbis.lega.deployment.cluster.Machine;
+import se.nbis.lega.deployment.lega.priv.Config;
 
 @Slf4j
 public class VerifyTask extends TestTask {
@@ -33,6 +34,10 @@ public class VerifyTask extends TestTask {
         props.setProperty("user", "lega_in");
         props.setProperty("password", readTrace(getProject().file(LEGA_PRIVATE_TMP_TRACE), DB_LEGA_IN_PASSWORD));
         props.setProperty("ssl", "true");
+        props.setProperty("sslcert",
+                        getProject().file(LEGA_PRIVATE_TMP_TRACE + "/ssl/" + Config.SSL_CERT).getAbsolutePath());
+        props.setProperty("sslkey",
+                        getProject().file(LEGA_PRIVATE_TMP_TRACE + "/ssl/" + Config.SSL_KEY).getAbsolutePath());
         try {
             Connection conn = DriverManager.getConnection(url, props);
             String sql = "select status from local_ega.files where id = ?";
