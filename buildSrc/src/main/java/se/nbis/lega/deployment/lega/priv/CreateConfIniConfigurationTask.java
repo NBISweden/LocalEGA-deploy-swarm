@@ -23,16 +23,16 @@ public class CreateConfIniConfigurationTask extends LegaPrivateTask {
         String postgresPassword = readTrace(DB_LEGA_IN_PASSWORD);
         File confIni = getProject().file(".tmp/conf.ini");
         FileUtils.write(confIni, String.format(
-            "[DEFAULT]\n" + "log = debug\n" + "\n" + "[keyserver]\n" + "port = 8080\n" + "\n"
+            "[DEFAULT]\n" + "log = debug\n" + "\n" + "[keyserver]\n" + "port = 8443\n" + "\n"
                 + "[quality_control]\n"
-                + "keyserver_endpoint = http://keys:8080/keys/retrieve/%%s/private/bin?idFormat=hex\n"
+                + "keyserver_endpoint = https://keys:8443/retrieve/%%s/private\n"
                 + "\n" + "[inbox]\n" + "storage_driver = S3Storage\n"
                 + "s3_url = http://inbox-s3:9000\n" + "s3_access_key = %s\n"
                 + "s3_secret_key = %s\n" + "#region = lega\n" + "\n" + "[archive]\n"
                 + "storage_driver = S3Storage\n" + "s3_url = http://vault-s3:9000\n"
                 + "s3_access_key = %s\n" + "s3_secret_key = %s\n" + "#region = lega\n" + "\n"
                 + "[outgestion]\n" + "# Just for test\n"
-                + "keyserver_endpoint = http://keys:8080/keys/retrieve/%%s/private/bin?idFormat=hex\n"
+                + "keyserver_endpoint = https://keys:8443/retrieve/%%s/private\n"
                 + "\n" + "## Connecting to Local EGA\n" + "[broker]\n" + "host = mq\n"
                 + "username = admin\n" + "connection_attempts = 30\n" + "# delay in seconds\n"
                 + "retry_delay = 10\n" + "\n" + "[postgres]\n" + "host = db\n" + "port = 5432\n"
