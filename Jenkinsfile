@@ -122,7 +122,6 @@ pipeline {
         '''
       }
     }
-  }
 
     stage('master'){
       environment {
@@ -138,94 +137,95 @@ pipeline {
         CEGA_MQ_CONNECTION=credentials('CEGA_MQ_CONNECTION')
         CEGA_USERS_CONNECTION=credentials('CEGA_USERS_CONNECTION')
         CEGA_USERS_CREDENTIALS=credentials('CEGA_USERS_CREDENTIALS')
+      }
+      when {
+        not{
+         branch "master"
         }
-        when {
-           branch "master"
-        }
-        stages{
-          stage('Tear down') {
-            steps {
-                sh '''
-                  gradle :cega:removeCEGATmpTask
-
-                  gradle :lega-private:removeStack -Pmachine=lega-private-staging --stacktrace
-                  gradle :lega-public:removeStack -Pmachine=lega-public-staging --stacktrace
-
-                  sleep 10
-
-                  gradle prune -Pmachine=lega-private-staging --stacktrace
-                  gradle prune -Pmachine=lega-public-staging --stacktrace
-                '''
-            }
-          }
-
-          stage('Bootstrap') {
-            steps {
-                sh '''
-                  gradle :lega-private:createConfiguration \
-                      -Pmachine=lega-private-staging \
-                      --stacktrace
-
-                  gradle :lega-public:createConfiguration \
-                      -Pmachine=lega-public-staging \
-                      -PcegaIP=${CEGA_IP} \
-                      -PlegaPrivateIP=${LEGA_private_IP} \
-                      --stacktrace
-                '''
-            }
-          }
-
-          stage('Deploy') {
-            steps {
-            parallel(
-                  "LEGA Public": {
-                    sh '''
-                      gradle :lega-public:deployStack -Pmachine=lega-public-staging --stacktrace
-                    '''
-                  },
-                  "LEGA Private": {
-                    sh '''
-                      gradle :lega-private:deployStack -Pmachine=lega-private-staging --stacktrace
-                    '''
-                  }
-                )
-            }
-          }
-
-          stage('Initialization') {
-            steps {
+      }
+      stages{
+        stage('Tear down') {
+          steps {
               sh '''
-                sleep 180
-              '''
-            }
-          }
+                gradle :cega:removeCEGATmpTask
 
-          stage('Test') {
-            steps {
-              sh '''
-                gradle ingest \
-                  -PlegaPublicIP=${LEGA_public_IP} \
-                  -PlegaPrivateIP=${LEGA_private_IP} \
-                  --stacktrace
+                gradle :lega-private:removeStack -Pmachine=lega-private-staging --stacktrace
+                gradle :lega-public:removeStack -Pmachine=lega-public-staging --stacktrace
+
+                sleep 10
+
+                gradle prune -Pmachine=lega-private-staging --stacktrace
+                gradle prune -Pmachine=lega-public-staging --stacktrace
               '''
-            }
-          }
-          stage('Verify') {
-            steps {
-              sh '''
-                gradle verify \
-                  -PlegaPublicIP=${LEGA_public_IP} \
-                  -PlegaPrivateIP=${LEGA_private_IP} \
-                  --stacktrace
-              '''
-            }
           }
         }
+
+        stage('Bootstrap') {
+          steps {
+              sh '''
+                gradle :lega-private:createConfiguration \
+                    -Pmachine=lega-private-staging \
+                    --stacktrace
+
+                gradle :lega-public:createConfiguration \
+                    -Pmachine=lega-public-staging \
+                    -PcegaIP=${CEGA_IP} \
+                    -PlegaPrivateIP=${LEGA_private_IP} \
+                    --stacktrace
+              '''
+          }
+        }
+
+        stage('Deploy') {
+          steps {
+          parallel(
+                "LEGA Public": {
+                  sh '''
+                    gradle :lega-public:deployStack -Pmachine=lega-public-staging --stacktrace
+                  '''
+                },
+                "LEGA Private": {
+                  sh '''
+                    gradle :lega-private:deployStack -Pmachine=lega-private-staging --stacktrace
+                  '''
+                }
+              )
+          }
+        }
+
+        stage('Initialization') {
+          steps {
+            sh '''
+              sleep 180
+            '''
+          }
+        }
+
+        stage('Test') {
+          steps {
+            sh '''
+              gradle ingest \
+                -PlegaPublicIP=${LEGA_public_IP} \
+                -PlegaPrivateIP=${LEGA_private_IP} \
+                --stacktrace
+            '''
+          }
+        }
+
+        stage('Verify') {
+          steps {
+            sh '''
+              gradle verify -PlegaPublicIP=${LEGA_public_IP} -PlegaPrivateIP=${LEGA_private_IP} --stacktrace
+            '''
+          }
+        }
+      }
     }
   }
 
-post('Remove VM') {
-  cleanup {
-    sh 'docker-machine rm -y CEGA-${ID} LEGA-public-${ID} LEGA-private-${ID}'
+  post('Remove VM') {
+    cleanup {
+      sh 'docker-machine rm -y CEGA-${ID} LEGA-public-${ID} LEGA-private-${ID}'
+    }
   }
 }
