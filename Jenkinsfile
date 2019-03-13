@@ -145,9 +145,7 @@ pipeline {
         CEGA_USERS_CREDENTIALS=credentials('CEGA_USERS_CREDENTIALS')
       }
       when {
-        not{
-         branch "master"
-        }
+        branch "master"
       }
       stages{
         stage('Tear down') {
