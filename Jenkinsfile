@@ -216,7 +216,12 @@ pipeline {
 
   post('Remove VM') {
     cleanup {
-      sh 'docker-machine rm -y CEGA-${ID} LEGA-public-${ID} LEGA-private-${ID}'
+      when {
+        not{
+         branch "master"
+        }
+        sh 'docker-machine rm -y CEGA-${ID} LEGA-public-${ID} LEGA-private-${ID}'
+      }
     }
   }
 }
