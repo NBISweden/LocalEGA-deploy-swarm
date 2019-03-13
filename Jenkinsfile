@@ -1,14 +1,14 @@
 pipeline {
-  
+
   agent any
-  
+
   options { disableConcurrentBuilds() }
-  
+
   triggers {
     cron(env.BRANCH_NAME == 'master' ? '0 0 * * *' : '')
     upstream(upstreamProjects: 'LocalEGA Build Trigger')
   }
-  
+
   environment {
     OS_USERNAME=credentials('OS_USERNAME')
     OS_PASSWORD=credentials('OS_PASSWORD')
@@ -63,18 +63,18 @@ pipeline {
               )
           }
         }
-    
+
         stage('Bootstrap') {
           steps {
               sh '''
                 gradle :cega:createConfiguration \
                     -Pmachine=CEGA-${ID} \
                     --stacktrace
-    
+
                 gradle :lega-private:createConfiguration \
                     -Pmachine=LEGA-private-${ID} \
                     --stacktrace
-    
+
                 gradle :lega-public:createConfiguration \
                     -Pmachine=LEGA-public-${ID} \
                     -PcegaIP=$(docker-machine ip CEGA-${ID}) \
@@ -83,7 +83,7 @@ pipeline {
               '''
           }
         }
-    
+
         stage('Deploy') {
           steps {
           parallel(
@@ -105,7 +105,7 @@ pipeline {
               )
           }
         }
-    
+
         stage('Initialization') {
           steps {
             sh '''
@@ -113,7 +113,7 @@ pipeline {
             '''
           }
         }
-    
+
         stage('Ingest') {
           steps {
             sh '''
@@ -128,6 +128,11 @@ pipeline {
               gradle verify -PcegaIP=$(docker-machine ip CEGA-${ID}) -PlegaPublicIP=$(docker-machine ip LEGA-public-${ID}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${ID}) --stacktrace
             '''
           }
+        }
+      }
+      post('Remove VM') {
+        cleanup {
+          sh 'docker-machine rm -y CEGA-${ID} LEGA-public-${ID} LEGA-private-${ID}'
         }
       }
     }
@@ -229,12 +234,21 @@ pipeline {
           }
         }
       }
-    }
-  }
 
-  post('Remove VM') {
-    cleanup {
-      sh 'docker-machine rm -y CEGA-${ID} LEGA-public-${ID} LEGA-private-${ID}'
+      post('logging') {
+        failure{
+          sh '''
+            gradle :cluster:serviceLogs -Pmachine=lega-public-staging -Pservice=inbox --stacktrace -i
+            gradle :cluster:serviceLogs -Pmachine=lega-public-staging -Pservice=mq --stacktrace -i
+            gradle :cluster:serviceLogs -Pmachine=lega-private-staging -Pservice=mq --stacktrace -i
+            gradle :cluster:serviceLogs -Pmachine=lega-private-staging -Pservice=ingest --stacktrace -i
+            gradle :cluster:serviceLogs -Pmachine=lega-private-staging -Pservice=db --stacktrace -i
+            gradle :cluster:serviceLogs -Pmachine=lega-private-staging -Pservice=vault-s3 --stacktrace -i
+            gradle :cluster:serviceLogs -Pmachine=lega-private-staging -Pservice=verify --stacktrace -i
+          '''
+        }
+      }
+
     }
   }
 }

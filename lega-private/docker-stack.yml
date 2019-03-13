@@ -99,30 +99,30 @@ services:
     command: server /data
 
   keys:
-    image: cscfi/ega-keyserver:m4
+    image: egarchive/lega-base:latest
     deploy:
       restart_policy:
         condition: on-failure
         delay: 5s
         window: 120s
     environment:
-      - SPRING_PROFILES_ACTIVE=no-oss
-      - EGA_KEY_PATH=/etc/ega/pgp/ega.sec,/etc/ega/pgp/ega2.sec
-      - EGA_KEYPASS_PATH=/etc/ega/pgp/ega.sec.pass,/etc/ega/pgp/ega2.sec.pass
-      - EGA_SHAREDPASS_PATH=/etc/ega/pgp/ega.shared.pass
-      - EGA_PUBLICKEY_URL=
-      - EGA_LEGACY_PATH=
+      - LEGA_PASSWORD
+      - KEYS_PASSWORD
     configs:
+      - source: conf.ini
+        target: /etc/ega/conf.ini
+      - source: keys.ini.enc
+        target: /etc/ega/keys.ini.enc
+      - source: ssl.cert
+        target: /etc/ega/ssl.cert
+      - source: ssl.key
+        target: /etc/ega/ssl.key
       - source: ega.sec
         target: /etc/ega/pgp/ega.sec
       - source: ega2.sec
         target: /etc/ega/pgp/ega2.sec
-      - source: ega.sec.pass
-        target: /etc/ega/pgp/ega.sec.pass
-      - source: ega2.sec.pass
-        target: /etc/ega/pgp/ega2.sec.pass
-      - source: ega.shared.pass
-        target: /etc/ega/pgp/ega.shared.pass
+    user: lega
+    entrypoint: ["ega-keyserver", "--keys", "/etc/ega/keys.ini.enc"]
 
   verify:
     image: egarchive/lega-base:latest
@@ -235,13 +235,15 @@ configs:
     external: true
   conf.ini:
     external: true
+  keys.ini.enc:
+    external: true
+  ssl.cert:
+    external: true
+  ssl.key:
+    external: true
   ega.sec:
     external: true
   ega2.sec:
-    external: true
-  ega.sec.pass:
-    external: true
-  ega2.sec.pass:
     external: true
   ega.shared.pass:
     external: true
