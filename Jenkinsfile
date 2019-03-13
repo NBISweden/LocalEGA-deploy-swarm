@@ -145,7 +145,9 @@ pipeline {
         CEGA_USERS_CREDENTIALS=credentials('CEGA_USERS_CREDENTIALS')
       }
       when {
+        not{
          branch "master"
+        }
       }
       stages{
         stage('Tear down') {
@@ -216,12 +218,23 @@ pipeline {
           }
         }
       }
+      post('Remove VM') {
+        failure{
+          sh '''
+            gradle :cluster:serviceLogs -Pmachine=lega-public-staging -Pservice=inbox --stacktrace -i
+            gradle :cluster:serviceLogs -Pmachine=lega-public-staging -Pservice=mq --stacktrace -i
+            gradle :cluster:serviceLogs -Pmachine=lega-private-staging -Pservice=mq --stacktrace -i
+            gradle :cluster:serviceLogs -Pmachine=lega-private-staging -Pservice=ingest --stacktrace -i
+            gradle :cluster:serviceLogs -Pmachine=lega-private-staging -Pservice=db --stacktrace -i
+            gradle :cluster:serviceLogs -Pmachine=lega-private-staging -Pservice=vault-s3 --stacktrace -i
+            gradle :cluster:serviceLogs -Pmachine=lega-private-staging -Pservice=verify --stacktrace -i
+          '''
+        }
+        cleanup {
+          sh ' gradle :cluster:serviceLogs -Pmachine=lega-private-staging -Pservice=verify --stacktrace -i '
+        }
+      }
     }
   }
 
-  post('Remove VM') {
-    cleanup {
-      sh 'docker-machine rm -y CEGA-${ID} LEGA-public-${ID} LEGA-private-${ID}'
-    }
-  }
 }
