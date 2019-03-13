@@ -122,6 +122,11 @@ pipeline {
           }
         }
       }
+      post('Remove VM') {
+        cleanup {
+          sh 'docker-machine rm -y CEGA-${ID} LEGA-public-${ID} LEGA-private-${ID}'
+        }
+      }
     }
 
     stage('master'){
@@ -216,9 +221,7 @@ pipeline {
 
   post('Remove VM') {
     cleanup {
-      if (env.BRANCH_NAME != "master") {
-        sh 'docker-machine rm -y CEGA-${ID} LEGA-public-${ID} LEGA-private-${ID}'
-      }
+      sh 'docker-machine rm -y CEGA-${ID} LEGA-public-${ID} LEGA-private-${ID}'
     }
   }
 }
