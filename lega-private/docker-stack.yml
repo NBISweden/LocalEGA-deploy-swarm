@@ -75,7 +75,6 @@ services:
       interval: 1m
       timeout: 10s
       retries: 3
-      start_period: 50s
     deploy:
       restart_policy:
         condition: on-failure
@@ -97,7 +96,6 @@ services:
       interval: 1m
       timeout: 10s
       retries: 3
-      start_period: 50s
     deploy:
       restart_policy:
         condition: on-failure
