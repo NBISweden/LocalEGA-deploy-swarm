@@ -217,7 +217,7 @@ pipeline {
         }
       }
       post('logging') {
-        failure{
+        failure {
           sh '''
             gradle :cluster:serviceLogs -Pmachine=lega-public-staging -Pservice=inbox --stacktrace -i
             gradle :cluster:serviceLogs -Pmachine=lega-public-staging -Pservice=mq --stacktrace -i
@@ -227,6 +227,9 @@ pipeline {
             gradle :cluster:serviceLogs -Pmachine=lega-private-staging -Pservice=vault-s3 --stacktrace -i
             gradle :cluster:serviceLogs -Pmachine=lega-private-staging -Pservice=verify --stacktrace -i
           '''
+        }
+        always {
+          cleanWs()
         }
       }
     }
