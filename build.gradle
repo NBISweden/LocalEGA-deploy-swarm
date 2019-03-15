@@ -5,6 +5,7 @@ import se.nbis.lega.deployment.test.GenerateFileTask
 import se.nbis.lega.deployment.test.IngestFileTask
 import se.nbis.lega.deployment.test.UploadFileTask
 import se.nbis.lega.deployment.test.VerifyTask
+import se.nbis.lega.deployment.test.TestTask
 
 plugins {
     id 'com.gradle.build-scan' version '2.0.2'

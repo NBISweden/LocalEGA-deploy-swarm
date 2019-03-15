@@ -114,14 +114,6 @@ pipeline {
           }
         }
 
-        stage('Ingest') {
-          steps {
-            sh '''
-              gradle ingest -PcegaIP=$(docker-machine ip CEGA-${ID}) -PlegaPublicIP=$(docker-machine ip LEGA-public-${ID}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${ID}) --stacktrace
-            '''
-          }
-        }
-        
         stage('Verify') {
           steps {
             sh '''
@@ -131,6 +123,17 @@ pipeline {
         }
       }
       post('Remove VM') {
+        failure{
+          sh '''
+            gradle :cluster:serviceLogs -Pmachine=LEGA-public-${ID} -Pservice=inbox --stacktrace -i
+            gradle :cluster:serviceLogs -Pmachine=LEGA-public-${ID} -Pservice=mq --stacktrace -i
+            gradle :cluster:serviceLogs -Pmachine=LEGA-private-${ID} -Pservice=mq --stacktrace -i
+            gradle :cluster:serviceLogs -Pmachine=LEGA-private-${ID} -Pservice=ingest --stacktrace -i
+            gradle :cluster:serviceLogs -Pmachine=LEGA-private-${ID} -Pservice=db --stacktrace -i
+            gradle :cluster:serviceLogs -Pmachine=LEGA-private-${ID} -Pservice=vault-s3 --stacktrace -i
+            gradle :cluster:serviceLogs -Pmachine=LEGA-private-${ID} -Pservice=verify --stacktrace -i
+          '''
+        }
         cleanup {
           sh 'docker-machine rm -y CEGA-${ID} LEGA-public-${ID} LEGA-private-${ID}'
         }
@@ -153,9 +156,7 @@ pipeline {
         CEGA_USERS_CREDENTIALS=credentials('CEGA_USERS_CREDENTIALS')
       }
       when {
-        not{
-         branch "master"
-        }
+       branch "master"
       }
       stages{
         stage('Tear down') {
@@ -211,17 +212,6 @@ pipeline {
           steps {
             sh '''
               sleep 180
-            '''
-          }
-        }
-
-        stage('Ingest') {
-          steps {
-            sh '''
-              gradle ingest \
-                -PlegaPublicIP=${LEGA_public_IP} \
-                -PlegaPrivateIP=${LEGA_private_IP} \
-                --stacktrace
             '''
           }
         }
