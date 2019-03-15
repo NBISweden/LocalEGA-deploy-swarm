@@ -109,7 +109,7 @@ pipeline {
         stage('Initialization') {
           steps {
             sh '''
-              sleep 240
+              sleep 180
             '''
           }
         }
@@ -200,7 +200,7 @@ pipeline {
         stage('Initialization') {
           steps {
             sh '''
-              sleep 240
+              sleep 180
             '''
           }
         }
