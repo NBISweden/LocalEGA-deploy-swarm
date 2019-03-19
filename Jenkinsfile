@@ -211,7 +211,7 @@ pipeline {
         stage('Initialization') {
           steps {
             sh '''
-              sleep 120
+              sleep 180
             '''
           }
         }
@@ -237,7 +237,7 @@ pipeline {
             gradle :cluster:serviceLogs -Pmachine=lega-private-staging -Pservice=verify --stacktrace -i
           '''
         }
-        always {
+        cleanup {
           cleanWs()
         }
       }

@@ -24,12 +24,14 @@ public class UploadFileTask extends TestTask {
             host = getMachineIPAddress(Machine.LEGA_PUBLIC.getName());
         }
         System.out.println("Connecting to " + host);
-        SSHClient ssh = new SSHClient();
+        SSHClient ssh;
         try {
+            ssh = new SSHClient();
             ssh.addHostKeyVerifier(new PromiscuousVerifier());
             ssh.connect(host, 2222);
             ssh.authPublickey("john", getProject().file("cega/.tmp/users/john.sec").getAbsolutePath());
         } catch (UserAuthException e) {
+            ssh = new SSHClient();
             ssh.addHostKeyVerifier(new PromiscuousVerifier());
             ssh.connect(host, 2222);
             ssh.authPublickey("dummy", "dummy.sec");
