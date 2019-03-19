@@ -24,6 +24,6 @@ dependencies {
     compile "no.uio.ifi:crypt4gh:1.2.0"
     compileOnly 'org.projectlombok:lombok:1.18.6'
     annotationProcessor 'org.projectlombok:lombok:1.18.6'
-    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
+    compile "org.postgresql:postgresql:42.2.5"
     
 }

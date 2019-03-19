@@ -109,20 +109,31 @@ pipeline {
         stage('Initialization') {
           steps {
             sh '''
-              sleep 180
+              sleep 120
             '''
           }
         }
 
-        stage('Ingest') {
+        stage('Test') {
           steps {
             sh '''
-              gradle ingest -PcegaIP=$(docker-machine ip CEGA-${ID}) -PlegaPublicIP=$(docker-machine ip LEGA-public-${ID}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${ID}) --stacktrace
+              gradle verify -PcegaIP=$(docker-machine ip CEGA-${ID}) -PlegaPublicIP=$(docker-machine ip LEGA-public-${ID}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${ID}) --stacktrace
             '''
           }
         }
       }
       post('Remove VM') {
+        failure{
+          sh '''
+            gradle :cluster:serviceLogs -Pmachine=LEGA-public-${ID} -Pservice=inbox --stacktrace -i
+            gradle :cluster:serviceLogs -Pmachine=LEGA-public-${ID} -Pservice=mq --stacktrace -i
+            gradle :cluster:serviceLogs -Pmachine=LEGA-private-${ID} -Pservice=mq --stacktrace -i
+            gradle :cluster:serviceLogs -Pmachine=LEGA-private-${ID} -Pservice=ingest --stacktrace -i
+            gradle :cluster:serviceLogs -Pmachine=LEGA-private-${ID} -Pservice=db --stacktrace -i
+            gradle :cluster:serviceLogs -Pmachine=LEGA-private-${ID} -Pservice=vault-s3 --stacktrace -i
+            gradle :cluster:serviceLogs -Pmachine=LEGA-private-${ID} -Pservice=verify --stacktrace -i
+          '''
+        }
         cleanup {
           sh 'docker-machine rm -y CEGA-${ID} LEGA-public-${ID} LEGA-private-${ID}'
         }
@@ -200,22 +211,20 @@ pipeline {
         stage('Initialization') {
           steps {
             sh '''
-              sleep 180
+              sleep 120
             '''
           }
         }
 
-        stage('Ingest') {
+        stage('Test') {
           steps {
             sh '''
-              gradle ingest \
-                -PlegaPublicIP=${LEGA_public_IP} \
-                -PlegaPrivateIP=${LEGA_private_IP} \
-                --stacktrace
+              gradle verify -PlegaPublicIP=${LEGA_public_IP} -PlegaPrivateIP=${LEGA_private_IP} --stacktrace
             '''
           }
         }
       }
+
       post('logging') {
         failure {
           sh '''
@@ -232,7 +241,7 @@ pipeline {
           cleanWs()
         }
       }
+
     }
   }
-
 }
