@@ -17,7 +17,7 @@ services:
     command: ["--no-stats", "--no-dockerEvents", "-a", "stack=public", "-a", "rev=${GIT_COMMIT_SHORT}", "-a", "build=${BUILD_NUMBER}", "-a", "env=${ENV}"]
 
   mq:
-    image: uiobmi/localega-broker:public
+    image: ${PUBLIC_BROKER_IMAGE}
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -33,7 +33,7 @@ services:
       - CEGA_CONNECTION
 
   inbox:
-    image: nbisweden/ega-mina-inbox:latest
+    image: ${INBOX_IMAGE}
     ports:
       - "2222:2222"
     deploy:
