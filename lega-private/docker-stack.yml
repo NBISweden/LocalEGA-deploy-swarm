@@ -31,7 +31,7 @@ services:
       - PASSWORD_HASH=4tHURqDiZzypw0NTvoHhpn8/MMgONWonWxgRZ4NXgR8nZRBz
 
   db:
-    image: postgres:10
+    image: egarchive/lega-db:latest
     ports:
       - "5432:5432"
     deploy:
@@ -46,25 +46,6 @@ services:
       - SSL_SUBJ=/C=NO/ST=Norway/L=Oslo/O=UiO/OU=IFI/CN=LocalEGA/emailAddress=ega@nbis.se
     volumes:
       - db:/ega/data
-    configs:
-      - source: postgresql.conf
-        target: /etc/ega/pg.conf
-      - source: main.sql
-        target: /docker-entrypoint-initdb.d/main.sql
-      - source: grants.sql
-        target: /docker-entrypoint-initdb.d/grants.sql
-      - source: download.sql
-        target: /docker-entrypoint-initdb.d/download.sql
-      - source: ebi.sql
-        target: /docker-entrypoint-initdb.d/ebi.sql
-      - source: qc.sql
-        target: /docker-entrypoint-initdb.d/qc.sql
-      - source: db.entrypoint.sh
-        target: /usr/bin/ega-entrypoint.sh
-        uid: '999'
-        gid: '999'
-        mode: 0555
-    entrypoint: ["/bin/bash", "/usr/bin/ega-entrypoint.sh"]
 
   inbox-s3:
     image: minio/minio:RELEASE.2019-02-12T21-58-47Z
@@ -229,20 +210,6 @@ volumes:
   db:
 
 configs:
-  postgresql.conf:
-    external: true
-  main.sql:
-    external: true
-  grants.sql:
-    external: true
-  download.sql:
-    external: true
-  ebi.sql:
-    external: true
-  qc.sql:
-    external: true
-  db.entrypoint.sh:
-    external: true
   conf.ini:
     external: true
   keys.ini.enc:
