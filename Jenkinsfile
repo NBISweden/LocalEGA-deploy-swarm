@@ -47,11 +47,11 @@ pipeline {
 
   stages {
 
-    stage('external'){
+    stage('external') {
 
       when { triggeredBy 'GenericTrigger' }
 
-      stages{
+      stages {
         stage('Create VMs') {
           steps {
           parallel(
@@ -150,18 +150,18 @@ pipeline {
       }
     }
 
-    stage('branch'){
+    stage('branch') {
 
       when {
         not{
-         branch 'master'
+         triggeredBy 'GenericTrigger'
         }
         not{
          branch 'master'
         }
       }
 
-      stages{
+      stages {
         stage('Create VMs') {
           steps {
           parallel(
@@ -260,7 +260,7 @@ pipeline {
       }
     }
 
-    stage('master'){
+    stage('master') {
 
       environment {
         ENV = 'staging'
@@ -284,7 +284,7 @@ pipeline {
         branch 'master'
       }
 
-      stages{
+      stages {
         stage('Tear down') {
           steps {
               sh '''
