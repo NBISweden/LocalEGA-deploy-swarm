@@ -6,7 +6,16 @@ pipeline {
 
   triggers {
     cron(env.BRANCH_NAME == 'master' ? '0 0 * * *' : '')
-    upstream(upstreamProjects: 'LocalEGA Build Trigger')
+    GenericTrigger(
+     genericVariables: [
+      [key: 'service', value: '$.service'],
+      [key: 'image', value: '$.image']
+     ],
+     token: 'LocalEGA',
+     causeString: 'Triggered by $image',
+     printContributedVariables: true,
+     printPostContent: true
+    )
   }
 
   environment {
