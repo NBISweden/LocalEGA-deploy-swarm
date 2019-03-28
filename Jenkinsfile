@@ -154,7 +154,9 @@ pipeline {
 
       when {
         not{
-         triggeredBy 'GenericTrigger'
+         branch 'master'
+        }
+        not{
          branch 'master'
         }
       }
