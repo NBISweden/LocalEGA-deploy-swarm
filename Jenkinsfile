@@ -46,12 +46,119 @@ pipeline {
   }
 
   stages {
-    stage('branch'){
-      when {
-        not{
-         branch "master"
+
+    stage('external'){
+
+      when { triggeredBy 'GenericTrigger' }
+
+      stages{
+        stage('Create VMs') {
+          steps {
+          parallel(
+                "CEGA": {
+                          sh '''
+                            gradle :cluster:createCEGAMachine -Pmachine=CEGA-${ID} --stacktrace -i
+                          '''
+                },
+                "LEGA Public": {
+                          sh '''
+                            gradle :cluster:createLEGAPublicMachine -Pmachine=LEGA-public-${ID} --stacktrace -i
+                          '''
+                },
+                "LEGA Private": {
+                          sh '''
+                            gradle :cluster:createLEGAPrivateMachine -Pmachine=LEGA-private-${ID} --stacktrace -i
+                          '''
+                }
+              )
+          }
+        }
+
+        stage('Bootstrap') {
+          steps {
+              sh '''
+                gradle :cega:createConfiguration \
+                    -Pmachine=CEGA-${ID} \
+                    --stacktrace
+
+                gradle :lega-private:createConfiguration \
+                    -Pmachine=LEGA-private-${ID} \
+                    --stacktrace
+
+                gradle :lega-public:createConfiguration \
+                    -Pmachine=LEGA-public-${ID} \
+                    -PcegaIP=$(docker-machine ip CEGA-${ID}) \
+                    -PlegaPrivateIP=$(docker-machine ip LEGA-private-${ID}) \
+                    --stacktrace
+              '''
+          }
+        }
+
+        stage('Deploy') {
+          steps {
+          parallel(
+                "CEGA": {
+                          sh '''
+                            gradle :cega:deployStack -Pmachine=CEGA-${ID} --stacktrace
+                          '''
+                },
+                "LEGA Public": {
+                          sh '''
+                            gradle :lega-public:deployStack -Pmachine=LEGA-public-${ID} --stacktrace
+                          '''
+                },
+                "LEGA Private": {
+                          sh '''
+                            gradle :lega-private:deployStack -Pmachine=LEGA-private-${ID} --stacktrace
+                          '''
+                }
+              )
+          }
+        }
+
+        stage('Initialization') {
+          steps {
+            sh '''
+              sleep 120
+            '''
+          }
+        }
+
+        stage('Test') {
+          steps {
+            sh '''
+              gradle verify -PcegaIP=$(docker-machine ip CEGA-${ID}) -PlegaPublicIP=$(docker-machine ip LEGA-public-${ID}) -PlegaPrivateIP=$(docker-machine ip LEGA-private-${ID}) --stacktrace
+            '''
+          }
         }
       }
+      post('Remove VM') {
+        failure{
+          sh '''
+            gradle :cluster:serviceLogs -Pmachine=LEGA-public-${ID} -Pservice=inbox --stacktrace -i
+            gradle :cluster:serviceLogs -Pmachine=LEGA-public-${ID} -Pservice=mq --stacktrace -i
+            gradle :cluster:serviceLogs -Pmachine=LEGA-private-${ID} -Pservice=mq --stacktrace -i
+            gradle :cluster:serviceLogs -Pmachine=LEGA-private-${ID} -Pservice=ingest --stacktrace -i
+            gradle :cluster:serviceLogs -Pmachine=LEGA-private-${ID} -Pservice=db --stacktrace -i
+            gradle :cluster:serviceLogs -Pmachine=LEGA-private-${ID} -Pservice=vault-s3 --stacktrace -i
+            gradle :cluster:serviceLogs -Pmachine=LEGA-private-${ID} -Pservice=verify --stacktrace -i
+          '''
+        }
+        cleanup {
+          sh 'docker-machine rm -y CEGA-${ID} LEGA-public-${ID} LEGA-private-${ID}'
+        }
+      }
+    }
+
+    stage('branch'){
+
+      when {
+        not{
+         triggeredBy 'GenericTrigger'
+         branch 'master'
+        }
+      }
+
       stages{
         stage('Create VMs') {
           steps {
@@ -152,6 +259,7 @@ pipeline {
     }
 
     stage('master'){
+
       environment {
         ENV = 'staging'
         LEGA_private_IP = sh(
@@ -166,9 +274,14 @@ pipeline {
         CEGA_USERS_CONNECTION=credentials('CEGA_USERS_CONNECTION')
         CEGA_USERS_CREDENTIALS=credentials('CEGA_USERS_CREDENTIALS')
       }
+
       when {
-        branch "master"
+        not {
+          triggeredBy 'GenericTrigger'
+        }
+        branch 'master'
       }
+
       stages{
         stage('Tear down') {
           steps {
