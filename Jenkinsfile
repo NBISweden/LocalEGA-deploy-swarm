@@ -58,7 +58,7 @@ pipeline {
 
     stage('external') {
 
-      when { triggeredBy 'GenericTrigger' }
+      when { triggeredBy cause: "GenericCause" }
 
       stages {
         stage('Create VMs') {
