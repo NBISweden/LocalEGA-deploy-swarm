@@ -378,5 +378,11 @@ pipeline {
       }
 
     }
+
+    stage('chuck') {
+      steps{
+        chuckNorris()
+      }
+    }
   }
 }
