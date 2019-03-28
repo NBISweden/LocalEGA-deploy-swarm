@@ -163,10 +163,10 @@ pipeline {
 
       when {
         not{
-         triggeredBy 'GenericTrigger'
+         triggeredBy cause: "GenericCause"
         }
         not{
-         branch 'master'
+         branch "master"
         }
       }
 
@@ -288,9 +288,9 @@ pipeline {
 
       when {
         not {
-          triggeredBy 'GenericTrigger'
+          triggeredBy cause: "GenericCause"
         }
-        branch 'master'
+        branch "master"
       }
 
       stages {
