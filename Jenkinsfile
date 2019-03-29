@@ -60,16 +60,15 @@ pipeline {
 
       when { triggeredBy cause: "GenericCause" }
 
-      environment {
-        service = image
-      }
-
       stages {
 
-        stage('Print service image') {
-            script {
-                echo service
-                echo image
+        stage('Set service image') {
+            steps {
+                script {
+                    echo service
+                    echo image
+                    env.put(service, image)
+                }
             }
         }
 
