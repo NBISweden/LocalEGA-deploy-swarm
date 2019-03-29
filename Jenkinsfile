@@ -67,7 +67,7 @@ pipeline {
                 script {
                     echo service
                     echo image
-                    env.put(service, image)
+                    env.putAt(service, image)
                 }
             }
         }
