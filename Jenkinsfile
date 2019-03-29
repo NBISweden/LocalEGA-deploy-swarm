@@ -60,7 +60,19 @@ pipeline {
 
       when { triggeredBy cause: "GenericCause" }
 
+      environment {
+        service = image
+      }
+
       stages {
+
+        stage('Print service image') {
+            script {
+                echo service
+                echo image
+            }
+        }
+
         stage('Create VMs') {
           steps {
           parallel(
