@@ -1,22 +1,6 @@
 package se.nbis.lega.deployment;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.attribute.PosixFilePermission;
-import java.security.KeyPair;
-import java.security.Security;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
@@ -25,7 +9,14 @@ import org.apache.commons.io.FileUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.gradle.api.DefaultTask;
-import lombok.extern.slf4j.Slf4j;
+
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.attribute.PosixFilePermission;
+import java.security.KeyPair;
+import java.security.Security;
+import java.util.*;
 
 @Slf4j
 public abstract class LocalEGATask extends DefaultTask {
@@ -34,10 +25,9 @@ public abstract class LocalEGATask extends DefaultTask {
     public static final String TMP_TRACE = ".tmp/.trace";
     public static final String CEGA_TMP_TRACE = "cega/.tmp/.trace";
     public static final String LEGA_PRIVATE_TMP_TRACE = "lega-private/.tmp/.trace";
-    public static final String LEGA_PRIVATE_TMP = "lega-private/.tmp/";
 
-    public static final List<String> DOCKER_ENV_VARS =
-                    Arrays.asList("DOCKER_TLS_VERIFY", "DOCKER_HOST", "DOCKER_CERT_PATH", "DOCKER_MACHINE_NAME");
+    public static final List<String> DOCKER_ENV_VARS = Arrays
+        .asList("DOCKER_TLS_VERIFY", "DOCKER_HOST", "DOCKER_CERT_PATH", "DOCKER_MACHINE_NAME");
 
     public static final String LEGA_INSTANCES = "LEGA_INSTANCES";
     public static final String LEGA_INSTANCE_NAME = "lega";
@@ -103,7 +93,9 @@ public abstract class LocalEGATask extends DefaultTask {
     public void writeTrace(File traceFile, String key, String value) throws IOException {
         String existingValue = readTrace(traceFile, key);
         if (existingValue == null) {
-            FileUtils.writeLines(traceFile, Collections.singleton(String.format("%s=%s", key, value)), true);
+            FileUtils
+                .writeLines(traceFile, Collections.singleton(String.format("%s=%s", key, value)),
+                    true);
         }
     }
 
@@ -138,7 +130,8 @@ public abstract class LocalEGATask extends DefaultTask {
     }
 
     protected void removeConfig(String name) throws IOException {
-        List<String> rs = exec(true, getMachineEnvironment(machineName), "docker config ls -q -f NAME=" + name);
+        List<String> rs =
+            exec(true, getMachineEnvironment(machineName), "docker config ls -q -f NAME=" + name);
         boolean configExist = rs.get(0).length() > 0;
         if (configExist) {
             exec(true, getMachineEnvironment(machineName), "docker config rm", name);
@@ -146,7 +139,8 @@ public abstract class LocalEGATask extends DefaultTask {
     }
 
     protected void removeConfigs(Set<String> names) throws IOException {
-        exec(true, getMachineEnvironment(machineName), "docker config rm " + String.join(" ", names));
+        exec(true, getMachineEnvironment(machineName),
+            "docker config rm " + String.join(" ", names));
     }
 
     protected void listServices() throws IOException {
@@ -154,7 +148,8 @@ public abstract class LocalEGATask extends DefaultTask {
     }
 
     protected void serviceLogs(String service) throws IOException {
-        exec(true, getMachineEnvironment(machineName), "docker service logs ", machineName + "_" + service);
+        exec(true, getMachineEnvironment(machineName), "docker service logs ",
+            machineName + "_" + service);
     }
 
     protected void removeVolume(String name) throws IOException {
@@ -162,24 +157,26 @@ public abstract class LocalEGATask extends DefaultTask {
     }
 
     protected void createConfig(String name, File file) throws IOException {
-        exec(true, getMachineEnvironment(machineName), "docker config create", name, file.getAbsolutePath());
+        exec(true, getMachineEnvironment(machineName), "docker config create", name,
+            file.getAbsolutePath());
     }
 
     protected List<String> exec(String command, String... arguments) throws IOException {
         return exec(false, null, command, arguments);
     }
 
-    protected List<String> exec(boolean ignoreExitCode, String command, String... arguments) throws IOException {
+    protected List<String> exec(boolean ignoreExitCode, String command, String... arguments)
+        throws IOException {
         return exec(ignoreExitCode, null, command, arguments);
     }
 
-    protected List<String> exec(Map<String, String> environment, String command, String... arguments)
-                    throws IOException {
+    protected List<String> exec(Map<String, String> environment, String command,
+        String... arguments) throws IOException {
         return exec(false, environment, command, arguments);
     }
 
-    protected List<String> exec(boolean ignoreExitCode, Map<String, String> environment, String command,
-                    String... arguments) throws IOException {
+    protected List<String> exec(boolean ignoreExitCode, Map<String, String> environment,
+        String command, String... arguments) throws IOException {
         Map<String, String> systemEnvironment = new HashMap<>(System.getenv());
         if (environment != null) {
             systemEnvironment.putAll(environment);
@@ -207,10 +204,12 @@ public abstract class LocalEGATask extends DefaultTask {
         }
     }
 
-    protected void regenerateCertificates(String name, Map<String, String> openStackEnvironment) throws IOException {
+    protected void regenerateCertificates(String name, Map<String, String> openStackEnvironment)
+        throws IOException {
         log.info("regenerate-certs");
         try {
-            exec(true, openStackEnvironment, "docker-machine regenerate-certs", "--client-certs", "--force", name);
+            exec(true, openStackEnvironment, "docker-machine regenerate-certs", "--client-certs",
+                "--force", name);
         } catch (Exception e) {
             log.error("Error regenerate-certs for: " + name);
             throw e;
