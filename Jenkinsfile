@@ -72,12 +72,6 @@ pipeline {
             }
         }
 
-        stage('List env') {
-            steps {
-                echo sh(returnStdout: true, script: 'env')
-            }
-        }
-
         stage('Create VMs') {
           steps {
           parallel(
