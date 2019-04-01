@@ -12,7 +12,7 @@ pipeline {
       [key: 'image', value: '$.image']
      ],
      token: 'LocalEGA',
-     causeString: 'Triggered by $image',
+     causeString: 'Triggered by service $service with image $image',
      printContributedVariables: true,
      printPostContent: true
     )
