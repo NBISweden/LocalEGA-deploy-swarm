@@ -17,7 +17,7 @@ services:
     command: ["--no-stats", "--no-dockerEvents", "-a", "stack=private", "-a", "rev=${GIT_COMMIT_SHORT}", "-a", "build=${BUILD_NUMBER}", "-a", "env=${ENV}"]
 
   mq:
-    image: uiobmi/localega-broker:private
+    image: ${PRIVATE_BROKER_SERVICE}
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -31,7 +31,7 @@ services:
       - PASSWORD_HASH=4tHURqDiZzypw0NTvoHhpn8/MMgONWonWxgRZ4NXgR8nZRBz
 
   db:
-    image: egarchive/lega-db:latest
+    image: ${DB_SERVICE}
     ports:
       - "5432:5432"
     deploy:
@@ -90,7 +90,7 @@ services:
     command: server /data
 
   keys:
-    image: egarchive/lega-base:latest
+    image: ${KEYS_SERVICE}
     deploy:
       restart_policy:
         condition: on-failure
@@ -116,7 +116,7 @@ services:
     entrypoint: ["ega-keyserver", "--keys", "/etc/ega/keys.ini.enc"]
 
   verify:
-    image: egarchive/lega-base:latest
+    image: ${VERIFY_SERVICE}
     deploy:
       restart_policy:
         condition: on-failure
@@ -138,7 +138,7 @@ services:
     entrypoint: ["ega-verify"]
 
   res:
-    image: cscfi/ega-res:latest
+    image: ${RES_SERVICE}
     ports:
       - "8081:8080"
     deploy:
@@ -167,8 +167,8 @@ services:
       - source: ega.shared.pass
         target: /etc/ega/pgp/ega.shared.pass
 
-  id-mapper:
-    image: egarchive/lega-base:latest
+  finalize:
+    image: ${FINALIZE_SERVICE}
     deploy:
       restart_policy:
         condition: on-failure
@@ -184,7 +184,7 @@ services:
     entrypoint: ["ega-finalize"]
 
   ingest:
-    image: egarchive/lega-base:latest
+    image: ${INGEST_SERVICE}
     deploy:
       restart_policy:
         condition: on-failure

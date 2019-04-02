@@ -14,6 +14,9 @@ public class DeployStackTask extends LocalEGATask {
     public void run() throws IOException {
         environment.putAll(getMachineEnvironment(machineName));
         environment.putAll(System.getenv());
+        if (environment.containsKey("service")) {
+            environment.put(environment.get("service"), environment.get("image"));
+        }
         exec(environment, "docker stack deploy", "--compose-file", composeFile, machineName);
     }
 
