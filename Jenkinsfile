@@ -42,16 +42,16 @@ pipeline {
     ENV = 'test'
     LOGZIO_TOKEN=credentials('LOGZIO_TOKEN')
 
-    PUBLIC_BROKER_IMAGE='uiobmi/localega-broker:public'
-    INBOX_IMAGE='nbisweden/ega-mina-inbox:latest'
+    PUBLIC_BROKER_SERVICE='uiobmi/localega-broker:public'
+    INBOX_SERVICE='nbisweden/ega-mina-inbox:latest'
 
-    PRIVATE_BROKER_IMAGE='uiobmi/localega-broker:private'
-    DB_IMAGE='egarchive/lega-db:latest'
-    KEYS_IMAGE='egarchive/lega-base:latest'
-    VERIFY_IMAGE='egarchive/lega-base:latest'
-    RES_IMAGE='cscfi/ega-res:latest'
-    FINALIZE_IMAGE='egarchive/lega-base:latest'
-    INGEST_IMAGE='egarchive/lega-base:latest'
+    PRIVATE_BROKER_SERVICE='uiobmi/localega-broker:private'
+    DB_SERVICE='egarchive/lega-db:latest'
+    KEYS_SERVICE='egarchive/lega-base:latest'
+    VERIFY_SERVICE='egarchive/lega-base:latest'
+    RES_SERVICE='cscfi/ega-res:latest'
+    FINALIZE_SERVICE='egarchive/lega-base:latest'
+    INGEST_SERVICE='egarchive/lega-base:latest'
   }
 
   stages {
