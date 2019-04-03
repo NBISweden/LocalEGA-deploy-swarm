@@ -42,10 +42,10 @@ pipeline {
     ENV = 'test'
     LOGZIO_TOKEN=credentials('LOGZIO_TOKEN')
 
-    PUBLIC_BROKER_SERVICE='uiobmi/localega-broker:public'
+    PUBLIC_BROKER_SERVICE='uiobmi/localega-broker-public:latest'
     INBOX_SERVICE='nbisweden/ega-mina-inbox:latest'
 
-    PRIVATE_BROKER_SERVICE='uiobmi/localega-broker:private'
+    PRIVATE_BROKER_SERVICE='uiobmi/localega-broker-private:latest'
     DB_SERVICE='egarchive/lega-db:latest'
     KEYS_SERVICE='egarchive/lega-base:latest'
     VERIFY_SERVICE='egarchive/lega-base:latest'
