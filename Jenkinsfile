@@ -19,6 +19,8 @@ pipeline {
   }
 
   environment {
+    SLACK_TOKEN=credentials('SLACK_TOKEN')
+
     OS_USERNAME=credentials('OS_USERNAME')
     OS_PASSWORD=credentials('OS_PASSWORD')
     OS_TENANT_ID=credentials('OS_TENANT_ID')
@@ -55,6 +57,12 @@ pipeline {
   }
 
   stages {
+
+    stage('setup') {
+      steps{
+        slackSend (color: '#FFFF00', message: "STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+      }
+    }
 
     stage('external') {
 
@@ -390,10 +398,19 @@ pipeline {
 
     }
 
-    stage('chuck') {
-      steps{
-        chuckNorris()
+    post {
+        always {
+          chuckNorris()
+        }
+
+        success {
+          slackSend (color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+        }
+
+        failure {
+          slackSend (color: '#FF0000', message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+        }
       }
-    }
+
   }
 }
