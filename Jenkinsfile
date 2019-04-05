@@ -19,8 +19,6 @@ pipeline {
   }
 
   environment {
-    SLACK_TOKEN=credentials('SLACK_TOKEN')
-
     OS_USERNAME=credentials('OS_USERNAME')
     OS_PASSWORD=credentials('OS_PASSWORD')
     OS_TENANT_ID=credentials('OS_TENANT_ID')
