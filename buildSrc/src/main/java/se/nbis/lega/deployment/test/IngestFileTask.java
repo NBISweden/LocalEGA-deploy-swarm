@@ -56,21 +56,6 @@ public class IngestFileTask extends TestTask {
             Thread.sleep(1000);
         }
         System.out.println("File seems to be ingested successfully.");
-        // + ": trying to download it..."
-        // String url = String.format("http://%s:8081/file?sourceKey=%s&sourceIV=%s&filePath=%s", host,
-        // readTrace("sessionKey"), readTrace("iv"), expectedAmount);
-        // System.out.println("URL : " + url);
-        // URL resURL = new URL(url);
-        // File downloadedFile = getProject().file(".tmp/data.raw.out");
-        // FileUtils.copyURLToFile(resURL, downloadedFile);
-        // boolean equals = FileUtils.contentEquals(getRawFile(), downloadedFile);
-        // if (!equals) {
-        // throw new GradleException("The retrieved file doesn't match the original one!");
-        // }
-        // System.out.println("File is downloaded successfully!");
-        // byte[] bytes = DigestUtils.sha256(FileUtils.openInputStream(downloadedFile));
-        // System.out.println("Checksum: " + Hex.encodeHexString(bytes));
-        // System.out.println("Files are identical.");
     }
 
     private void ingest() throws IOException, URISyntaxException, NoSuchAlgorithmException, KeyManagementException,
