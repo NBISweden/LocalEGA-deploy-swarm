@@ -47,6 +47,6 @@ public class VerifyTask extends TestTask {
             log.error(e.getMessage(), e);
             throw e;
         }
-        log.info("Verification completed successfully");
+        System.out.println("Verification completed successfully");
     }
 }
