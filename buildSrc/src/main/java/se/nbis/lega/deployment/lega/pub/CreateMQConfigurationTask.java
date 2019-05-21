@@ -29,8 +29,12 @@ public class CreateMQConfigurationTask extends LegaPublicTask {
         }
         writeTrace(PRIVATE_CONNECTION, String.format("amqp://admin:guest@%s:5672", privateHost));
 
-        createConfig(Config.CA_CERT.getName(),
-            getProject().getParent().file("common/.tmp/ssl/CA.cert"));
+        try {
+            createConfig(Config.CA_CERT.getName(),
+                getProject().getParent().file("common/.tmp/ssl/CA.cert"));
+        } catch (Exception ignore) {
+            // ignore already existing CA
+        }
         createConfig(Config.MQ_CERT.getName(),
             getProject().getParent().file("common/.tmp/ssl/publicMQ.cert"));
         createConfig(Config.MQ_KEY.getName(),

@@ -3,6 +3,8 @@ package se.nbis.lega.deployment.lega.pub;
 public enum Config {
 
     CA_CERT("CA.cert"),
+    INBOX_CERT("inbox.cert"),
+    INBOX_KEY("inbox.key"),
     MQ_CERT("mq.cert"),
     MQ_KEY("mq.key");
 
