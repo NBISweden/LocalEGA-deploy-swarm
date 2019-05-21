@@ -69,7 +69,7 @@ services:
     ports:
       - "9001:9000"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ["CMD", "curl", "-f", "https://localhost:9000/minio/health/live"]
       interval: 1m
       timeout: 10s
       retries: 3
@@ -83,9 +83,9 @@ services:
       - MINIO_SECRET_KEY=${INBOX_S3_SECRET_KEY}
     configs:
       - source: inboxS3.cert
-        target: /home/.minio/public.crt
+        target: /home/.minio/certs/public.crt
       - source: inboxS3.key
-        target: /home/.minio/private.key
+        target: /home/.minio/certs/private.key
       - source: CA.cert
         target: /home/.minio/CAs/LocalEGA.crt
     volumes:
@@ -97,7 +97,7 @@ services:
     ports:
       - "9000:9000"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ["CMD", "curl", "-f", "https://localhost:9000/minio/health/live"]
       interval: 1m
       timeout: 10s
       retries: 3
@@ -111,9 +111,9 @@ services:
       - MINIO_SECRET_KEY=${VAULT_S3_SECRET_KEY}
     configs:
       - source: vaultS3.cert
-        target: /home/.minio/public.crt
+        target: /home/.minio/certs/public.crt
       - source: vaultS3.key
-        target: /home/.minio/private.key
+        target: /home/.minio/certs/private.key
       - source: CA.cert
         target: /home/.minio/CAs/LocalEGA.crt
     volumes:

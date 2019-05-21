@@ -97,7 +97,7 @@ public class IngestFileTask extends TestTask {
         File traceFile = getProject().file(LEGA_PRIVATE_TMP_TRACE);
         String accessKey = readTrace(traceFile, VAULT_S3_ACCESS_KEY);
         String secretKey = readTrace(traceFile, VAULT_S3_SECRET_KEY);
-        MinioClient minioClient = new MinioClient(String.format("http://%s:9000", host), accessKey, secretKey);
+        MinioClient minioClient = new MinioClient(String.format("https://%s:9000", host), accessKey, secretKey, true);
         if (!minioClient.bucketExists(VAULT_S3_BUCKET_NAME)) {
             return 0;
         }
