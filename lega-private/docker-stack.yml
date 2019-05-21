@@ -68,11 +68,6 @@ services:
     image: minio/minio:RELEASE.2019-02-12T21-58-47Z
     ports:
       - "9001:9000"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "https://localhost:9000/minio/health/live"]
-      interval: 1m
-      timeout: 10s
-      retries: 3
     deploy:
       restart_policy:
         condition: on-failure
@@ -96,11 +91,6 @@ services:
     image: minio/minio:RELEASE.2019-02-12T21-58-47Z
     ports:
       - "9000:9000"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "https://localhost:9000/minio/health/live"]
-      interval: 1m
-      timeout: 10s
-      retries: 3
     deploy:
       restart_policy:
         condition: on-failure
