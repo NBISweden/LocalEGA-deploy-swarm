@@ -13,19 +13,15 @@ import org.gradle.api.tasks.TaskAction;
 import se.nbis.lega.deployment.cluster.Machine;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
-import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
@@ -104,27 +100,30 @@ public class IngestFileTask extends TestTask {
     }
 
     private OkHttpClient getOkHttpClient() throws Exception {
-        SSLContext sslContext;
-        TrustManager[] trustManagers;
-        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-        keyStore.load(null, null);
-        File certFile = getProject().file("common/.tmp/ssl/CA.cert");
-        try (FileInputStream fis = new FileInputStream(certFile)) {
-            CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
-            X509Certificate certificate =
-                (X509Certificate) certificateFactory.generateCertificate(fis);
-            keyStore
-                .setCertificateEntry(certificate.getSubjectX500Principal().getName(), certificate);
-            TrustManagerFactory trustManagerFactory =
-                TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            trustManagerFactory.init(keyStore);
-            trustManagers = trustManagerFactory.getTrustManagers();
-            sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, trustManagers, null);
-        }
-        return new OkHttpClient.Builder()
-            .sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustManagers[0])
-            .build();
+        final TrustManager[] trustAllCerts = new TrustManager[] {new X509TrustManager() {
+            @Override public void checkClientTrusted(java.security.cert.X509Certificate[] chain,
+                String authType) {
+            }
+
+            @Override public void checkServerTrusted(java.security.cert.X509Certificate[] chain,
+                String authType) {
+            }
+
+            @Override public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                return new java.security.cert.X509Certificate[] {};
+            }
+        }};
+
+        SSLContext sslContext = SSLContext.getInstance("SSL");
+        sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+
+        SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
+
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        builder.sslSocketFactory(sslSocketFactory, (X509TrustManager) trustAllCerts[0]);
+        builder.hostnameVerifier((hostname, session) -> true);
+
+        return builder.build();
     }
 
     @InputFile public File getRawFile() {
