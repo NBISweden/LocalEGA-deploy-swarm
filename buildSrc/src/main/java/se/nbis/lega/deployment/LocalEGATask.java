@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.attribute.PosixFilePermission;
 import java.security.KeyPair;
 import java.security.Security;
+import java.security.cert.X509Certificate;
 import java.util.*;
 
 @Slf4j
@@ -233,21 +234,26 @@ public abstract class LocalEGATask extends DefaultTask {
     }
 
     protected void writePublicKey(KeyPair keyPair, File file) throws IOException {
-        FileWriter fileWriter = new FileWriter(file);
-        JcaPEMWriter pemWriter = new JcaPEMWriter(fileWriter);
-        pemWriter.writeObject(keyPair.getPublic());
-        pemWriter.close();
+        writeBCObject(keyPair.getPublic(), file);
     }
 
     protected void writePrivateKey(KeyPair keyPair, File file) throws IOException {
-        FileWriter fileWriter = new FileWriter(file);
-        JcaPEMWriter pemWriter = new JcaPEMWriter(fileWriter);
-        pemWriter.writeObject(keyPair.getPrivate());
-        pemWriter.close();
+        writeBCObject(keyPair.getPrivate(), file);
         Set<PosixFilePermission> perms = new HashSet<>();
         perms.add(PosixFilePermission.OWNER_READ);
         perms.add(PosixFilePermission.OWNER_WRITE);
         Files.setPosixFilePermissions(file.toPath(), perms);
+    }
+
+    protected void writeCertificate(X509Certificate certificate, File file) throws IOException {
+        writeBCObject(certificate, file);
+    }
+
+    private <T> void writeBCObject(T object, File file) throws IOException {
+        FileWriter fileWriter = new FileWriter(file);
+        JcaPEMWriter pemWriter = new JcaPEMWriter(fileWriter);
+        pemWriter.writeObject(object);
+        pemWriter.close();
     }
 
 }

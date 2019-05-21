@@ -45,7 +45,7 @@ task cleanAll() {
 task bootstrap() {
     setGroup "swarm"
 
-    dependsOn ":cega:createConfiguration", ":lega-private:createConfiguration", ":lega-public:createConfiguration"
+    dependsOn ":common:createConfiguration", ":cega:createConfiguration", ":lega-private:createConfiguration", ":lega-public:createConfiguration"
 }
 
 task deploy() {

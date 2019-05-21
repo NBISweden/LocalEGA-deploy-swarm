@@ -11,6 +11,9 @@ public class CreateDBConfigurationTask extends LegaPrivateTask {
     public void run() throws IOException {
         writeTrace(DB_LEGA_IN_PASSWORD, UUID.randomUUID().toString().replace("-", ""));
         writeTrace(DB_LEGA_OUT_PASSWORD, UUID.randomUUID().toString().replace("-", ""));
+
+        createConfig(Config.DB_CERT.getName(), getProject().getParent().file("common/.tmp/ssl/db.cert"));
+        createConfig(Config.DB_KEY.getName(), getProject().getParent().file("common/.tmp/ssl/db.key"));
     }
 
 }

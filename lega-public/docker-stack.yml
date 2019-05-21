@@ -31,6 +31,16 @@ services:
       - PASSWORD_HASH=4tHURqDiZzypw0NTvoHhpn8/MMgONWonWxgRZ4NXgR8nZRBz
       - PRIVATE_CONNECTION
       - CEGA_CONNECTION
+      - MQ_CA=/etc/rabbitmq/CA.cert
+      - MQ_SERVER_CERT=/etc/rabbitmq/ssl.cert
+      - MQ_SERVER_KEY=/etc/rabbitmq/ssl.key
+    configs:
+      - source: mq.cert
+        target: /etc/rabbitmq/ssl.cert
+      - source: mq.key
+        target: /etc/rabbitmq/ssl.key
+      - source: CA.cert
+        target: /etc/rabbitmq/CA.cert
 
   inbox:
     image: ${INBOX_SERVICE}
@@ -56,3 +66,12 @@ services:
 
 volumes:
   inbox:
+
+
+configs:
+  CA.cert:
+    external: true
+  mq.cert:
+    external: true
+  mq.key:
+    external: true

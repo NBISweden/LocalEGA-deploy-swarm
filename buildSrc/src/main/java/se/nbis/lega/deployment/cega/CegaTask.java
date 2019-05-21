@@ -5,7 +5,7 @@ import se.nbis.lega.deployment.LocalEGATask;
 import se.nbis.lega.deployment.cluster.Machine;
 
 /**
- * Cega task
+ * CEGA task
  */
 public abstract class CegaTask extends LocalEGATask {
 

@@ -1,0 +1,13 @@
+import se.nbis.lega.deployment.Groups
+import se.nbis.lega.deployment.common.GenerateCertificatesTask
+
+task generateCertificates(type: GenerateCertificatesTask) {
+    setGroup Groups.COMMON.getName()
+    setMachineName("")
+}
+
+task createConfiguration {
+    setGroup Groups.CEGA.getName()
+
+    dependsOn generateCertificates
+}

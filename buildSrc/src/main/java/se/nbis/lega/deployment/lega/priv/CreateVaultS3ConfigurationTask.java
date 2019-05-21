@@ -11,6 +11,9 @@ public class CreateVaultS3ConfigurationTask extends LegaPrivateTask {
     public void run() throws IOException {
         writeTrace(VAULT_S3_ACCESS_KEY, UUID.randomUUID().toString().replace("-", ""));
         writeTrace(VAULT_S3_SECRET_KEY, UUID.randomUUID().toString().replace("-", ""));
+
+        createConfig(Config.VAULT_S3_CERT.getName(), getProject().getParent().file("common/.tmp/ssl/vaultS3.cert"));
+        createConfig(Config.VAULT_S3_KEY.getName(), getProject().getParent().file("common/.tmp/ssl/vaultS3.key"));
     }
 
 }
