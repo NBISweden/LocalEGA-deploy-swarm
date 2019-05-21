@@ -83,11 +83,11 @@ services:
       - MINIO_SECRET_KEY=${INBOX_S3_SECRET_KEY}
     configs:
       - source: inboxS3.cert
-        target: /home/.minio/certs/public.crt
+        target: /root/.minio/certs/public.crt
       - source: inboxS3.key
-        target: /home/.minio/certs/private.key
+        target: /root/.minio/certs/private.key
       - source: CA.cert
-        target: /home/.minio/CAs/LocalEGA.crt
+        target: /root/.minio/CAs/LocalEGA.crt
     volumes:
       - inbox_s3:/data
     command: server /data
@@ -111,11 +111,11 @@ services:
       - MINIO_SECRET_KEY=${VAULT_S3_SECRET_KEY}
     configs:
       - source: vaultS3.cert
-        target: /home/.minio/certs/public.crt
+        target: /root/.minio/certs/public.crt
       - source: vaultS3.key
-        target: /home/.minio/certs/private.key
+        target: /root/.minio/certs/private.key
       - source: CA.cert
-        target: /home/.minio/CAs/LocalEGA.crt
+        target: /root/.minio/CAs/LocalEGA.crt
     volumes:
       - vault_s3:/data
     command: server /data
