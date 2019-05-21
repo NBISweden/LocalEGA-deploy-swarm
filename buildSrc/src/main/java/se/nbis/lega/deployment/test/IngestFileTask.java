@@ -108,7 +108,7 @@ public class IngestFileTask extends TestTask {
         TrustManager[] trustManagers;
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
         keyStore.load(null, null);
-        File certFile = getProject().getParent().file("common/.tmp/ssl/CA.cert");
+        File certFile = getProject().file("common/.tmp/ssl/CA.cert");
         try (FileInputStream fis = new FileInputStream(certFile)) {
             CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
             X509Certificate certificate =
