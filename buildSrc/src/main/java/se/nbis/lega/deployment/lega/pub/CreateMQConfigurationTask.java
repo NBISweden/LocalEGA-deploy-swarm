@@ -27,7 +27,8 @@ public class CreateMQConfigurationTask extends LegaPublicTask {
         if (privateHost == null) {
             privateHost = getMachineIPAddress(Machine.LEGA_PRIVATE.getName());
         }
-        writeTrace(PRIVATE_CONNECTION, String.format("amqp://admin:guest@%s:5672", privateHost));
+        writeTrace(PRIVATE_CONNECTION, "amqps://admin:guest@" + privateHost
+            + ":5671/%2F?heartbeat=0\\&connection_attempts=30\\&retry_delay=10\\&server_name_indication=privateMQ\\&verify=verify_peer\\&fail_if_no_peer_cert=true\\&cacertfile=/etc/rabbitmq/CA.cert\\&certfile=/etc/rabbitmq/ssl.cert\\&keyfile=/etc/rabbitmq/ssl.key");
 
         try {
             createConfig(Config.CA_CERT.getName(),
