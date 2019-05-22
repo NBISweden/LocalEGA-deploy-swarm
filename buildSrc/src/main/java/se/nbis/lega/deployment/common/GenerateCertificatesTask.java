@@ -62,7 +62,7 @@ public class GenerateCertificatesTask extends CommonTask {
             rootCertificate);
         String keyStorePassword = UUID.randomUUID().toString().replace("-", "");
         keyStore.setKeyEntry(clientCertificate.getSubjectX500Principal().getName(),
-            clientKeyPair.getPrivate(), INBOX_JKS_PASSWORD.toCharArray(), chain);
+            clientKeyPair.getPrivate(), keyStorePassword.toCharArray(), chain);
         File file = getProject().file(".tmp/ssl/inbox.jks");
         try (FileOutputStream fos = new FileOutputStream(file)) {
             keyStore.store(fos, keyStorePassword.toCharArray());
