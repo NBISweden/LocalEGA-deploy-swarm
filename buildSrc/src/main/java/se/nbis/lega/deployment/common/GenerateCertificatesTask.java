@@ -10,7 +10,6 @@ import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.bc.BcX509ExtensionUtils;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
-import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
@@ -18,20 +17,22 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.internal.Pair;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.GeneralSecurityException;
-import java.security.KeyPair;
-import java.security.PublicKey;
-import java.security.SecureRandom;
+import java.security.*;
+import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.Date;
+import java.util.UUID;
 
 public class GenerateCertificatesTask extends CommonTask {
 
-    @TaskAction public void run() throws Exception {
+    @TaskAction
+    public void run() throws Exception {
         getProject().file(".tmp/ssl/").mkdirs();
         Pair<X509Certificate, KeyPair> root = generateCertificate(null, null, "CA");
         generateCertificate(root.left, root.right, "vaultS3");
@@ -40,12 +41,34 @@ public class GenerateCertificatesTask extends CommonTask {
         generateCertificate(root.left, root.right, "cegaUsers");
         generateCertificate(root.left, root.right, "db");
         generateCertificate(root.left, root.right, "finalize");
-        generateCertificate(root.left, root.right, "inbox");
         generateCertificate(root.left, root.right, "ingest");
         generateCertificate(root.left, root.right, "keys");
         generateCertificate(root.left, root.right, "privateMQ");
         generateCertificate(root.left, root.right, "publicMQ");
         generateCertificate(root.left, root.right, "verify");
+        Pair<X509Certificate, KeyPair> inbox = generateCertificate(root.left, root.right, "inbox");
+        saveAsKeyStore(root, inbox);
+    }
+
+    private void saveAsKeyStore(Pair<X509Certificate, KeyPair> root,
+        Pair<X509Certificate, KeyPair> client) throws Exception {
+        X509Certificate rootCertificate = root.left;
+        X509Certificate clientCertificate = client.left;
+        KeyPair clientKeyPair = client.right;
+        Certificate[] chain = new Certificate[] {clientCertificate, rootCertificate};
+        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        keyStore.load(null, null);
+        keyStore.setCertificateEntry(rootCertificate.getSubjectX500Principal().getName(),
+            rootCertificate);
+        String keyStorePassword = UUID.randomUUID().toString().replace("-", "");
+        keyStore.setKeyEntry(clientCertificate.getSubjectX500Principal().getName(),
+            clientKeyPair.getPrivate(), INBOX_JKS_PASSWORD.toCharArray(), chain);
+        File file = getProject().file(".tmp/ssl/inbox.jks");
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            keyStore.store(fos, keyStorePassword.toCharArray());
+            File traceFile = getProject().getParent().file(LEGA_PUBLIC_TMP_TRACE);
+            writeTrace(traceFile, INBOX_JKS_PASSWORD, keyStorePassword);
+        }
     }
 
     private Pair<X509Certificate, KeyPair> generateCertificate(X509Certificate rootCertificate,
@@ -59,9 +82,7 @@ public class GenerateCertificatesTask extends CommonTask {
             .addRDN(BCStyle.EmailAddress, "nels-developers@googlegroups.com").build();
 
         X509v3CertificateBuilder builder = rootCertificate == null ?
-            new JcaX509v3CertificateBuilder(
-                subject,
-                getSecureRandomSerial(),
+            new JcaX509v3CertificateBuilder(subject, getSecureRandomSerial(),
                 Date.from(LocalDate.of(2018, 1, 1).atStartOfDay(ZoneOffset.UTC).toInstant()),
                 Date.from(LocalDate.of(2020, 1, 1).atStartOfDay(ZoneOffset.UTC).toInstant()),
                 subject, keyPair.getPublic()) :

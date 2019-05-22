@@ -47,6 +47,8 @@ public class CreateInboxConfigurationTask extends LegaPublicTask {
             getProject().getParent().file("common/.tmp/ssl/inbox.cert"));
         createConfig(Config.INBOX_KEY.getName(),
             getProject().getParent().file("common/.tmp/ssl/inbox.key"));
+        createConfig(Config.INBOX_JKS.getName(),
+            getProject().getParent().file("common/.tmp/ssl/inbox.jks"));
     }
 
 }

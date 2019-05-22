@@ -57,10 +57,13 @@ services:
       - S3_SECRET_KEY=${INBOX_S3_SECRET_KEY}
       - S3_ENDPOINT
       - BROKER_USERNAME=admin
-      - USE_SSL=false
+      - JKS_PATH=/etc/ega/inbox.jks
+      - INBOX_JKS_PASSWORD
     configs:
       - source: CA.cert
         target: /usr/local/share/ca-certificates/CA.cert
+      - source: inbox.jks
+        target: /etc/ega/inbox.jks
     volumes:
       - inbox:/ega/inbox
 
@@ -74,4 +77,6 @@ configs:
   mq.cert:
     external: true
   mq.key:
+    external: true
+  inbox.jks:
     external: true
