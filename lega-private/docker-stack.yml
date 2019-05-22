@@ -70,6 +70,8 @@ services:
         uid: '70'
         gid: '70'
         mode: 0600
+      - source: db.entrypoint.sh
+        target: /usr/local/bin/entrypoint.sh
     volumes:
       - db:/ega/data
 
@@ -259,6 +261,8 @@ configs:
   db.cert:
     external: true
   db.key:
+    external: true
+  db.entrypoint.sh:
     external: true
   inboxS3.cert:
     external: true

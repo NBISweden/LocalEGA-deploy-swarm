@@ -7,6 +7,7 @@ public enum Config {
     MQ_KEY("mq.key"),
     DB_CERT("db.cert"),
     DB_KEY("db.key"),
+    DB_ENTRYPOINT_SH("db.entrypoint.sh"),
     INBOX_S3_CERT("inboxS3.cert"),
     INBOX_S3_KEY("inboxS3.key"),
     VAULT_S3_CERT("vaultS3.cert"),

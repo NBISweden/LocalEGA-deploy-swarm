@@ -14,6 +14,7 @@ public class CreateDBConfigurationTask extends LegaPrivateTask {
 
         createConfig(Config.DB_CERT.getName(), getProject().getParent().file("common/.tmp/ssl/db.cert"));
         createConfig(Config.DB_KEY.getName(), getProject().getParent().file("common/.tmp/ssl/db.key"));
+        createConfig(Config.DB_ENTRYPOINT_SH.getName(), getProject().file("db/entrypoint.sh"));
     }
 
 }
