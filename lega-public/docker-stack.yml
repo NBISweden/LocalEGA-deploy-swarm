@@ -58,6 +58,9 @@ services:
       - S3_ENDPOINT
       - BROKER_USERNAME=admin
       - USE_SSL=false
+    configs:
+      - source: CA.cert
+        target: /usr/local/share/ca-certificates/CA.cert
     volumes:
       - inbox:/ega/inbox
 
