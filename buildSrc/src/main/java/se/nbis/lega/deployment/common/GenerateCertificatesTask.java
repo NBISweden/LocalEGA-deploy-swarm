@@ -36,6 +36,10 @@ public class GenerateCertificatesTask extends CommonTask {
     @TaskAction
     public void run() throws Exception {
         getProject().file(".tmp/ssl/").mkdirs();
+        String privateHost = getProperty("legaPrivateIP");
+        if (privateHost == null) {
+            privateHost = getMachineIPAddress(Machine.LEGA_PRIVATE.getName());
+        }
         Pair<X509Certificate, KeyPair> root = generateCertificate(null, null, "CA", null);
         generateCertificate(root.left, root.right, "cegaMQ", null);
         generateCertificate(root.left, root.right, "cegaUsers", null);
@@ -44,9 +48,9 @@ public class GenerateCertificatesTask extends CommonTask {
         generateCertificate(root.left, root.right, "ingest", null);
         generateCertificate(root.left, root.right, "verify", null);
         generateCertificate(root.left, root.right, "finalize", null);
-        generateCertificate(root.left, root.right, "keys", Machine.LEGA_PRIVATE);
-        generateCertificate(root.left, root.right, "inboxS3", Machine.LEGA_PRIVATE);
-        generateCertificate(root.left, root.right, "vaultS3", Machine.LEGA_PRIVATE);
+        generateCertificate(root.left, root.right, "keys", privateHost);
+        generateCertificate(root.left, root.right, "inboxS3", privateHost);
+        generateCertificate(root.left, root.right, "vaultS3", privateHost);
         generateCertificate(root.left, root.right, "publicMQ", null);
         Pair<X509Certificate, KeyPair> inbox =
             generateCertificate(root.left, root.right, "inbox", null);
@@ -74,7 +78,7 @@ public class GenerateCertificatesTask extends CommonTask {
     }
 
     private Pair<X509Certificate, KeyPair> generateCertificate(X509Certificate rootCertificate,
-        KeyPair parentKeypair, String service, Machine machine)
+        KeyPair parentKeypair, String service, String machineIPAddress)
         throws IOException, GeneralSecurityException, OperatorCreationException {
         KeyPair keyPair = KeyUtils.generateKeyPair("ssh-rsa", 2048);
 
@@ -116,8 +120,7 @@ public class GenerateCertificatesTask extends CommonTask {
             ExtendedKeyUsage extendedKeyUsage = new ExtendedKeyUsage(
                 new KeyPurposeId[] {KeyPurposeId.id_kp_serverAuth, KeyPurposeId.id_kp_clientAuth});
             builder.addExtension(Extension.extendedKeyUsage, true, extendedKeyUsage);
-            if (machine != null) {
-                String machineIPAddress = getMachineIPAddress(machine.getName());
+            if (machineIPAddress != null) {
                 GeneralName generalName = new GeneralName(GeneralName.iPAddress, machineIPAddress);
                 GeneralNames generalNames = GeneralNames.getInstance(new DERSequence(generalName));
                 builder.addExtension(Extension.subjectAlternativeName, false, generalNames);
