@@ -1,6 +1,7 @@
 package se.nbis.lega.deployment.common;
 
 import org.apache.sshd.common.config.keys.KeyUtils;
+import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
@@ -16,6 +17,7 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.internal.Pair;
+import se.nbis.lega.deployment.cluster.Machine;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -34,19 +36,20 @@ public class GenerateCertificatesTask extends CommonTask {
     @TaskAction
     public void run() throws Exception {
         getProject().file(".tmp/ssl/").mkdirs();
-        Pair<X509Certificate, KeyPair> root = generateCertificate(null, null, "CA");
-        generateCertificate(root.left, root.right, "vaultS3");
-        generateCertificate(root.left, root.right, "inboxS3");
-        generateCertificate(root.left, root.right, "cegaMQ");
-        generateCertificate(root.left, root.right, "cegaUsers");
-        generateCertificate(root.left, root.right, "db");
-        generateCertificate(root.left, root.right, "finalize");
-        generateCertificate(root.left, root.right, "ingest");
-        generateCertificate(root.left, root.right, "keys");
-        generateCertificate(root.left, root.right, "privateMQ");
-        generateCertificate(root.left, root.right, "publicMQ");
-        generateCertificate(root.left, root.right, "verify");
-        Pair<X509Certificate, KeyPair> inbox = generateCertificate(root.left, root.right, "inbox");
+        Pair<X509Certificate, KeyPair> root = generateCertificate(null, null, "CA", null);
+        generateCertificate(root.left, root.right, "cegaMQ", null);
+        generateCertificate(root.left, root.right, "cegaUsers", null);
+        generateCertificate(root.left, root.right, "privateMQ", null);
+        generateCertificate(root.left, root.right, "db", null);
+        generateCertificate(root.left, root.right, "ingest", null);
+        generateCertificate(root.left, root.right, "verify", null);
+        generateCertificate(root.left, root.right, "finalize", null);
+        generateCertificate(root.left, root.right, "keys", Machine.LEGA_PRIVATE);
+        generateCertificate(root.left, root.right, "inboxS3", Machine.LEGA_PRIVATE);
+        generateCertificate(root.left, root.right, "vaultS3", Machine.LEGA_PRIVATE);
+        generateCertificate(root.left, root.right, "publicMQ", null);
+        Pair<X509Certificate, KeyPair> inbox =
+            generateCertificate(root.left, root.right, "inbox", null);
         saveAsKeyStore(root, inbox);
     }
 
@@ -71,7 +74,7 @@ public class GenerateCertificatesTask extends CommonTask {
     }
 
     private Pair<X509Certificate, KeyPair> generateCertificate(X509Certificate rootCertificate,
-        KeyPair parentKeypair, String service)
+        KeyPair parentKeypair, String service, Machine machine)
         throws IOException, GeneralSecurityException, OperatorCreationException {
         KeyPair keyPair = KeyUtils.generateKeyPair("ssh-rsa", 2048);
 
@@ -113,6 +116,12 @@ public class GenerateCertificatesTask extends CommonTask {
             ExtendedKeyUsage extendedKeyUsage = new ExtendedKeyUsage(
                 new KeyPurposeId[] {KeyPurposeId.id_kp_serverAuth, KeyPurposeId.id_kp_clientAuth});
             builder.addExtension(Extension.extendedKeyUsage, true, extendedKeyUsage);
+            if (machine != null) {
+                String machineIPAddress = getMachineIPAddress(machine.getName());
+                GeneralName generalName = new GeneralName(GeneralName.iPAddress, machineIPAddress);
+                GeneralNames generalNames = GeneralNames.getInstance(new DERSequence(generalName));
+                builder.addExtension(Extension.subjectAlternativeName, false, generalNames);
+            }
         }
 
         ContentSigner signer = new JcaContentSignerBuilder("SHA256withRSA")
