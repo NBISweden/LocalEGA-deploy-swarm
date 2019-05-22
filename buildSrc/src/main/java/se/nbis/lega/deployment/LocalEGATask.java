@@ -27,6 +27,7 @@ public abstract class LocalEGATask extends DefaultTask {
     public static final String CEGA_TMP_TRACE = "cega/.tmp/.trace";
     public static final String LEGA_PRIVATE_TMP_TRACE = "lega-private/.tmp/.trace";
     public static final String LEGA_PUBLIC_TMP_TRACE = "lega-public/.tmp/.trace";
+    public static final String COMMON_TMP_TRACE = "common/.tmp/.trace";
 
     public static final List<String> DOCKER_ENV_VARS = Arrays
         .asList("DOCKER_TLS_VERIFY", "DOCKER_HOST", "DOCKER_CERT_PATH", "DOCKER_MACHINE_NAME");
