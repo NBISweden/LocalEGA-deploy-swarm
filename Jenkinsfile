@@ -103,7 +103,9 @@ pipeline {
         stage('Bootstrap') {
           steps {
               sh '''
-                gradle :common:createConfiguration
+                gradle :common:createConfiguration \
+                    -PlegaPrivateIP=$(docker-machine ip LEGA-private-${ID}) \
+                    --stacktrace
 
                 gradle :cega:createConfiguration \
                     -Pmachine=CEGA-${ID} \
@@ -215,7 +217,9 @@ pipeline {
         stage('Bootstrap') {
           steps {
               sh '''
-                gradle :common:createConfiguration
+                gradle :common:createConfiguration \
+                    -PlegaPrivateIP=$(docker-machine ip LEGA-private-${ID}) \
+                    --stacktrace
 
                 gradle :cega:createConfiguration \
                     -Pmachine=CEGA-${ID} \
@@ -334,7 +338,9 @@ pipeline {
         stage('Bootstrap') {
           steps {
               sh '''
-                gradle :common:createConfiguration
+                gradle :common:createConfiguration \
+                    -PlegaPrivateIP=$(docker-machine ip LEGA-private-${ID}) \
+                    --stacktrace
 
                 gradle :lega-private:createConfiguration \
                     -Pmachine=lega-private-staging \
