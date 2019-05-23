@@ -179,6 +179,7 @@ services:
         target: /etc/ega/ssl.cert
       - source: verify.key
         target: /etc/ega/ssl.key
+        mode: 0600
       - source: CA.cert
         target: /etc/ega/CA.cert
     user: lega
@@ -201,6 +202,7 @@ services:
         target: /etc/ega/ssl.cert
       - source: finalize.key
         target: /etc/ega/ssl.key
+        mode: 0600
       - source: CA.cert
         target: /etc/ega/CA.cert
     user: lega
@@ -228,6 +230,7 @@ services:
         target: /etc/ega/ssl.cert
       - source: ingest.key
         target: /etc/ega/ssl.key
+        mode: 0600
       - source: CA.cert
         target: /etc/ega/CA.cert
     user: lega
