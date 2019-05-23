@@ -240,8 +240,18 @@ public abstract class LocalEGATask extends DefaultTask {
         writeBCObject(keyPair.getPublic(), file);
     }
 
-    protected void writePrivateKey(KeyPair keyPair, File file) throws IOException {
+    protected void writePrivateKeyPEM(KeyPair keyPair, File file) throws IOException {
         writeBCObject(keyPair.getPrivate(), file);
+        Set<PosixFilePermission> perms = new HashSet<>();
+        perms.add(PosixFilePermission.OWNER_READ);
+        perms.add(PosixFilePermission.OWNER_WRITE);
+        Files.setPosixFilePermissions(file.toPath(), perms);
+    }
+
+    protected void writePrivateKeyDER(KeyPair keyPair, File file) throws IOException {
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            fos.write(keyPair.getPrivate().getEncoded());
+        }
         Set<PosixFilePermission> perms = new HashSet<>();
         perms.add(PosixFilePermission.OWNER_READ);
         perms.add(PosixFilePermission.OWNER_WRITE);

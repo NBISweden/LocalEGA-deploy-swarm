@@ -137,7 +137,9 @@ public class GenerateCertificatesTask extends CommonTask {
 
         writeCertificate(certificate, getProject().file(".tmp/ssl/" + service + ".cert"));
 
-        writePrivateKey(keyPair, getProject().file(".tmp/ssl/" + service + ".key"));
+        writePrivateKeyPEM(keyPair, getProject().file(".tmp/ssl/" + service + ".key"));
+
+        writePrivateKeyDER(keyPair, getProject().file(".tmp/ssl/" + service + ".der.key"));
 
         return Pair.of(certificate, keyPair);
     }

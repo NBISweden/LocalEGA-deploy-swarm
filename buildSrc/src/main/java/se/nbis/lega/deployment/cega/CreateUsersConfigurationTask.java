@@ -49,7 +49,7 @@ public class CreateUsersConfigurationTask extends CegaTask {
         FileUtils.writeLines(userYML, Arrays
             .asList("---", "password_hash: " + hash, "pubkey: " + sshKeyString, "uid: " + uid));
         writePublicKey(keyPair, getProject().file(String.format(".tmp/users/%s.pub", username)));
-        writePrivateKey(keyPair, getProject().file(String.format(".tmp/users/%s.sec", username)));
+        writePrivateKeyPEM(keyPair, getProject().file(String.format(".tmp/users/%s.sec", username)));
 
         return password;
     }
