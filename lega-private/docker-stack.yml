@@ -179,6 +179,8 @@ services:
         target: /etc/ega/ssl.cert
       - source: verify.key
         target: /etc/ega/ssl.key
+        uid: '1000'
+        gid: '1000'
         mode: 0600
       - source: CA.cert
         target: /etc/ega/CA.cert
@@ -202,6 +204,8 @@ services:
         target: /etc/ega/ssl.cert
       - source: finalize.key
         target: /etc/ega/ssl.key
+        uid: '1000'
+        gid: '1000'
         mode: 0600
       - source: CA.cert
         target: /etc/ega/CA.cert
@@ -230,6 +234,8 @@ services:
         target: /etc/ega/ssl.cert
       - source: ingest.key
         target: /etc/ega/ssl.key
+        uid: '1000'
+        gid: '1000'
         mode: 0600
       - source: CA.cert
         target: /etc/ega/CA.cert
