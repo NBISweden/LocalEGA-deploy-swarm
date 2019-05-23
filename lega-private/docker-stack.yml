@@ -72,6 +72,7 @@ services:
         mode: 0600
       - source: db.entrypoint.sh
         target: /usr/local/bin/entrypoint.sh
+        mode: 0770
     volumes:
       - db:/ega/data
 
