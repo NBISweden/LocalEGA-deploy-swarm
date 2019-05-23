@@ -339,7 +339,7 @@ pipeline {
           steps {
               sh '''
                 gradle :common:createConfiguration \
-                    -PlegaPrivateIP=$(docker-machine ip LEGA-private-${ID}) \
+                    -PlegaPrivateIP=${LEGA_private_IP} \
                     --stacktrace
 
                 gradle :lega-private:createConfiguration \
