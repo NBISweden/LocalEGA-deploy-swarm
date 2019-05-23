@@ -1,21 +1,12 @@
 package se.nbis.lega.deployment.lega.priv;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.sshd.common.config.keys.KeyUtils;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x500.X500NameBuilder;
-import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.bcpg.ArmoredOutputStream;
 import org.bouncycastle.bcpg.HashAlgorithmTags;
 import org.bouncycastle.bcpg.sig.Features;
 import org.bouncycastle.bcpg.sig.KeyFlags;
-import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.cert.X509v3CertificateBuilder;
-import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
-import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.crypto.generators.RSAKeyPairGenerator;
 import org.bouncycastle.crypto.params.RSAKeyGenerationParameters;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.*;
 import org.bouncycastle.openpgp.operator.PBESecretKeyEncryptor;
 import org.bouncycastle.openpgp.operator.PGPDigestCalculator;
@@ -23,26 +14,16 @@ import org.bouncycastle.openpgp.operator.bc.BcPBESecretKeyEncryptorBuilder;
 import org.bouncycastle.openpgp.operator.bc.BcPGPContentSignerBuilder;
 import org.bouncycastle.openpgp.operator.bc.BcPGPDigestCalculatorProvider;
 import org.bouncycastle.openpgp.operator.bc.BcPGPKeyPair;
-import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
-import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.gradle.api.tasks.TaskAction;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.attribute.PosixFilePermission;
-import java.security.GeneralSecurityException;
-import java.security.KeyPair;
 import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -52,11 +33,9 @@ public class CreateKeysConfigurationTask extends LegaPrivateTask {
 
     @TaskAction
     public void run() throws Exception {
-        getProject().file(".tmp/ssl/").mkdirs();
         getProject().file(".tmp/pgp/").mkdirs();
-        generateSSLCertificate();
-        createConfig(Config.SSL_CERT.getName(), getProject().file(".tmp/ssl/ssl.cert"));
-        createConfig(Config.SSL_KEY.getName(), getProject().file(".tmp/ssl/ssl.key"));
+        createConfig(Config.KEYS_CERT.getName(), getProject().getParent().file("common/.tmp/ssl/keys.cert"));
+        createConfig(Config.KEYS_KEY.getName(), getProject().getParent().file("common/.tmp/ssl/keys.key"));
         String pgpPassphrase = UUID.randomUUID().toString().replace("-", "");
         writeTrace(PGP_PASSPHRASE, pgpPassphrase);
         generatePGPKeyPair("ega", pgpPassphrase);
@@ -65,42 +44,18 @@ public class CreateKeysConfigurationTask extends LegaPrivateTask {
         createConfig(Config.EGA2_SEC.getName(), getProject().file(".tmp/pgp/ega2.sec"));
         String masterPassphrase = UUID.randomUUID().toString().replace("-", "");
         writeTrace(LEGA_PASSWORD, masterPassphrase);
-        File egaSharedSec = getProject().file(".tmp/pgp/ega.shared.sec");
+
+        File egaSharedSec = getProject().file(".tmp/pgp/ega.shared.pass");
         FileUtils.write(egaSharedSec, masterPassphrase, Charset.defaultCharset());
         createConfig(Config.EGA_SHARED_PASS.getName(), egaSharedSec);
-    }
 
-    private void generateSSLCertificate()
-        throws IOException, GeneralSecurityException, OperatorCreationException {
-        KeyPair keyPair = KeyUtils.generateKeyPair("ssh-rsa", 2048);
+        File egaSecPass = getProject().file(".tmp/pgp/ega.sec.pass");
+        FileUtils.write(egaSecPass, pgpPassphrase, Charset.defaultCharset());
+        createConfig(Config.EGA_SEC_PASS.getName(), egaSharedSec);
 
-        X500Name subject = new X500NameBuilder(BCStyle.INSTANCE).addRDN(BCStyle.C, "NO")
-            .addRDN(BCStyle.ST, "Norway").addRDN(BCStyle.L, "Oslo").addRDN(BCStyle.O, "UiO")
-            .addRDN(BCStyle.OU, "IFI").addRDN(BCStyle.CN, "LocalEGA")
-            .addRDN(BCStyle.EmailAddress, "ega@nbis.se").build();
-        SecureRandom random = new SecureRandom();
-        byte[] id = new byte[20];
-        random.nextBytes(id);
-        BigInteger serial = new BigInteger(160, random);
-        X509v3CertificateBuilder certificate = new JcaX509v3CertificateBuilder(subject, serial,
-            Date.from(LocalDate.of(2018, 1, 1).atStartOfDay(ZoneOffset.UTC).toInstant()),
-            Date.from(LocalDate.of(2020, 1, 1).atStartOfDay(ZoneOffset.UTC).toInstant()), subject,
-            keyPair.getPublic());
-
-        ContentSigner signer =
-            new JcaContentSignerBuilder("SHA256withRSA").build(keyPair.getPrivate());
-        X509CertificateHolder holder = certificate.build(signer);
-
-        JcaX509CertificateConverter converter = new JcaX509CertificateConverter();
-        converter.setProvider(new BouncyCastleProvider());
-        X509Certificate x509 = converter.getCertificate(holder);
-
-        FileWriter fileWriter = new FileWriter(getProject().file(".tmp/ssl/ssl.cert"));
-        JcaPEMWriter pemWriter = new JcaPEMWriter(fileWriter);
-        pemWriter.writeObject(x509);
-        pemWriter.close();
-
-        writePrivateKey(keyPair, getProject().file(".tmp/ssl/ssl.key"));
+        File ega2SecPass = getProject().file(".tmp/pgp/ega2.sec.pass");
+        FileUtils.write(ega2SecPass, pgpPassphrase, Charset.defaultCharset());
+        createConfig(Config.EGA2_SEC_PASS.getName(), egaSharedSec);
     }
 
     private void generatePGPKeyPair(String userId, String passphrase) throws Exception {

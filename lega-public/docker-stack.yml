@@ -19,8 +19,8 @@ services:
   mq:
     image: ${PUBLIC_BROKER_SERVICE}
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "5671:5671"
+      - "15671:15671"
     deploy:
       restart_policy:
         condition: on-failure
@@ -31,6 +31,13 @@ services:
       - PASSWORD_HASH=4tHURqDiZzypw0NTvoHhpn8/MMgONWonWxgRZ4NXgR8nZRBz
       - PRIVATE_CONNECTION
       - CEGA_CONNECTION
+    configs:
+      - source: mq.cert
+        target: /etc/rabbitmq/ssl.cert
+      - source: mq.key
+        target: /etc/rabbitmq/ssl.key
+      - source: CA.cert
+        target: /etc/rabbitmq/CA.cert
 
   inbox:
     image: ${INBOX_SERVICE}
@@ -50,9 +57,26 @@ services:
       - S3_SECRET_KEY=${INBOX_S3_SECRET_KEY}
       - S3_ENDPOINT
       - BROKER_USERNAME=admin
-      - USE_SSL=false
+      - INBOX_JKS_PATH=/etc/ega/inbox.jks
+      - INBOX_JKS_PASSWORD
+    configs:
+      - source: CA.cert
+        target: /usr/local/share/ca-certificates/CA.cert
+      - source: inbox.jks
+        target: /etc/ega/inbox.jks
     volumes:
       - inbox:/ega/inbox
 
 volumes:
   inbox:
+
+
+configs:
+  CA.cert:
+    external: true
+  mq.cert:
+    external: true
+  mq.key:
+    external: true
+  inbox.jks:
+    external: true

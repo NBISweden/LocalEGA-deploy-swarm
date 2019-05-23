@@ -10,7 +10,7 @@ public class CreateMQConfigurationTask extends LegaPublicTask {
     @TaskAction
     public void run() throws IOException {
         String cegaMQPassword =
-            readTrace(getProject().getParent().file(CEGA_TMP_TRACE), "CEGA_MQ_PASSWORD");
+            readTrace(getProject().getParent().file(CEGA_TMP_TRACE), CEGA_MQ_PASSWORD);
         if (cegaMQPassword != null) { // test pipeline
             String cegaHost = getProperty("cegaIP");
             if (cegaHost == null) {
@@ -27,7 +27,19 @@ public class CreateMQConfigurationTask extends LegaPublicTask {
         if (privateHost == null) {
             privateHost = getMachineIPAddress(Machine.LEGA_PRIVATE.getName());
         }
-        writeTrace(PRIVATE_CONNECTION, String.format("amqp://admin:guest@%s:5672", privateHost));
+        writeTrace(PRIVATE_CONNECTION, "amqps://admin:guest@" + privateHost
+            + ":5671/%2F?heartbeat=0\\&connection_attempts=30\\&retry_delay=10\\&server_name_indication=privateMQ\\&verify=verify_peer\\&fail_if_no_peer_cert=true\\&cacertfile=/etc/rabbitmq/CA.cert\\&certfile=/etc/rabbitmq/ssl.cert\\&keyfile=/etc/rabbitmq/ssl.key");
+
+        try {
+            createConfig(Config.CA_CERT.getName(),
+                getProject().getParent().file("common/.tmp/ssl/CA.cert"));
+        } catch (Exception ignore) {
+            // ignore already existing CA
+        }
+        createConfig(Config.MQ_CERT.getName(),
+            getProject().getParent().file("common/.tmp/ssl/publicMQ.cert"));
+        createConfig(Config.MQ_KEY.getName(),
+            getProject().getParent().file("common/.tmp/ssl/publicMQ.key"));
     }
 
 }

@@ -19,8 +19,8 @@ services:
   mq:
     image: ${PRIVATE_BROKER_SERVICE}
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "5671:5671"
+      - "15671:15671"
     deploy:
       restart_policy:
         condition: on-failure
@@ -29,6 +29,13 @@ services:
     environment:
       - USER_NAME=admin
       - PASSWORD_HASH=4tHURqDiZzypw0NTvoHhpn8/MMgONWonWxgRZ4NXgR8nZRBz
+    configs:
+      - source: mq.cert
+        target: /etc/rabbitmq/ssl.cert
+      - source: mq.key
+        target: /etc/rabbitmq/ssl.key
+      - source: CA.cert
+        target: /etc/rabbitmq/CA.cert
 
   db:
     image: ${DB_SERVICE}
@@ -40,10 +47,32 @@ services:
         delay: 5s
         window: 120s
     environment:
-      - PGDATA=/ega/data
       - DB_LEGA_IN_PASSWORD
       - DB_LEGA_OUT_PASSWORD
-      - SSL_SUBJ=/C=NO/ST=Norway/L=Oslo/O=UiO/OU=IFI/CN=LocalEGA/emailAddress=ega@nbis.se
+      - PGDATA=/ega/data
+      - PG_SERVER_CERT=/etc/ega/pg.cert
+      - PG_SERVER_KEY=/etc/ega/pg.key
+      - PG_CA=/etc/ega/CA.cert
+      - PG_VERIFY_PEER=1
+    configs:
+      - source: db.cert
+        target: /etc/ega/pg.cert
+        uid: '70'
+        gid: '70'
+        mode: 0600
+      - source: db.key
+        target: /etc/ega/pg.key
+        uid: '70'
+        gid: '70'
+        mode: 0600
+      - source: CA.cert
+        target: /etc/ega/CA.cert
+        uid: '70'
+        gid: '70'
+        mode: 0600
+      - source: db.entrypoint.sh
+        target: /usr/local/bin/entrypoint.sh
+        mode: 0777
     volumes:
       - db:/ega/data
 
@@ -51,11 +80,6 @@ services:
     image: minio/minio:RELEASE.2019-02-12T21-58-47Z
     ports:
       - "9001:9000"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 1m
-      timeout: 10s
-      retries: 3
     deploy:
       restart_policy:
         condition: on-failure
@@ -64,6 +88,13 @@ services:
     environment:
       - MINIO_ACCESS_KEY=${INBOX_S3_ACCESS_KEY}
       - MINIO_SECRET_KEY=${INBOX_S3_SECRET_KEY}
+    configs:
+      - source: inboxS3.cert
+        target: /root/.minio/certs/public.crt
+      - source: inboxS3.key
+        target: /root/.minio/certs/private.key
+      - source: CA.cert
+        target: /root/.minio/CAs/LocalEGA.crt
     volumes:
       - inbox_s3:/data
     command: server /data
@@ -72,11 +103,6 @@ services:
     image: minio/minio:RELEASE.2019-02-12T21-58-47Z
     ports:
       - "9000:9000"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 1m
-      timeout: 10s
-      retries: 3
     deploy:
       restart_policy:
         condition: on-failure
@@ -85,6 +111,13 @@ services:
     environment:
       - MINIO_ACCESS_KEY=${VAULT_S3_ACCESS_KEY}
       - MINIO_SECRET_KEY=${VAULT_S3_SECRET_KEY}
+    configs:
+      - source: vaultS3.cert
+        target: /root/.minio/certs/public.crt
+      - source: vaultS3.key
+        target: /root/.minio/certs/private.key
+      - source: CA.cert
+        target: /root/.minio/CAs/LocalEGA.crt
     volumes:
       - vault_s3:/data
     command: server /data
@@ -97,21 +130,29 @@ services:
         delay: 5s
         window: 120s
     environment:
-      - LEGA_PASSWORD
-      - KEYS_PASSWORD
+      - SPRING_PROFILES_ACTIVE=no-oss
+      - EGA_KEY_PATH=/etc/ega/pgp/ega.sec,/etc/ega/pgp/ega2.sec
+      - EGA_KEYPASS_PATH=/etc/ega/pgp/ega.sec.pass,/etc/ega/pgp/ega2.sec.pass
+      - EGA_SHAREDPASS_PATH=/etc/ega/pgp/ega.shared.pass
+      - EGA_PUBLICKEY_URL=
+      - EGA_LEGACY_PATH=
     configs:
-      - source: conf.ini
-        target: /etc/ega/conf.ini
-      - source: keys.ini.enc
-        target: /etc/ega/keys.ini.enc
-      - source: ssl.cert
-        target: /etc/ega/ssl.cert
-      - source: ssl.key
-        target: /etc/ega/ssl.key
       - source: ega.sec
         target: /etc/ega/pgp/ega.sec
+      - source: ega.sec.pass
+        target: /etc/ega/pgp/ega.sec.pass
       - source: ega2.sec
         target: /etc/ega/pgp/ega2.sec
+      - source: ega2.sec.pass
+        target: /etc/ega/pgp/ega2.sec.pass
+      - source: ega.shared.pass
+        target: /etc/ega/pgp/ega.shared.pass
+      - source: keys.cert
+        target: /etc/ega/ssl.cert
+      - source: keys.key
+        target: /etc/ega/ssl.key
+      - source: CA.cert
+        target: /etc/ega/CA.cert
     user: lega
     entrypoint: ["ega-keyserver", "--keys", "/etc/ega/keys.ini.enc"]
 
@@ -134,6 +175,15 @@ services:
     configs:
       - source: conf.ini
         target: /etc/ega/conf.ini
+      - source: verify.cert
+        target: /etc/ega/ssl.cert
+      - source: verify.key
+        target: /etc/ega/ssl.key
+        uid: '1000'
+        gid: '1000'
+        mode: 0600
+      - source: CA.cert
+        target: /etc/ega/CA.cert
     user: lega
     entrypoint: ["ega-verify"]
 
@@ -150,6 +200,15 @@ services:
     configs:
       - source: conf.ini
         target: /etc/ega/conf.ini
+      - source: finalize.cert
+        target: /etc/ega/ssl.cert
+      - source: finalize.key
+        target: /etc/ega/ssl.key
+        uid: '1000'
+        gid: '1000'
+        mode: 0600
+      - source: CA.cert
+        target: /etc/ega/CA.cert
     user: lega
     entrypoint: ["ega-finalize"]
 
@@ -171,6 +230,15 @@ services:
     configs:
       - source: conf.ini
         target: /etc/ega/conf.ini
+      - source: ingest.cert
+        target: /etc/ega/ssl.cert
+      - source: ingest.key
+        target: /etc/ega/ssl.key
+        uid: '1000'
+        gid: '1000'
+        mode: 0600
+      - source: CA.cert
+        target: /etc/ega/CA.cert
     user: lega
     entrypoint: ["ega-ingest"]
 
@@ -184,13 +252,49 @@ configs:
     external: true
   keys.ini.enc:
     external: true
-  ssl.cert:
-    external: true
-  ssl.key:
-    external: true
   ega.sec:
+    external: true
+  ega.sec.pass:
     external: true
   ega2.sec:
     external: true
+  ega2.sec.pass:
+    external: true
   ega.shared.pass:
+    external: true
+  CA.cert:
+    external: true
+  mq.cert:
+    external: true
+  mq.key:
+    external: true
+  db.cert:
+    external: true
+  db.key:
+    external: true
+  db.entrypoint.sh:
+    external: true
+  inboxS3.cert:
+    external: true
+  inboxS3.key:
+    external: true
+  vaultS3.cert:
+    external: true
+  vaultS3.key:
+    external: true
+  keys.cert:
+    external: true
+  keys.key:
+    external: true
+  verify.cert:
+    external: true
+  verify.key:
+    external: true
+  finalize.cert:
+    external: true
+  finalize.key:
+    external: true
+  ingest.cert:
+    external: true
+  ingest.key:
     external: true

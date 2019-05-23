@@ -47,7 +47,7 @@ pipeline {
 
     PRIVATE_BROKER_SERVICE='uiobmi/localega-broker-private:latest'
     DB_SERVICE='egarchive/lega-db:latest'
-    KEYS_SERVICE='egarchive/lega-base:latest'
+    KEYS_SERVICE='cscfi/ega-keyserver'
     VERIFY_SERVICE='egarchive/lega-base:latest'
     RES_SERVICE='cscfi/ega-res:latest'
     FINALIZE_SERVICE='egarchive/lega-base:latest'
@@ -103,6 +103,10 @@ pipeline {
         stage('Bootstrap') {
           steps {
               sh '''
+                gradle :common:createConfiguration \
+                    -PlegaPrivateIP=$(docker-machine ip LEGA-private-${ID}) \
+                    --stacktrace
+
                 gradle :cega:createConfiguration \
                     -Pmachine=CEGA-${ID} \
                     --stacktrace
@@ -213,6 +217,10 @@ pipeline {
         stage('Bootstrap') {
           steps {
               sh '''
+                gradle :common:createConfiguration \
+                    -PlegaPrivateIP=$(docker-machine ip LEGA-private-${ID}) \
+                    --stacktrace
+
                 gradle :cega:createConfiguration \
                     -Pmachine=CEGA-${ID} \
                     --stacktrace
@@ -330,6 +338,10 @@ pipeline {
         stage('Bootstrap') {
           steps {
               sh '''
+                gradle :common:createConfiguration \
+                    -PlegaPrivateIP=$(docker-machine ip LEGA-private-${ID}) \
+                    --stacktrace
+
                 gradle :lega-private:createConfiguration \
                     -Pmachine=lega-private-staging \
                     --stacktrace

@@ -36,6 +36,23 @@ public class CreateInboxConfigurationTask extends LegaPublicTask {
             host = getMachineIPAddress(Machine.LEGA_PRIVATE.getName());
         }
         writeTrace(S3_ENDPOINT, host + ":9001");
+
+        try {
+            createConfig(Config.CA_CERT.getName(),
+                getProject().getParent().file("common/.tmp/ssl/CA.cert"));
+        } catch (Exception ignore) {
+            // ignore already existing CA
+        }
+        createConfig(Config.INBOX_CERT.getName(),
+            getProject().getParent().file("common/.tmp/ssl/inbox.cert"));
+        createConfig(Config.INBOX_KEY.getName(),
+            getProject().getParent().file("common/.tmp/ssl/inbox.key"));
+        createConfig(Config.INBOX_JKS.getName(),
+            getProject().getParent().file("common/.tmp/ssl/inbox.jks"));
+
+        String jksPassword =
+            readTrace(getProject().getParent().file(COMMON_TMP_TRACE), INBOX_JKS_PASSWORD);
+        writeTrace(INBOX_JKS_PASSWORD, jksPassword);
     }
 
 }
