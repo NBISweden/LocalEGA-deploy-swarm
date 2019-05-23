@@ -49,7 +49,7 @@ public class CreateConfIniConfigurationTask extends LegaPrivateTask {
                 + "enable_ssl = yes\n" + "verify_peer = yes\n" + "verify_hostname = no\n"
                 + "cacertfile = /etc/ega/CA.cert\n" + "certfile = /etc/ega/ssl.cert\n"
                 + "keyfile = /etc/ega/ssl.key\n" + "\n" + "[db]\n"
-                + "connection = postgres://lega_in:%s@db:5432/lega?application_name=LocalEGA&sslmode=verify-full&sslcert=/etc/ega/ssl.cert&sslkey=/etc/ega/ssl.key.lega&sslrootcert=/etc/ega/CA.cert\n"
+                + "connection = postgres://lega_in:%s@db:5432/lega?application_name=LocalEGA&sslmode=verify-full&sslcert=/etc/ega/ssl.cert&sslkey=/etc/ega/ssl.key&sslrootcert=/etc/ega/CA.cert\n"
                 + "try = 30\n" + "try_interval = 1\n", inboxS3AccessKey, inboxS3SecretKey,
             vaultS3AccessKey, vaultS3SecretKey, postgresPassword), Charset.defaultCharset());
     }
