@@ -44,10 +44,10 @@ public class GenerateCertificatesTask extends CommonTask {
         generateCertificate(root.left, root.right, "cegaMQ", null);
         generateCertificate(root.left, root.right, "cegaUsers", null);
         generateCertificate(root.left, root.right, "privateMQ", null);
-        generateCertificate(root.left, root.right, "db", null);
         generateCertificate(root.left, root.right, "ingest", null);
         generateCertificate(root.left, root.right, "verify", null);
         generateCertificate(root.left, root.right, "finalize", null);
+        generateCertificate(root.left, root.right, "db", privateHost);
         generateCertificate(root.left, root.right, "keys", privateHost);
         generateCertificate(root.left, root.right, "inboxS3", privateHost);
         generateCertificate(root.left, root.right, "vaultS3", privateHost);
