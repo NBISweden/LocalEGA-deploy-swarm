@@ -59,6 +59,7 @@ services:
       - BROKER_USERNAME=admin
       - INBOX_JKS_PATH=/etc/ega/inbox.jks
       - INBOX_JKS_PASSWORD
+      - LOGGING_LEVEL_ROOT=OFF
     configs:
       - source: CA.cert
         target: /usr/local/share/ca-certificates/CA.cert
