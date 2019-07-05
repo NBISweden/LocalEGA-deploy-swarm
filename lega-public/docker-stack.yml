@@ -60,6 +60,7 @@ services:
       - INBOX_JKS_PATH=/etc/ega/inbox.jks
       - INBOX_JKS_PASSWORD
       - LOGGING_LEVEL_ROOT=OFF
+      - LOGGING_LEVEL_SE_NBIS_LEGA_INBOX=INFO
     configs:
       - source: CA.cert
         target: /usr/local/share/ca-certificates/CA.cert
