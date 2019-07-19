@@ -73,7 +73,7 @@ public class GenerateCertificatesTask extends CommonTask {
         File file = getProject().file(".tmp/ssl/inbox.jks");
         try (FileOutputStream fos = new FileOutputStream(file)) {
             keyStore.store(fos, keyStorePassword.toCharArray());
-            writeTrace(INBOX_JKS_PASSWORD, keyStorePassword);
+            writeTrace(KEYSTORE_PASSWORD, keyStorePassword);
         }
     }
 

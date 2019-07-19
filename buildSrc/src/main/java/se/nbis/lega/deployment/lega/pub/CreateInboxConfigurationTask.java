@@ -51,8 +51,8 @@ public class CreateInboxConfigurationTask extends LegaPublicTask {
             getProject().getParent().file("common/.tmp/ssl/inbox.jks"));
 
         String jksPassword =
-            readTrace(getProject().getParent().file(COMMON_TMP_TRACE), INBOX_JKS_PASSWORD);
-        writeTrace(INBOX_JKS_PASSWORD, jksPassword);
+            readTrace(getProject().getParent().file(COMMON_TMP_TRACE), KEYSTORE_PASSWORD);
+        writeTrace(KEYSTORE_PASSWORD, jksPassword);
     }
 
 }
