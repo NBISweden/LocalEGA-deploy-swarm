@@ -58,7 +58,7 @@ services:
       - S3_ENDPOINT
       - BROKER_USERNAME=admin
       - INBOX_JKS_PATH=/etc/ega/inbox.jks
-      - INBOX_JKS_PASSWORD
+      - KEYSTORE_PASSWORD
     configs:
       - source: CA.cert
         target: /usr/local/share/ca-certificates/CA.cert
