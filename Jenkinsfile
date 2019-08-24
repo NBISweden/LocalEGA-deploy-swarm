@@ -5,7 +5,6 @@ pipeline {
   options { disableConcurrentBuilds() }
 
   triggers {
-    cron(env.BRANCH_NAME == 'master' ? '0 0 * * *' : '')
     GenericTrigger(
      genericVariables: [
       [key: 'service', value: '$.service'],
